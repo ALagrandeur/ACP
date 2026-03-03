@@ -1,0 +1,4372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC Crew Pairings - Mars 2026</title>
+    <style>
+        :root {
+            --ac-red: #D72B1F;
+            --ac-dark: #1a1a2e;
+            --ac-darker: #12121f;
+            --ac-card: #1e1e32;
+            --ac-border: #2a2a45;
+            --ac-text: #e0e0e8;
+            --ac-muted: #8888a0;
+            --ac-accent: #ff4444;
+            --ac-green: #2ecc71;
+            --ac-blue: #3498db;
+            --ac-gold: #f1c40f;
+            --radius: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--ac-darker);
+            color: var(--ac-text);
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--ac-dark) 0%, #1a1a35 100%);
+            border-bottom: 3px solid var(--ac-red);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--ac-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text span {
+            color: var(--ac-red);
+        }
+
+        .month-badge {
+            background: var(--ac-red);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--ac-muted);
+        }
+
+        .stats strong {
+            color: var(--ac-text);
+        }
+
+        /* SEARCH BAR */
+        .search-section {
+            padding: 16px 24px;
+            background: var(--ac-dark);
+            border-bottom: 1px solid var(--ac-border);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            max-width: 600px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: var(--ac-card);
+            border: 2px solid var(--ac-border);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            color: var(--ac-text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--ac-red);
+        }
+
+        .search-input::placeholder {
+            color: var(--ac-muted);
+        }
+
+        /* LAYOUT */
+        .main-layout {
+            display: flex;
+            min-height: calc(100vh - 130px);
+        }
+
+        /* SIDEBAR FILTERS */
+        .sidebar {
+            width: 300px;
+            min-width: 300px;
+            background: var(--ac-dark);
+            border-right: 1px solid var(--ac-border);
+            padding: 16px;
+            overflow-y: auto;
+            max-height: calc(100vh - 130px);
+            position: sticky;
+            top: 130px;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--ac-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .filter-chip {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--ac-muted);
+            user-select: none;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--ac-red);
+            color: var(--ac-text);
+        }
+
+        .filter-chip.active {
+            background: var(--ac-red);
+            border-color: var(--ac-red);
+            color: white;
+        }
+
+        .range-slider-container {
+            padding: 4px 0;
+        }
+
+        .range-slider-container label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--ac-muted);
+        }
+
+        .range-slider-container label span {
+            color: var(--ac-text);
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--ac-border);
+            border-radius: 3px;
+            outline: none;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--ac-red);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .range-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .range-row input[type="range"] {
+            flex: 1;
+        }
+
+        .filter-select {
+            width: 100%;
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: var(--ac-text);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--ac-red);
+        }
+
+        .filter-select option {
+            background: var(--ac-card);
+        }
+
+        .btn-reset {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            padding: 10px;
+            color: var(--ac-muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-reset:hover {
+            border-color: var(--ac-red);
+            color: var(--ac-red);
+        }
+
+        /* SORT BAR */
+        .sort-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            background: var(--ac-dark);
+            border-bottom: 1px solid var(--ac-border);
+            flex-wrap: wrap;
+        }
+
+        .sort-bar label {
+            font-size: 12px;
+            color: var(--ac-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .sort-btn {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--ac-muted);
+            transition: all 0.15s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--ac-red);
+            color: var(--ac-text);
+        }
+
+        .sort-btn.active {
+            background: var(--ac-red);
+            border-color: var(--ac-red);
+            color: white;
+        }
+
+        /* RESULTS */
+        .results-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .results-grid {
+            padding: 16px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* PAIRING CARD */
+        .pairing-card {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .pairing-card:hover {
+            border-color: var(--ac-red);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(215, 43, 31, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 16px;
+        }
+
+        .pairing-id {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--ac-red);
+            min-width: 70px;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .card-route {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+
+        .city-code {
+            background: rgba(255, 68, 68, 0.1);
+            color: var(--ac-accent);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'Consolas', monospace;
+        }
+
+        .city-code.base {
+            background: rgba(52, 152, 219, 0.15);
+            color: var(--ac-blue);
+        }
+
+        .route-arrow {
+            color: var(--ac-muted);
+            font-size: 11px;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-days {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--ac-green);
+        }
+
+        .badge-block {
+            background: rgba(52, 152, 219, 0.15);
+            color: var(--ac-blue);
+        }
+
+        .badge-tafb {
+            background: rgba(155, 89, 182, 0.15);
+            color: #9b59b6;
+        }
+
+        .badge-allowance {
+            background: rgba(241, 196, 15, 0.15);
+            color: var(--ac-gold);
+        }
+
+        .badge-equip {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--ac-muted);
+        }
+
+        .badge-dh {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+
+        .card-dates {
+            font-size: 12px;
+            color: var(--ac-muted);
+            min-width: 130px;
+            text-align: right;
+        }
+
+        /* EXPANDED CARD DETAILS */
+        .card-details {
+            display: none;
+            border-top: 1px solid var(--ac-border);
+            padding: 16px;
+            background: rgba(0,0,0,0.15);
+        }
+
+        .pairing-card.expanded .card-details {
+            display: block;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .detail-section {
+            margin-bottom: 12px;
+        }
+
+        .detail-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--ac-muted);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .legs-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .legs-table th {
+            text-align: left;
+            padding: 6px 8px;
+            font-size: 11px;
+            color: var(--ac-muted);
+            border-bottom: 1px solid var(--ac-border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .legs-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .legs-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .legs-table .dh-row {
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        .leg-city {
+            font-weight: 700;
+            color: var(--ac-accent);
+            font-family: 'Consolas', monospace;
+        }
+
+        .leg-time {
+            color: var(--ac-text);
+            font-family: 'Consolas', monospace;
+        }
+
+        .leg-layover {
+            color: var(--ac-green);
+        }
+
+        .hotel-info {
+            background: rgba(52, 152, 219, 0.08);
+            border-left: 3px solid var(--ac-blue);
+            padding: 8px 12px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .hotel-info strong {
+            color: var(--ac-blue);
+        }
+
+        .crew-info, .lang-info {
+            font-size: 13px;
+            color: var(--ac-text);
+            font-family: 'Consolas', monospace;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .summary-item {
+            background: var(--ac-dark);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .summary-item .value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--ac-text);
+        }
+
+        .summary-item .label {
+            font-size: 11px;
+            color: var(--ac-muted);
+            margin-top: 2px;
+        }
+
+        .operating-dates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .date-chip {
+            background: var(--ac-dark);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ac-text);
+            font-family: 'Consolas', monospace;
+        }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+        }
+
+        .page-btn {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            padding: 8px 14px;
+            color: var(--ac-muted);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+
+        .page-btn:hover {
+            border-color: var(--ac-red);
+            color: var(--ac-text);
+        }
+
+        .page-btn.active {
+            background: var(--ac-red);
+            border-color: var(--ac-red);
+            color: white;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: var(--ac-muted);
+            font-size: 13px;
+        }
+
+        /* NO RESULTS */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ac-muted);
+        }
+
+        .no-results h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--ac-text);
+        }
+
+        /* MOBILE SIDEBAR TOGGLE */
+        .sidebar-toggle {
+            display: none;
+            background: var(--ac-red);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* DAY FILTER CHIPS */
+        .day-chips {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .day-chip {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Destination search within filter */
+        .dest-search {
+            width: 100%;
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: var(--ac-text);
+            font-size: 12px;
+            outline: none;
+            margin-bottom: 6px;
+        }
+
+        .dest-search:focus {
+            border-color: var(--ac-red);
+        }
+
+        .dest-list {
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .dest-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .dest-list::-webkit-scrollbar-thumb {
+            background: var(--ac-border);
+            border-radius: 2px;
+        }
+
+        /* TABS */
+        .tab-bar {
+            display: flex;
+            background: var(--ac-dark);
+            border-bottom: 1px solid var(--ac-border);
+            padding: 0 24px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--ac-muted);
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: var(--ac-text); }
+
+        .tab-btn.active {
+            color: var(--ac-red);
+            border-bottom-color: var(--ac-red);
+        }
+
+        .tab-badge {
+            background: var(--ac-red);
+            color: white;
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-size: 11px;
+            margin-left: 6px;
+            font-weight: 700;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-content.active#tabBid { display: flex; }
+
+        /* SENIORITY BANNER */
+        .seniority-banner {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .seniority-rank-block {
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .seniority-rank-block .rank-big {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--ac-red);
+            line-height: 1;
+        }
+        .seniority-rank-block .rank-total {
+            font-size: 14px;
+            color: var(--ac-muted);
+            margin-top: 2px;
+        }
+        .seniority-bar-wrapper {
+            flex: 1;
+            min-width: 200px;
+        }
+        .seniority-bar-label {
+            font-size: 12px;
+            color: var(--ac-muted);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .seniority-bar {
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(90deg, #2ecc71 0%, #f1c40f 50%, #e74c3c 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: visible;
+        }
+        .seniority-bar-marker {
+            position: absolute;
+            top: -4px;
+            width: 4px;
+            height: 28px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 0 6px rgba(0,0,0,0.5);
+        }
+        .seniority-bar-marker::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: white;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .seniority-info {
+            flex: 1;
+            font-size: 13px;
+            color: var(--ac-muted);
+            line-height: 1.7;
+        }
+        .seniority-info strong { color: var(--ac-text); }
+        .seniority-info .highlight { color: var(--ac-red); font-weight: 700; }
+
+        /* STRATEGY TAB */
+        .strategy-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .strategy-header {
+            margin-bottom: 24px;
+        }
+        .strategy-header h2 {
+            font-size: 22px;
+            color: var(--ac-text);
+            margin-bottom: 4px;
+        }
+        .strategy-header p {
+            color: var(--ac-muted);
+            font-size: 13px;
+        }
+        .strat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .strat-card {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+        }
+        .strat-card .label { font-size: 11px; color: var(--ac-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .strat-card .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+        .strat-card .value.red { color: var(--ac-red); }
+        .strat-card .value.green { color: var(--ac-green); }
+        .strat-card .value.blue { color: var(--ac-blue); }
+        .strat-card .value.gold { color: var(--ac-gold); }
+
+        .strat-section {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .strat-section-title {
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--ac-border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .strat-section-body { padding: 0; }
+
+        .strat-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .strat-table th {
+            background: rgba(255,255,255,0.03);
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--ac-muted);
+            border-bottom: 1px solid var(--ac-border);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .strat-table th:hover { color: var(--ac-text); }
+        .strat-table th.sorted { color: var(--ac-red); }
+        .strat-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            white-space: nowrap;
+        }
+        .strat-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .prob-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .prob-high { background: rgba(46,204,113,0.15); color: #2ecc71; }
+        .prob-medium { background: rgba(241,196,15,0.15); color: #f1c40f; }
+        .prob-low { background: rgba(231,76,60,0.15); color: #e74c3c; }
+
+        .score-bar {
+            width: 80px;
+            height: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .strat-methodology {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--ac-muted);
+            line-height: 1.7;
+        }
+        .strat-methodology h3 {
+            color: var(--ac-text);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .strat-methodology code {
+            background: rgba(255,255,255,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--ac-gold);
+            font-size: 12px;
+        }
+        .strat-methodology ul {
+            margin: 8px 0 8px 20px;
+        }
+
+        .strat-reco {
+            background: rgba(215,43,31,0.06);
+            border: 1px solid rgba(215,43,31,0.2);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .strat-reco h3 {
+            color: var(--ac-red);
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        .strat-reco ol {
+            margin: 0 0 0 20px;
+            font-size: 13px;
+            line-height: 2;
+        }
+        .strat-reco .reco-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .strat-reco .reco-rank {
+            width: 28px;
+            height: 28px;
+            background: var(--ac-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .strat-reco .reco-text { flex: 1; font-size: 13px; }
+        .strat-reco .reco-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .tag-secure { background: rgba(46,204,113,0.15); color: #2ecc71; }
+        .tag-value { background: rgba(241,196,15,0.15); color: #f1c40f; }
+        .tag-reach { background: rgba(231,76,60,0.15); color: #e74c3c; }
+
+        .strat-export-btn {
+            background: var(--ac-red);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .strat-export-btn:hover { opacity: 0.9; }
+
+        /* CONFIG PANEL */
+        .strat-config {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .strat-config h3 {
+            font-size: 15px;
+            color: var(--ac-text);
+            margin-bottom: 16px;
+        }
+        .config-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .config-group label {
+            font-size: 11px;
+            color: var(--ac-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .config-group input,
+        .config-group select {
+            background: var(--ac-darker);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            color: var(--ac-text);
+            padding: 8px 12px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        .config-group input:focus,
+        .config-group select:focus {
+            outline: none;
+            border-color: var(--ac-red);
+        }
+        .config-group select option {
+            background: var(--ac-darker);
+            color: var(--ac-text);
+        }
+        .config-btn-recalc {
+            background: var(--ac-red);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            height: 38px;
+        }
+        .config-btn-recalc:hover { opacity: 0.9; }
+
+        /* BLOCK CONFIG */
+        .block-config-container {
+            margin-top: 16px;
+            border-top: 1px solid var(--ac-border);
+            padding-top: 16px;
+        }
+        .block-config-container h4 {
+            font-size: 13px;
+            color: var(--ac-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .block-config-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .block-config-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        .block-config-item .block-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ac-text);
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+        .block-config-item .block-label small {
+            font-weight: 400;
+            color: var(--ac-muted);
+            font-size: 11px;
+            display: block;
+        }
+        .block-config-item select {
+            background: var(--ac-darker);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            color: var(--ac-text);
+            padding: 6px 10px;
+            font-size: 13px;
+            flex: 1;
+            min-width: 0;
+        }
+        .block-config-item select option {
+            background: var(--ac-darker);
+            color: var(--ac-text);
+        }
+
+        /* BID BLOCK SECTIONS */
+        .bid-block-section {
+            margin-bottom: 20px;
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .bid-block-header {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--ac-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .bid-block-header h4 {
+            font-size: 14px;
+            color: var(--ac-text);
+        }
+        .bid-block-priorities {
+            display: flex;
+            gap: 8px;
+        }
+        .bid-block-priorities .priority-tag {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            background: rgba(52,152,219,0.15);
+            color: #3498db;
+        }
+        .bid-block-body {
+            padding: 16px 20px;
+        }
+
+        /* COLLAPSIBLE SECTION */
+        .collapsible-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+        .collapsible-header .arrow {
+            transition: transform 0.2s;
+            font-size: 12px;
+            color: var(--ac-muted);
+        }
+        .collapsible-header .arrow.open {
+            transform: rotate(90deg);
+        }
+        .collapsible-body {
+            display: none;
+        }
+        .collapsible-body.open {
+            display: block;
+        }
+
+        /* UPLOAD SECTION */
+        .upload-section {
+            margin-top: 16px;
+            border-top: 1px solid var(--ac-border);
+            padding-top: 16px;
+        }
+        .upload-section h4 {
+            font-size: 13px;
+            color: var(--ac-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .upload-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .upload-btn {
+            background: var(--ac-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .upload-btn:hover { opacity: 0.9; }
+        .upload-status {
+            font-size: 12px;
+            color: var(--ac-muted);
+        }
+        .history-list { margin-top: 8px; }
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .history-item.denial { background: rgba(231,76,60,0.1); }
+        .history-item.success { background: rgba(46,204,113,0.1); }
+        .history-month { font-weight: 600; color: var(--ac-text); min-width: 120px; }
+        .history-status {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .history-item.denial .history-status { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        .history-item.success .history-status { background: rgba(46,204,113,0.2); color: #2ecc71; }
+        .history-detail { color: var(--ac-muted); flex: 1; }
+        .history-remove {
+            background: none;
+            border: none;
+            color: var(--ac-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+        }
+        .history-remove:hover { color: #e74c3c; }
+
+        /* ALGO SUMMARY */
+        .algo-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            background: rgba(52, 152, 219, 0.08);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            border-radius: 8px;
+        }
+        .algo-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+        .algo-label {
+            font-size: 10px;
+            color: var(--ac-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .algo-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ac-blue);
+        }
+
+        /* MATCH COUNT BADGE */
+        .match-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .match-badge.good { background: rgba(46,204,113,0.15); color: #2ecc71; }
+        .match-badge.medium { background: rgba(241,196,15,0.15); color: #f1c40f; }
+        .match-badge.low { background: rgba(231,76,60,0.15); color: #e74c3c; }
+
+        /* DENIAL RISK */
+        .denial-risk-meter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .denial-risk-meter.low { background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.2); color: #2ecc71; }
+        .denial-risk-meter.medium { background: rgba(241,196,15,0.08); border: 1px solid rgba(241,196,15,0.2); color: #f1c40f; }
+        .denial-risk-meter.high { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.2); color: #e74c3c; }
+
+        /* PROPOSED BID */
+        .bid-proposed {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .bid-proposed .bid-group-header {
+            color: var(--ac-green);
+            font-weight: 700;
+            font-size: 14px;
+            margin-top: 16px;
+            margin-bottom: 4px;
+        }
+        .bid-proposed .bid-group-header:first-child { margin-top: 0; }
+        .bid-proposed .bid-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        .bid-proposed .bid-line:hover { background: rgba(255,255,255,0.04); }
+        .bid-proposed .bid-num {
+            color: var(--ac-muted);
+            min-width: 30px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .bid-proposed .bid-cmd {
+            flex: 1;
+        }
+        .bid-proposed .bid-cmd .kw { color: var(--ac-red); font-weight: 600; }
+        .bid-proposed .bid-cmd .val { color: var(--ac-gold); }
+        .bid-proposed .bid-cmd .dest { color: var(--ac-blue); }
+        .bid-proposed .bid-cmd .cond { color: #9b59b6; }
+        .bid-proposed .bid-tag {
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .bid-proposed .bid-comment {
+            color: var(--ac-muted);
+            font-size: 11px;
+            font-style: italic;
+            padding-left: 42px;
+            margin-bottom: 4px;
+        }
+        .bid-proposed .bid-separator {
+            border-top: 1px dashed var(--ac-border);
+            margin: 10px 0;
+        }
+
+        /* BID PANEL */
+        .bid-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .bid-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            background: var(--ac-dark);
+            border-bottom: 1px solid var(--ac-border);
+            flex-wrap: wrap;
+        }
+
+        .bid-toolbar .btn {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: 6px;
+            padding: 8px 16px;
+            color: var(--ac-text);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .bid-toolbar .btn:hover {
+            border-color: var(--ac-red);
+        }
+
+        .bid-toolbar .btn-primary {
+            background: var(--ac-red);
+            border-color: var(--ac-red);
+            color: white;
+        }
+
+        .bid-toolbar .btn-primary:hover {
+            background: #b8221a;
+        }
+
+        .bid-sheet-area {
+            padding: 24px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .bid-sheet-block {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .bid-block-header {
+            background: rgba(215, 43, 31, 0.1);
+            border-bottom: 1px solid var(--ac-border);
+            padding: 10px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--ac-red);
+            font-family: 'Consolas', monospace;
+        }
+
+        .bid-line-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            gap: 10px;
+            transition: background 0.1s;
+        }
+
+        .bid-line-item:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .bid-line-item:last-child { border-bottom: none; }
+
+        .bid-line-num {
+            color: var(--ac-muted);
+            font-size: 12px;
+            min-width: 24px;
+            text-align: right;
+            font-family: 'Consolas', monospace;
+        }
+
+        .bid-line-text {
+            flex: 1;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            color: var(--ac-text);
+        }
+
+        .bid-line-text .kw {
+            color: var(--ac-red);
+            font-weight: 700;
+        }
+
+        .bid-line-text .val {
+            color: var(--ac-gold);
+        }
+
+        .bid-line-text .cond {
+            color: var(--ac-blue);
+        }
+
+        .bid-line-info {
+            font-size: 11px;
+            color: var(--ac-muted);
+            min-width: 160px;
+        }
+
+        .bid-line-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .bid-line-actions button {
+            background: none;
+            border: 1px solid var(--ac-border);
+            border-radius: 4px;
+            color: var(--ac-muted);
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.15s;
+        }
+
+        .bid-line-actions button:hover {
+            border-color: var(--ac-red);
+            color: var(--ac-red);
+        }
+
+        .bid-embedded {
+            color: var(--ac-muted);
+            font-style: italic;
+            font-size: 12px;
+            padding: 8px 16px;
+            font-family: 'Consolas', monospace;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .bid-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ac-muted);
+        }
+
+        .bid-empty h3 {
+            color: var(--ac-text);
+            margin-bottom: 8px;
+        }
+
+        .bid-empty p {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        /* Add to bid button on pairing cards */
+        .btn-add-bid {
+            background: none;
+            border: 2px solid var(--ac-green);
+            color: var(--ac-green);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-add-bid:hover {
+            background: var(--ac-green);
+            color: white;
+        }
+
+        .btn-add-bid.added {
+            background: rgba(46, 204, 113, 0.15);
+            border-color: var(--ac-green);
+            color: var(--ac-green);
+            cursor: default;
+        }
+
+        /* Copy feedback */
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--ac-green);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            transition: transform 0.3s;
+            z-index: 999;
+        }
+
+        .copy-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                top: 0;
+                height: 100vh;
+                z-index: 200;
+                transition: left 0.3s;
+                padding-top: 60px;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 150;
+            }
+
+            .sidebar.open ~ .sidebar-overlay {
+                display: block;
+            }
+
+            .header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .stats {
+                display: none;
+            }
+
+            .card-header {
+                flex-wrap: wrap;
+            }
+
+            .card-dates {
+                text-align: left;
+                width: 100%;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">AC</div>
+                <div class="logo-text">Crew <span>Pairings</span></div>
+            </div>
+            <div class="month-badge" id="monthBadge">Mars 2026</div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">Filtres</button>
+        </div>
+        <div class="header-right">
+            <div class="stats">
+                <span><strong id="resultCount">0</strong> pairings</span>
+                <span><strong id="totalCount">0</strong> total</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search-section">
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput"
+                   placeholder="Rechercher un pairing (ex: M5007) ou une destination (ex: NRT)..."
+                   autocomplete="off">
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('pairings')">Pairings</button>
+        <button class="tab-btn" onclick="switchTab('bid')">Bid Sheet <span class="tab-badge" id="bidCount" style="display:none">0</span></button>
+        <button class="tab-btn" onclick="switchTab('strategy')">Strategie Bid</button>
+    </div>
+
+    <!-- TAB: PAIRINGS -->
+    <div class="tab-content active" id="tabPairings">
+    <div class="main-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Destinations -->
+            <div class="filter-section">
+                <div class="filter-title">Destinations</div>
+                <input type="text" class="dest-search" id="destSearch" placeholder="Filtrer les destinations...">
+                <div class="dest-list" id="destFilters"></div>
+            </div>
+
+            <!-- Nombre de jours -->
+            <div class="filter-section">
+                <div class="filter-title">Nombre de jours</div>
+                <div class="filter-group" id="daysFilter"></div>
+            </div>
+
+            <!-- Dates d'operation -->
+            <div class="filter-section">
+                <div class="filter-title">Dates d'operation</div>
+                <div class="day-chips" id="dateFilter"></div>
+            </div>
+
+            <!-- Block Time -->
+            <div class="filter-section">
+                <div class="filter-title">Temps de vol (Block)</div>
+                <div class="range-slider-container">
+                    <label>Min: <span id="blockMinVal">0h</span></label>
+                    <input type="range" id="blockMin" min="0" max="40" value="0" step="1">
+                </div>
+                <div class="range-slider-container">
+                    <label>Max: <span id="blockMaxVal">40h</span></label>
+                    <input type="range" id="blockMax" min="0" max="40" value="40" step="1">
+                </div>
+            </div>
+
+            <!-- TAFB -->
+            <div class="filter-section">
+                <div class="filter-title">TAFB</div>
+                <div class="range-slider-container">
+                    <label>Min: <span id="tafbMinVal">0h</span></label>
+                    <input type="range" id="tafbMin" min="0" max="120" value="0" step="1">
+                </div>
+                <div class="range-slider-container">
+                    <label>Max: <span id="tafbMaxVal">120h</span></label>
+                    <input type="range" id="tafbMax" min="0" max="120" value="120" step="1">
+                </div>
+            </div>
+
+            <!-- Allocation -->
+            <div class="filter-section">
+                <div class="filter-title">Allocation ($)</div>
+                <div class="range-slider-container">
+                    <label>Min: <span id="allowMinVal">$0</span></label>
+                    <input type="range" id="allowMin" min="0" max="800" value="0" step="10">
+                </div>
+                <div class="range-slider-container">
+                    <label>Max: <span id="allowMaxVal">$800</span></label>
+                    <input type="range" id="allowMax" min="0" max="800" value="800" step="10">
+                </div>
+            </div>
+
+            <!-- Equipment -->
+            <div class="filter-section">
+                <div class="filter-title">Equipement</div>
+                <div class="filter-group" id="equipFilter"></div>
+            </div>
+
+            <!-- Langues -->
+            <div class="filter-section">
+                <div class="filter-title">Langues requises</div>
+                <div class="filter-group" id="langFilter"></div>
+            </div>
+
+            <!-- Crew Position -->
+            <div class="filter-section">
+                <div class="filter-title">Position</div>
+                <div class="filter-group" id="crewFilter"></div>
+            </div>
+
+            <button class="btn-reset" onclick="resetFilters()">Reinitialiser les filtres</button>
+        </aside>
+
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- RESULTS -->
+        <main class="results-area">
+            <!-- SORT BAR -->
+            <div class="sort-bar">
+                <label>Trier par:</label>
+                <button class="sort-btn active" data-sort="id" onclick="setSort('id')">Pairing ID</button>
+                <button class="sort-btn" data-sort="blockMinutes" onclick="setSort('blockMinutes')">Block Time</button>
+                <button class="sort-btn" data-sort="tafbMinutes" onclick="setSort('tafbMinutes')">TAFB</button>
+                <button class="sort-btn" data-sort="allowance" onclick="setSort('allowance')">Allocation</button>
+                <button class="sort-btn" data-sort="numDays" onclick="setSort('numDays')">Nb Jours</button>
+                <button class="sort-btn" data-sort="destinations" onclick="setSort('destinations')">Destination</button>
+                <button class="sort-btn" id="sortDirBtn" onclick="toggleSortDir()" title="Ordre de tri">&#9650;</button>
+            </div>
+
+            <div class="results-grid" id="resultsGrid"></div>
+            <div class="pagination" id="pagination"></div>
+        </main>
+    </div>
+
+    </div><!-- /tabPairings -->
+
+    <!-- TAB: BID SHEET -->
+    <div class="tab-content" id="tabBid">
+        <div style="display:flex;flex:1;overflow:hidden;">
+            <!-- BID CONFIG SIDEBAR -->
+            <aside class="sidebar" id="bidSidebar" style="position:static;max-height:calc(100vh - 180px);">
+                <div class="filter-section">
+                    <div class="filter-title">Jours de conge (cliquer en ordre de priorite)</div>
+                    <div class="day-chips" id="bidDaysOff" style="gap:3px"></div>
+                    <button class="btn-reset" onclick="clearDaysOff()" style="margin-top:6px;padding:6px;font-size:11px">Effacer les conges</button>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Per Diem minimum ($)</div>
+                    <div class="range-slider-container">
+                        <label>Allocation min: <span id="bidPerDiemVal">$0</span></label>
+                        <input type="range" id="bidPerDiem" min="0" max="600" value="0" step="10" oninput="updateBidConfig()">
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Duree du pairing (jours)</div>
+                    <div style="display:flex;gap:8px;">
+                        <div style="flex:1">
+                            <label style="font-size:11px;color:var(--ac-muted)">Min: <span id="bidDaysMinVal">1</span>J</label>
+                            <input type="range" id="bidDaysMin" min="1" max="7" value="1" step="1" oninput="updateBidConfig()">
+                        </div>
+                        <div style="flex:1">
+                            <label style="font-size:11px;color:var(--ac-muted)">Max: <span id="bidDaysMaxVal">7</span>J</label>
+                            <input type="range" id="bidDaysMax" min="1" max="7" value="7" step="1" oninput="updateBidConfig()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Max vols (legs) par duty</div>
+                    <select class="filter-select" id="bidMaxLegs" onchange="updateBidConfig()">
+                        <option value="0">Pas de limite</option>
+                        <option value="1">1 leg max</option>
+                        <option value="2">2 legs max</option>
+                        <option value="3">3 legs max</option>
+                        <option value="4" selected>4 legs max</option>
+                        <option value="5">5 legs max</option>
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">TAFB minimum (heures)</div>
+                    <div class="range-slider-container">
+                        <label>Min: <span id="bidTafbMinVal">0h</span></label>
+                        <input type="range" id="bidTafbMin" min="0" max="80" value="0" step="1" oninput="updateBidConfig()">
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Eviter check-in avant</div>
+                    <select class="filter-select" id="bidNoEarlyCheckin" onchange="updateBidConfig()">
+                        <option value="" selected>Pas de restriction</option>
+                        <option value="04:30">04h30</option>
+                        <option value="05:00">05h00</option>
+                        <option value="05:30">05h30</option>
+                        <option value="06:00">06h00</option>
+                        <option value="07:00">07h00</option>
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Suggestions auto</div>
+                    <button class="btn-reset" onclick="autoSuggestFromSelection()" style="background:rgba(215,43,31,0.1);border-color:var(--ac-red);color:var(--ac-red);padding:10px;">
+                        Generer depuis pairings selectionnes
+                    </button>
+                    <p style="font-size:11px;color:var(--ac-muted);margin-top:6px">Analyse les pairings marques <strong style="color:var(--ac-green)">+ Bid</strong> et optimise les criteres.</p>
+                </div>
+            </aside>
+
+            <!-- BID SHEET OUTPUT -->
+            <main class="results-area" style="flex:1">
+                <div class="bid-toolbar">
+                    <button class="btn btn-primary" onclick="copyBidSheet()">Copier le Bid Sheet</button>
+                    <button class="btn" onclick="showMatchingPairings()" id="btnShowMatch">Voir les pairings disponibles</button>
+                    <button class="btn" onclick="clearAllBidConfig()" style="color:var(--ac-muted)">Effacer tout</button>
+                    <span style="flex:1"></span>
+                    <span style="color:var(--ac-muted);font-size:12px" id="bidBlockInfo"></span>
+                </div>
+                <div class="bid-sheet-area" id="bidSheetArea"></div>
+                <div id="matchingPairingsPanel" style="display:none;border-top:2px solid var(--ac-red);padding:16px 24px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                        <h3 style="font-size:15px;color:var(--ac-red);font-weight:700" id="matchingTitle">Pairings disponibles</h3>
+                        <button onclick="document.getElementById('matchingPairingsPanel').style.display='none'" style="background:none;border:1px solid var(--ac-border);border-radius:6px;color:var(--ac-muted);cursor:pointer;padding:4px 12px;font-size:12px">Fermer</button>
+                    </div>
+                    <div id="matchingPairingsGrid" class="results-grid" style="padding:0"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- TAB: STRATEGIE BID -->
+    <div class="tab-content" id="tabStrategy">
+        <div class="strategy-container">
+            <div class="strategy-header">
+                <h2>Analyse Strategique du Bid</h2>
+                <p>YUL-ALL-FA | Analyse basee sur les donnees historiques et le pool de pairings actuel</p>
+            </div>
+
+            <!-- 1. Configuration Panel -->
+            <div class="strat-config" id="stratConfig">
+                <h3>Configuration du Profil et de la Strategie</h3>
+                <div class="config-row">
+                    <div class="config-group">
+                        <label>Rang d'anciennete</label>
+                        <input type="number" id="cfgSeniorityRank" value="1502" min="1" max="10000">
+                    </div>
+                    <div class="config-group">
+                        <label>Total Flight Attendants</label>
+                        <input type="number" id="cfgSeniorityTotal" value="1673" min="1" max="10000">
+                    </div>
+                    <div class="config-group">
+                        <label>Nombre de blocs</label>
+                        <select id="cfgBlockCount" onchange="onBlockCountChange()">
+                            <option value="2" selected>2 blocs</option>
+                            <option value="3">3 blocs</option>
+                            <option value="4">4 blocs</option>
+                            <option value="5">5 blocs</option>
+                            <option value="6">6 blocs</option>
+                        </select>
+                    </div>
+                    <button class="config-btn-recalc" onclick="recalculateStrategy()">Recalculer</button>
+                </div>
+                <div class="block-config-container" id="blockConfigContainer">
+                    <h4>Priorites par bloc</h4>
+                    <div class="block-config-grid" id="blockConfigGrid">
+                        <!-- Generated dynamically -->
+                    </div>
+                </div>
+                <div class="upload-section">
+                    <h4>Historique des resultats PBS</h4>
+                    <div class="upload-row">
+                        <input type="file" id="resultPdfInput" accept=".pdf" multiple style="display:none;" onchange="handleResultUpload(event)">
+                        <button class="upload-btn" onclick="document.getElementById('resultPdfInput').click()">Importer resultats PDF</button>
+                        <span class="upload-status" id="uploadStatus">Importez vos PDFs de resultats PBS pour ameliorer l'algorithme</span>
+                    </div>
+                    <div class="history-list" id="uploadedHistory">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Seniority Banner -->
+            <div class="seniority-banner" id="seniorityBanner"></div>
+
+            <!-- 3. Summary Cards -->
+            <div class="strat-cards" id="stratSummaryCards"></div>
+
+            <!-- 4. Bid Blocks PBS generes -->
+            <div class="strat-section" id="stratProposedBidSection">
+                <div class="strat-section-title">Blocs de Bid pour PBS</div>
+                <div class="strat-section-body" style="padding:20px;">
+                    <div id="stratProposedBid"></div>
+                    <div style="margin-top:16px;display:flex;gap:10px;">
+                        <button class="strat-export-btn" onclick="copyProposedBid()" style="margin-bottom:0;">Copier le Bid</button>
+                        <button class="strat-export-btn" onclick="exportStrategyCSV()" style="margin-bottom:0;background:var(--ac-blue);">Exporter analyse CSV</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Explications et Methodologie (deplacees ici) -->
+            <div class="strat-section">
+                <div class="strat-section-title collapsible-header" onclick="toggleCollapsible(this)">
+                    <span class="arrow open">&#9654;</span>
+                    Conseils, Strategie et Methodologie
+                </div>
+                <div class="strat-section-body collapsible-body open" id="stratExplanations">
+                    <div style="padding:20px;">
+                        <div class="strat-reco" id="stratRecommendation" style="margin-bottom:20px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Tableaux de vols (BAS) -->
+            <div class="strat-section">
+                <div class="strat-section-title">Analyse par Destination - Score Optimise</div>
+                <div class="strat-section-body">
+                    <table class="strat-table" id="stratTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortStratTable('dest')">Destination</th>
+                                <th onclick="sortStratTable('count')">Nb Pairings</th>
+                                <th onclick="sortStratTable('avgDays')">Duree Moy.</th>
+                                <th onclick="sortStratTable('avgAllow')">Perdiem Moy.</th>
+                                <th onclick="sortStratTable('maxAllow')">Perdiem Max</th>
+                                <th onclick="sortStratTable('monthlyAllow')">Perdiem/Mois Est.</th>
+                                <th onclick="sortStratTable('seniorRatio')">Competition</th>
+                                <th onclick="sortStratTable('prob')">Probabilite</th>
+                                <th onclick="sortStratTable('score')">Score Optimise</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stratTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="strat-section">
+                <div class="strat-section-title">Detail des Pairings - Tries par Score</div>
+                <div class="strat-section-body">
+                    <table class="strat-table" id="stratDetailTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortStratDetail('id')">Pairing ID</th>
+                                <th onclick="sortStratDetail('dest')">Destination</th>
+                                <th onclick="sortStratDetail('days')">Jours</th>
+                                <th onclick="sortStratDetail('block')">Block Time</th>
+                                <th onclick="sortStratDetail('allow')">Perdiem ($)</th>
+                                <th onclick="sortStratDetail('perDay')">$/Jour</th>
+                                <th onclick="sortStratDetail('prob')">Probabilite</th>
+                                <th onclick="sortStratDetail('score')">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stratDetailBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-toast" id="copyToast">Bid Sheet copie dans le presse-papier!</div>
+
+    <script src="data/pairings.js"></script>
+    <script>
+    // ============ CONSTANTS ============
+    const ITEMS_PER_PAGE = 50;
+    const DAY_NAMES = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    const FREQ_DAYS = {1: 'Lun', 2: 'Mar', 3: 'Mer', 4: 'Jeu', 5: 'Ven', 6: 'Sam', 7: 'Dim'};
+
+    const EQUIP_NAMES = {
+        '223': 'A220-300', '319': 'A319', '320': 'A320', '321': 'A321',
+        '330': 'A330', '737': 'B737-MAX', '772': 'B777-200', '773': 'B777-300',
+        '77P': 'B777', '788': 'B787-8', '789': 'B787-9',
+        'DH4': 'Dash 8', 'LHH': 'LH (DH)', 'QKK': 'Jazz (DH)'
+    };
+
+    const LANG_NAMES = {
+        'BL': 'Bilingue', 'SP': 'Espagnol', 'FR': 'Francais', 'IT': 'Italien',
+        'PR': 'Portugais', 'JA': 'Japonais', 'MD': 'Mandarin', 'GE': 'Allemand',
+        'AR': 'Arabe', 'HI': 'Hindi', 'GR': 'Grec', 'GJ': 'General J',
+        'GY': 'General Y', 'FA': 'FA', 'PJ': 'Purser J'
+    };
+
+    const CITY_NAMES = {
+        'YUL': 'Montreal', 'YYZ': 'Toronto', 'YVR': 'Vancouver', 'YYC': 'Calgary',
+        'YEG': 'Edmonton', 'YWG': 'Winnipeg', 'YHZ': 'Halifax', 'YOW': 'Ottawa',
+        'YQB': 'Quebec', 'YYT': "St. John's", 'YQM': 'Moncton', 'YQR': 'Regina',
+        'YQT': 'Thunder Bay', 'YYG': 'Charlottetown', 'YLW': 'Kelowna',
+        'NRT': 'Tokyo Narita', 'DEL': 'Delhi', 'LHR': 'Londres', 'CDG': 'Paris',
+        'FRA': 'Francfort', 'FCO': 'Rome', 'BCN': 'Barcelone', 'MAD': 'Madrid',
+        'LIS': 'Lisbonne', 'ATH': 'Athenes', 'AMS': 'Amsterdam', 'BRU': 'Bruxelles',
+        'GVA': 'Geneve', 'MXP': 'Milan', 'LYS': 'Lyon', 'TLS': 'Toulouse',
+        'CMN': 'Casablanca',
+        'PUJ': 'Punta Cana', 'CUN': 'Cancun', 'MBJ': 'Montego Bay',
+        'NAS': 'Nassau', 'PVR': 'Puerto Vallarta', 'SJD': 'Los Cabos',
+        'SXM': 'St. Maarten', 'BGI': 'Barbade', 'PTP': 'Pointe-a-Pitre',
+        'FDF': 'Fort-de-France', 'CUR': 'Curacao', 'PLS': 'Turks & Caicos',
+        'AZS': 'Samana', 'LRM': 'La Romana', 'POP': 'Puerto Plata',
+        'CZM': 'Cozumel', 'LIR': 'Liberia CR', 'SJO': 'San Jose CR',
+        'ZIH': 'Ixtapa', 'TQO': 'Tulum',
+        'MEX': 'Mexico', 'BOG': 'Bogota', 'CTG': 'Cartagena',
+        'GUA': 'Guatemala', 'LIM': 'Lima', 'GRU': 'Sao Paulo',
+        'EZE': 'Buenos Aires', 'SCL': 'Santiago',
+        'LAX': 'Los Angeles', 'SFO': 'San Francisco', 'ORD': 'Chicago',
+        'MIA': 'Miami', 'BOS': 'Boston', 'EWR': 'Newark', 'LGA': 'New York LGA',
+        'DFW': 'Dallas', 'DEN': 'Denver', 'SEA': 'Seattle', 'IAH': 'Houston',
+        'LAS': 'Las Vegas', 'FLL': 'Fort Lauderdale', 'MCO': 'Orlando',
+        'TPA': 'Tampa', 'BNA': 'Nashville', 'PBI': 'West Palm Beach',
+    };
+
+    // ============ STATE ============
+    let state = {
+        search: '',
+        selectedDests: new Set(),
+        selectedDays: new Set(),
+        selectedDates: new Set(),
+        blockMin: 0,
+        blockMax: 40,
+        tafbMin: 0,
+        tafbMax: 120,
+        allowMin: 0,
+        allowMax: 800,
+        selectedEquip: new Set(),
+        selectedLangs: new Set(),
+        selectedCrew: new Set(),
+        sortBy: 'id',
+        sortAsc: true,
+        page: 1
+    };
+
+    // ============ INIT ============
+    function init() {
+        document.getElementById('totalCount').textContent = PAIRINGS_DATA.length;
+        document.getElementById('monthBadge').textContent = PAIRINGS_METADATA.month;
+
+        buildDestFilters();
+        buildDaysFilter();
+        buildDateFilter();
+        buildEquipFilter();
+        buildLangFilter();
+        buildCrewFilter();
+        bindEvents();
+        applyFiltersAndRender();
+    }
+
+    // ============ BUILD FILTERS ============
+    function buildDestFilters() {
+        const container = document.getElementById('destFilters');
+        const dests = PAIRINGS_METADATA.destinations.filter(d => d !== 'YYZ'); // YYZ is transit
+        container.innerHTML = dests.map(d => {
+            const name = CITY_NAMES[d] || d;
+            return `<div class="filter-chip" data-dest="${d}" onclick="toggleDest('${d}')">${d} <span style="opacity:0.6;font-size:10px">${name}</span></div>`;
+        }).join('');
+    }
+
+    function buildDaysFilter() {
+        const container = document.getElementById('daysFilter');
+        const days = [1, 2, 3, 4, 5, 6, 7];
+        container.innerHTML = days.map(d => {
+            const label = d === 7 ? '7+' : d;
+            return `<div class="filter-chip" data-days="${d}" onclick="toggleDays(${d})">${label} jour${d > 1 ? 's' : ''}</div>`;
+        }).join('');
+    }
+
+    function buildDateFilter() {
+        const container = document.getElementById('dateFilter');
+        let html = '';
+        for (let d = 1; d <= 31; d++) {
+            html += `<div class="filter-chip day-chip" data-date="${d}" onclick="toggleDate(${d})" style="width:30px;height:28px;font-size:11px;padding:0;display:flex;align-items:center;justify-content:center;">${d}</div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function buildEquipFilter() {
+        const container = document.getElementById('equipFilter');
+        container.innerHTML = PAIRINGS_METADATA.equipment.map(e => {
+            const name = EQUIP_NAMES[e] || e;
+            return `<div class="filter-chip" data-equip="${e}" onclick="toggleEquip('${e}')">${name}</div>`;
+        }).join('');
+    }
+
+    function buildLangFilter() {
+        const container = document.getElementById('langFilter');
+        const langs = PAIRINGS_METADATA.languages.filter(l => !['GJ', 'GY', 'FA', 'PJ', 'BL'].includes(l));
+        container.innerHTML = langs.map(l => {
+            const name = LANG_NAMES[l] || l;
+            return `<div class="filter-chip" data-lang="${l}" onclick="toggleLang('${l}')">${name}</div>`;
+        }).join('');
+    }
+
+    function buildCrewFilter() {
+        const container = document.getElementById('crewFilter');
+        const positions = ['FA01', 'FA02', 'FA03', 'FA05', 'FA07', 'FA11'];
+        container.innerHTML = positions.map(p => {
+            return `<div class="filter-chip" data-crew="${p}" onclick="toggleCrew('${p}')">${p}</div>`;
+        }).join('');
+    }
+
+    // ============ TOGGLE HANDLERS ============
+    function toggleSetAndChip(set, value, selector) {
+        if (set.has(value)) {
+            set.delete(value);
+        } else {
+            set.add(value);
+        }
+        document.querySelectorAll(selector).forEach(el => {
+            const attr = el.dataset.dest || el.dataset.days || el.dataset.date || el.dataset.equip || el.dataset.lang || el.dataset.crew;
+            el.classList.toggle('active', set.has(attr) || set.has(Number(attr)));
+        });
+        state.page = 1;
+        applyFiltersAndRender();
+    }
+
+    function toggleDest(d) { toggleSetAndChip(state.selectedDests, d, '[data-dest]'); }
+    function toggleDays(d) { toggleSetAndChip(state.selectedDays, d, '[data-days]'); }
+    function toggleDate(d) { toggleSetAndChip(state.selectedDates, d, '[data-date]'); }
+    function toggleEquip(e) { toggleSetAndChip(state.selectedEquip, e, '[data-equip]'); }
+    function toggleLang(l) { toggleSetAndChip(state.selectedLangs, l, '[data-lang]'); }
+    function toggleCrew(c) { toggleSetAndChip(state.selectedCrew, c, '[data-crew]'); }
+
+    function setSort(field) {
+        if (state.sortBy === field) {
+            state.sortAsc = !state.sortAsc;
+        } else {
+            state.sortBy = field;
+            state.sortAsc = true;
+        }
+        document.querySelectorAll('.sort-btn[data-sort]').forEach(b => {
+            b.classList.toggle('active', b.dataset.sort === field);
+        });
+        document.getElementById('sortDirBtn').innerHTML = state.sortAsc ? '&#9650;' : '&#9660;';
+        applyFiltersAndRender();
+    }
+
+    function toggleSortDir() {
+        state.sortAsc = !state.sortAsc;
+        document.getElementById('sortDirBtn').innerHTML = state.sortAsc ? '&#9650;' : '&#9660;';
+        applyFiltersAndRender();
+    }
+
+    function resetFilters() {
+        state.search = '';
+        state.selectedDests.clear();
+        state.selectedDays.clear();
+        state.selectedDates.clear();
+        state.blockMin = 0;
+        state.blockMax = 40;
+        state.tafbMin = 0;
+        state.tafbMax = 120;
+        state.allowMin = 0;
+        state.allowMax = 800;
+        state.selectedEquip.clear();
+        state.selectedLangs.clear();
+        state.selectedCrew.clear();
+        state.sortBy = 'id';
+        state.sortAsc = true;
+        state.page = 1;
+
+        document.getElementById('searchInput').value = '';
+        document.getElementById('blockMin').value = 0;
+        document.getElementById('blockMax').value = 40;
+        document.getElementById('tafbMin').value = 0;
+        document.getElementById('tafbMax').value = 120;
+        document.getElementById('allowMin').value = 0;
+        document.getElementById('allowMax').value = 800;
+        updateSliderLabels();
+
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.sort-btn[data-sort]').forEach(b => {
+            b.classList.toggle('active', b.dataset.sort === 'id');
+        });
+        document.getElementById('sortDirBtn').innerHTML = '&#9650;';
+
+        applyFiltersAndRender();
+    }
+
+    // ============ EVENTS ============
+    function bindEvents() {
+        const searchInput = document.getElementById('searchInput');
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                state.search = searchInput.value.trim().toUpperCase();
+                state.page = 1;
+                applyFiltersAndRender();
+            }, 200);
+        });
+
+        ['blockMin', 'blockMax', 'tafbMin', 'tafbMax', 'allowMin', 'allowMax'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                updateSliderLabels();
+                state.blockMin = parseInt(document.getElementById('blockMin').value);
+                state.blockMax = parseInt(document.getElementById('blockMax').value);
+                state.tafbMin = parseInt(document.getElementById('tafbMin').value);
+                state.tafbMax = parseInt(document.getElementById('tafbMax').value);
+                state.allowMin = parseInt(document.getElementById('allowMin').value);
+                state.allowMax = parseInt(document.getElementById('allowMax').value);
+                state.page = 1;
+                applyFiltersAndRender();
+            });
+        });
+
+        // Destination search filter
+        document.getElementById('destSearch').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('[data-dest]').forEach(el => {
+                const dest = el.dataset.dest;
+                const name = (CITY_NAMES[dest] || '').toLowerCase();
+                el.style.display = (dest.toLowerCase().includes(q) || name.includes(q)) ? '' : 'none';
+            });
+        });
+    }
+
+    function updateSliderLabels() {
+        document.getElementById('blockMinVal').textContent = document.getElementById('blockMin').value + 'h';
+        document.getElementById('blockMaxVal').textContent = document.getElementById('blockMax').value + 'h';
+        document.getElementById('tafbMinVal').textContent = document.getElementById('tafbMin').value + 'h';
+        document.getElementById('tafbMaxVal').textContent = document.getElementById('tafbMax').value + 'h';
+        document.getElementById('allowMinVal').textContent = '$' + document.getElementById('allowMin').value;
+        document.getElementById('allowMaxVal').textContent = '$' + document.getElementById('allowMax').value;
+    }
+
+    // ============ FILTER + SORT + RENDER ============
+    function applyFiltersAndRender() {
+        let results = PAIRINGS_DATA.filter(p => {
+            // Search
+            if (state.search) {
+                const q = state.search;
+                const matchId = p.id.includes(q);
+                const matchDest = p.destinations.some(d => d.includes(q));
+                const matchCity = p.destinations.some(d => (CITY_NAMES[d] || '').toUpperCase().includes(q));
+                const matchHotel = p.hotels.some(h => h.toUpperCase().includes(q));
+                const matchFlight = p.legs.some(l => ('AC' + l.flight).includes(q) || l.flight === q);
+                if (!matchId && !matchDest && !matchCity && !matchHotel && !matchFlight) return false;
+            }
+
+            // Destinations
+            if (state.selectedDests.size > 0) {
+                if (!p.destinations.some(d => state.selectedDests.has(d))) return false;
+            }
+
+            // Days
+            if (state.selectedDays.size > 0) {
+                const match = [...state.selectedDays].some(d => {
+                    if (d === 7) return p.numDays >= 7;
+                    return p.numDays === d;
+                });
+                if (!match) return false;
+            }
+
+            // Dates
+            if (state.selectedDates.size > 0) {
+                if (!p.operatingDates.some(d => state.selectedDates.has(d))) return false;
+            }
+
+            // Block time (hours)
+            const blockHours = p.blockMinutes / 60;
+            if (blockHours < state.blockMin || blockHours > state.blockMax) return false;
+
+            // TAFB (hours)
+            const tafbHours = p.tafbMinutes / 60;
+            if (tafbHours < state.tafbMin || tafbHours > state.tafbMax) return false;
+
+            // Allowance
+            if (p.allowance < state.allowMin || p.allowance > state.allowMax) return false;
+
+            // Equipment
+            if (state.selectedEquip.size > 0) {
+                if (!p.equipment.some(e => state.selectedEquip.has(e))) return false;
+            }
+
+            // Languages
+            if (state.selectedLangs.size > 0) {
+                const pLangs = p.languages.split(/\s+/).map(l => l.replace(/\d+/g, ''));
+                if (![...state.selectedLangs].some(l => pLangs.includes(l))) return false;
+            }
+
+            // Crew position
+            if (state.selectedCrew.size > 0) {
+                if (![...state.selectedCrew].some(c => p.crew.includes(c))) return false;
+            }
+
+            return true;
+        });
+
+        // Sort
+        results.sort((a, b) => {
+            let va, vb;
+            switch (state.sortBy) {
+                case 'id':
+                    va = a.id; vb = b.id;
+                    return state.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+                case 'blockMinutes':
+                    va = a.blockMinutes; vb = b.blockMinutes; break;
+                case 'tafbMinutes':
+                    va = a.tafbMinutes; vb = b.tafbMinutes; break;
+                case 'allowance':
+                    va = a.allowance; vb = b.allowance; break;
+                case 'numDays':
+                    va = a.numDays; vb = b.numDays; break;
+                case 'destinations':
+                    va = a.destinations.join(','); vb = b.destinations.join(',');
+                    return state.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+                default:
+                    va = a.id; vb = b.id;
+                    return state.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+            }
+            return state.sortAsc ? va - vb : vb - va;
+        });
+
+        document.getElementById('resultCount').textContent = results.length;
+
+        // Paginate
+        const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE);
+        if (state.page > totalPages) state.page = Math.max(1, totalPages);
+        const start = (state.page - 1) * ITEMS_PER_PAGE;
+        const pageResults = results.slice(start, start + ITEMS_PER_PAGE);
+
+        renderResults(pageResults);
+        renderPagination(results.length, totalPages);
+    }
+
+    function renderResults(pairings) {
+        const grid = document.getElementById('resultsGrid');
+
+        if (pairings.length === 0) {
+            grid.innerHTML = `
+                <div class="no-results">
+                    <h3>Aucun pairing trouve</h3>
+                    <p>Essayez de modifier vos filtres ou votre recherche.</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = pairings.map(p => renderCard(p)).join('');
+    }
+
+    function renderCard(p) {
+        const route = buildRoute(p);
+        const hasDH = p.legs.some(l => l.deadhead);
+        const blockStr = formatTimeStr(p.blockTotal);
+        const tafbStr = formatTimeStr(p.tafb);
+        const datesStr = p.dateStart === p.dateEnd ?
+            p.dateStart : `${p.dateStart} - ${p.dateEnd}`;
+        const inBid = bidList.some(b => b.id === p.id);
+        const addBtnClass = inBid ? 'btn-add-bid added' : 'btn-add-bid';
+        const addBtnText = inBid ? 'Ajoute' : '+ Bid';
+
+        return `
+        <div class="pairing-card" onclick="toggleCard(this)">
+            <div class="card-header">
+                <div class="pairing-id">${p.id}</div>
+                <div class="card-route">${route}</div>
+                <div class="card-badges">
+                    <span class="badge badge-days">${p.numDays}J</span>
+                    <span class="badge badge-block">${blockStr}</span>
+                    <span class="badge badge-tafb">TAFB ${tafbStr}</span>
+                    <span class="badge badge-allowance">$${p.allowance.toFixed(2)}</span>
+                    ${p.equipment.map(e => `<span class="badge badge-equip">${EQUIP_NAMES[e] || e}</span>`).join('')}
+                    ${hasDH ? '<span class="badge badge-dh">DH</span>' : ''}
+                </div>
+                <button class="${addBtnClass}" onclick="event.stopPropagation(); addToBid('${p.id}')">${addBtnText}</button>
+                <div class="card-dates">${datesStr}</div>
+            </div>
+            <div class="card-details">
+                ${renderDetails(p)}
+            </div>
+        </div>`;
+    }
+
+    function buildRoute(p) {
+        const cities = [];
+        for (const leg of p.legs) {
+            if (cities.length === 0) {
+                cities.push(leg.dep_city);
+            }
+            cities.push(leg.arr_city);
+        }
+        // Simplify: remove consecutive duplicates and transit
+        const simplified = [cities[0]];
+        for (let i = 1; i < cities.length; i++) {
+            if (cities[i] !== simplified[simplified.length - 1]) {
+                simplified.push(cities[i]);
+            }
+        }
+
+        return simplified.map((c, i) => {
+            const isBase = c === 'YUL';
+            const name = CITY_NAMES[c] || '';
+            const cls = isBase ? 'city-code base' : 'city-code';
+            const arrow = i < simplified.length - 1 ? '<span class="route-arrow">&#10132;</span>' : '';
+            return `<span class="${cls}" title="${name}">${c}</span>${arrow}`;
+        }).join('');
+    }
+
+    function renderDetails(p) {
+        // Legs table
+        let legsHtml = `
+        <table class="legs-table">
+            <thead>
+                <tr>
+                    <th>Vol</th>
+                    <th>Equip</th>
+                    <th>Depart</th>
+                    <th></th>
+                    <th>Arrivee</th>
+                    <th></th>
+                    <th>Block</th>
+                    <th>Duty</th>
+                    <th>Repos</th>
+                    <th>Repas</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        for (const leg of p.legs) {
+            const dhClass = leg.deadhead ? 'dh-row' : '';
+            const dhBadge = leg.deadhead ? ' <span style="color:#e74c3c;font-size:10px">(DH)</span>' : '';
+            const depName = CITY_NAMES[leg.dep_city] || '';
+            const arrName = CITY_NAMES[leg.arr_city] || '';
+            const layoverStr = leg.layover ? `<span class="leg-layover">${formatTimeStr(leg.layover)}</span>` : '';
+
+            legsHtml += `
+                <tr class="${dhClass}">
+                    <td>AC${leg.flight}${dhBadge}</td>
+                    <td>${EQUIP_NAMES[leg.equipment] || leg.equipment}</td>
+                    <td><span class="leg-city" title="${depName}">${leg.dep_city}</span></td>
+                    <td><span class="leg-time">${formatClock(leg.dep_time)}</span></td>
+                    <td><span class="leg-city" title="${arrName}">${leg.arr_city}</span></td>
+                    <td><span class="leg-time">${formatClock(leg.arr_time)}</span></td>
+                    <td>${formatTimeStr(leg.block_time)}</td>
+                    <td>${formatTimeStr(leg.duty_time)}</td>
+                    <td>${layoverStr}</td>
+                    <td>${leg.meals || '-'}</td>
+                </tr>`;
+        }
+        legsHtml += '</tbody></table>';
+
+        // Hotels
+        let hotelsHtml = '';
+        if (p.hotels.length > 0) {
+            hotelsHtml = p.hotels.map(h =>
+                `<div class="hotel-info"><strong>Hotel:</strong> ${h}</div>`
+            ).join('');
+        }
+
+        // Operating dates
+        const datesHtml = p.operatingDates.map(d =>
+            `<span class="date-chip">${d} mars</span>`
+        ).join('');
+
+        return `
+            <div class="detail-section">
+                <div class="detail-title">Segments de vol</div>
+                ${legsHtml}
+                ${hotelsHtml}
+            </div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="value">${formatTimeStr(p.blockTotal)}</div>
+                    <div class="label">Block Total</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">${formatTimeStr(p.tafb)}</div>
+                    <div class="label">TAFB</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">$${p.allowance.toFixed(2)}</div>
+                    <div class="label">Allocation</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">${p.numDays}J</div>
+                    <div class="label">Duree</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:24px;margin-top:12px;flex-wrap:wrap;">
+                <div class="detail-section" style="flex:1;min-width:200px">
+                    <div class="detail-title">Equipage</div>
+                    <div class="crew-info">${p.crew || '-'}</div>
+                </div>
+                <div class="detail-section" style="flex:1;min-width:200px">
+                    <div class="detail-title">Langues requises</div>
+                    <div class="lang-info">${formatLanguages(p.languages)}</div>
+                </div>
+                <div class="detail-section" style="flex:1;min-width:200px">
+                    <div class="detail-title">Dates d'operation</div>
+                    <div class="operating-dates">${datesHtml || '<span style="color:var(--ac-muted)">-</span>'}</div>
+                </div>
+            </div>`;
+    }
+
+    // ============ PAGINATION ============
+    function renderPagination(total, totalPages) {
+        const container = document.getElementById('pagination');
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let html = `<button class="page-btn" onclick="goToPage(${state.page - 1})" ${state.page === 1 ? 'disabled' : ''}>&#9664; Prec</button>`;
+
+        const maxVisible = 7;
+        let startPage = Math.max(1, state.page - 3);
+        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+        if (endPage - startPage < maxVisible - 1) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+
+        if (startPage > 1) {
+            html += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+            if (startPage > 2) html += `<span class="page-info">...</span>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button class="page-btn ${i === state.page ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += `<span class="page-info">...</span>`;
+            html += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+        }
+
+        html += `<button class="page-btn" onclick="goToPage(${state.page + 1})" ${state.page === totalPages ? 'disabled' : ''}">Suiv &#9654;</button>`;
+        html += `<span class="page-info">${total} resultats</span>`;
+
+        container.innerHTML = html;
+    }
+
+    function goToPage(p) {
+        state.page = p;
+        applyFiltersAndRender();
+        document.getElementById('resultsGrid').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ============ HELPERS ============
+    function formatTimeStr(t) {
+        if (!t) return '-';
+        t = String(t).padStart(4, '0');
+        const h = t.slice(0, -2);
+        const m = t.slice(-2);
+        return `${parseInt(h)}h${m}`;
+    }
+
+    function formatClock(t) {
+        if (!t) return '-';
+        t = String(t).padStart(4, '0');
+        return `${t.slice(0, 2)}:${t.slice(2)}`;
+    }
+
+    function formatLanguages(langStr) {
+        if (!langStr) return '-';
+        return langStr.split(/\s+/).map(l => {
+            const code = l.replace(/\d+/g, '');
+            const count = l.replace(/[A-Z]+/g, '');
+            const name = LANG_NAMES[code] || code;
+            return `${name} x${count}`;
+        }).join(', ');
+    }
+
+    function toggleCard(el) {
+        el.classList.toggle('expanded');
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // ============ TABS ============
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => {
+            b.classList.toggle('active',
+                (i === 0 && tab === 'pairings') ||
+                (i === 1 && tab === 'bid') ||
+                (i === 2 && tab === 'strategy')
+            );
+        });
+        document.getElementById('tabPairings').classList.toggle('active', tab === 'pairings');
+        document.getElementById('tabBid').classList.toggle('active', tab === 'bid');
+        document.getElementById('tabStrategy').classList.toggle('active', tab === 'strategy');
+        if (tab === 'bid') {
+            buildBidDaysOff();
+            updateBidConfig();
+        }
+        if (tab === 'strategy') {
+            buildStrategyTab();
+        }
+    }
+
+    // ============ BID SHEET ============
+    let bidList = []; // selected pairing IDs for reference
+    let bidDaysOff = []; // ordered array of day numbers user wants off
+
+    function addToBid(pairingId) {
+        if (bidList.some(b => b.id === pairingId)) return;
+        const p = PAIRINGS_DATA.find(x => x.id === pairingId);
+        if (!p) return;
+        bidList.push({ id: pairingId, pairingData: p });
+        updateBidBadge();
+        applyFiltersAndRender();
+    }
+
+    function updateBidBadge() {
+        const badge = document.getElementById('bidCount');
+        badge.textContent = bidList.length;
+        badge.style.display = bidList.length > 0 ? '' : 'none';
+    }
+
+    // Days off calendar
+    function buildBidDaysOff() {
+        const container = document.getElementById('bidDaysOff');
+        if (container.children.length > 0) return; // already built
+        const mc = PAIRINGS_METADATA.monthCode.split('-');
+        const year = parseInt(mc[0]);
+        const month = parseInt(mc[1]);
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const dayLabels = ['D','L','M','M','J','V','S'];
+
+        // Header row
+        let html = dayLabels.map(d => `<div style="width:30px;text-align:center;font-size:10px;color:var(--ac-muted);font-weight:700">${d}</div>`).join('');
+
+        // Find first day of month (0=Sun)
+        const firstDow = new Date(year, month - 1, 1).getDay();
+        for (let i = 0; i < firstDow; i++) {
+            html += `<div style="width:30px;height:28px"></div>`;
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+            const isOff = bidDaysOff.includes(d);
+            const priority = isOff ? bidDaysOff.indexOf(d) + 1 : '';
+            const cls = isOff ? 'filter-chip day-chip active' : 'filter-chip day-chip';
+            html += `<div class="${cls}" onclick="toggleDayOff(${d})" style="width:30px;height:28px;font-size:11px;padding:0;display:flex;align-items:center;justify-content:center;position:relative" data-dayoff="${d}">${d}${isOff ? `<span style="position:absolute;top:-2px;right:-2px;background:var(--ac-gold);color:#000;border-radius:50%;width:12px;height:12px;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:900">${priority}</span>` : ''}</div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function toggleDayOff(d) {
+        const idx = bidDaysOff.indexOf(d);
+        if (idx >= 0) {
+            bidDaysOff.splice(idx, 1);
+        } else {
+            bidDaysOff.push(d);
+        }
+        // Rebuild calendar to show priority numbers
+        document.getElementById('bidDaysOff').innerHTML = '';
+        buildBidDaysOff();
+        updateBidConfig();
+    }
+
+    function clearDaysOff() {
+        bidDaysOff = [];
+        document.getElementById('bidDaysOff').innerHTML = '';
+        buildBidDaysOff();
+        updateBidConfig();
+    }
+
+    function clearAllBidConfig() {
+        // Reset days off
+        bidDaysOff = [];
+        document.getElementById('bidDaysOff').innerHTML = '';
+
+        // Reset bid list
+        bidList = [];
+        updateBidBadge();
+
+        // Reset sliders to defaults
+        document.getElementById('bidPerDiem').value = 0;
+        document.getElementById('bidDaysMin').value = 1;
+        document.getElementById('bidDaysMax').value = 7;
+        document.getElementById('bidTafbMin').value = 0;
+
+        // Reset selects to defaults
+        document.getElementById('bidMaxLegs').value = '4';
+        document.getElementById('bidNoEarlyCheckin').value = '';
+
+        // Hide matching pairings panel
+        document.getElementById('matchingPairingsPanel').style.display = 'none';
+
+        // Rebuild calendar and re-render
+        buildBidDaysOff();
+        updateBidConfig();
+        applyFiltersAndRender();
+    }
+
+    // Auto-suggest from selected pairings
+    function autoSuggestFromSelection() {
+        if (bidList.length === 0) {
+            alert('Selectionnez d\'abord des pairings dans l\'onglet Pairings avec le bouton + Bid');
+            return;
+        }
+
+        const selected = bidList.map(b => b.pairingData);
+
+        // Analyze selected pairings
+        const allowances = selected.map(p => p.allowance).filter(a => a > 0);
+        const durations = selected.map(p => p.numDays);
+        const tafbs = selected.map(p => p.tafbMinutes / 60);
+
+        // Per diem: use the minimum from selection (floor to nearest 10)
+        if (allowances.length > 0) {
+            const minAllow = Math.floor(Math.min(...allowances) / 10) * 10;
+            document.getElementById('bidPerDiem').value = minAllow;
+        }
+
+        // Duration: use range from selection
+        const minDays = Math.min(...durations);
+        const maxDays = Math.max(...durations);
+        document.getElementById('bidDaysMin').value = minDays;
+        document.getElementById('bidDaysMax').value = maxDays;
+
+        // TAFB: use minimum from selection (floor)
+        if (tafbs.length > 0) {
+            const minTafb = Math.floor(Math.min(...tafbs));
+            document.getElementById('bidTafbMin').value = minTafb;
+        }
+
+        updateBidConfig();
+    }
+
+    function updateBidConfig() {
+        // Update labels
+        document.getElementById('bidPerDiemVal').textContent = '$' + document.getElementById('bidPerDiem').value;
+        document.getElementById('bidDaysMinVal').textContent = document.getElementById('bidDaysMin').value;
+        document.getElementById('bidDaysMaxVal').textContent = document.getElementById('bidDaysMax').value;
+        document.getElementById('bidTafbMinVal').textContent = document.getElementById('bidTafbMin').value + 'h';
+
+        renderBidSheet();
+    }
+
+    function formatDateForBid(day) {
+        const monthNames = {
+            '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+            '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+            '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+        };
+        const mc = PAIRINGS_METADATA.monthCode.split('-');
+        const monthName = monthNames[mc[1]] || 'March';
+        return `${monthName} ${day}, ${mc[0]}`;
+    }
+
+    function generateBidLines() {
+        const lines = [];
+        const perDiem = parseInt(document.getElementById('bidPerDiem').value);
+        const daysMin = parseInt(document.getElementById('bidDaysMin').value);
+        const daysMax = parseInt(document.getElementById('bidDaysMax').value);
+        const maxLegs = parseInt(document.getElementById('bidMaxLegs').value);
+        const tafbMin = parseInt(document.getElementById('bidTafbMin').value);
+        const noEarly = document.getElementById('bidNoEarlyCheckin').value;
+
+        // --- 1. PREFER OFF (days off in priority order) ---
+        if (bidDaysOff.length > 0) {
+            const datesStr = bidDaysOff.map(d => formatDateForBid(d)).join(', ');
+            lines.push({
+                text: `Prefer Off ${datesStr}`,
+                type: 'negative',
+                explain: `Conges demandes (${bidDaysOff.length} jours, par ordre de priorite)`
+            });
+        }
+
+        // --- 2. AVOID lines (filter out unwanted pairings) ---
+        if (noEarly) {
+            lines.push({
+                text: `Avoid Pairings If Pairing Check-In Time Between 00:01 And ${noEarly}`,
+                type: 'negative',
+                explain: `Pas de check-in avant ${noEarly}`
+            });
+        }
+
+        if (maxLegs > 0) {
+            lines.push({
+                text: `Avoid Pairings If Duty Legs > ${maxLegs} legs`,
+                type: 'negative',
+                explain: `Maximum ${maxLegs} vols par periode de duty`
+            });
+        }
+
+        if (daysMin > 1 || daysMax < 7) {
+            if (daysMin > 1) {
+                lines.push({
+                    text: `Avoid Pairings If Pairing Length < ${daysMin} days`,
+                    type: 'negative',
+                    explain: `Minimum ${daysMin} jour(s) de duree`
+                });
+            }
+            if (daysMax < 7) {
+                lines.push({
+                    text: `Avoid Pairings If Pairing Length > ${daysMax} days`,
+                    type: 'negative',
+                    explain: `Maximum ${daysMax} jour(s) de duree`
+                });
+            }
+        }
+
+        // --- 3. AWARD lines (from specific to generic, per PBS best practices) ---
+
+        // Most specific: if pairings are selected, award matching high-value criteria
+        if (perDiem > 0 && tafbMin > 0) {
+            lines.push({
+                text: `Award Pairings If Allowance Amount > $${perDiem} If TAFB > ${String(tafbMin).padStart(2,'0')}:00`,
+                type: 'positive',
+                explain: `Per diem > $${perDiem} ET TAFB > ${tafbMin}h`
+            });
+        }
+
+        // Per diem seul (plus generique)
+        if (perDiem > 0) {
+            lines.push({
+                text: `Award Pairings If Allowance Amount > $${perDiem}`,
+                type: 'positive',
+                explain: `Per diem minimum $${perDiem}`
+            });
+        }
+
+        // TAFB seul
+        if (tafbMin > 0 && perDiem === 0) {
+            lines.push({
+                text: `Award Pairings If TAFB > ${String(tafbMin).padStart(2,'0')}:00`,
+                type: 'positive',
+                explain: `TAFB minimum ${tafbMin}h`
+            });
+        }
+
+        // Pairing length preference (if not default range)
+        if (daysMin > 1 && daysMax < 7) {
+            lines.push({
+                text: `Award Pairings If Pairing Length Between ${daysMin} days And ${daysMax} days`,
+                type: 'positive',
+                explain: `Pairings de ${daysMin} a ${daysMax} jours`
+            });
+        }
+
+        return lines;
+    }
+
+    function renderBidSheet() {
+        const area = document.getElementById('bidSheetArea');
+        const info = document.getElementById('bidBlockInfo');
+        const lines = generateBidLines();
+
+        if (lines.length === 0 && bidDaysOff.length === 0) {
+            area.innerHTML = `
+                <div class="bid-empty">
+                    <h3>Configurez vos preferences</h3>
+                    <p>Utilisez le panneau de gauche pour definir vos criteres.</p>
+                    <p style="margin-top:8px">1. Selectionnez vos <strong>jours de conge</strong> dans le calendrier</p>
+                    <p>2. Ajustez le <strong>per diem minimum</strong>, la <strong>duree</strong>, etc.</p>
+                    <p>3. Ou cliquez <strong style="color:var(--ac-red)">Generer depuis pairings selectionnes</strong></p>
+                </div>`;
+            info.textContent = '';
+            return;
+        }
+
+        // Count matching pairings with current criteria
+        const matchCount = countMatchingPairings();
+        info.textContent = `${lines.length} ligne(s) de bid | ~${matchCount} pairings correspondent a vos criteres`;
+
+        let html = `<div class="bid-sheet-block">`;
+        html += `<div class="bid-block-header">Start Pairings</div>`;
+
+        let lineNum = 1;
+        lines.forEach((line) => {
+            const highlighted = highlightSyntax(line.text);
+            const typeIcon = line.type === 'negative' ? '&#9940;' : '&#9989;';
+
+            html += `
+            <div class="bid-line-item">
+                <span class="bid-line-num">${lineNum}.</span>
+                <span class="bid-line-text">${highlighted}</span>
+                <span class="bid-line-info">${line.explain}</span>
+            </div>`;
+            lineNum++;
+        });
+
+        html += `<div class="bid-embedded">${lineNum}. Award Pairings</div>`;
+        html += `</div>`;
+
+        html += `<div class="bid-sheet-block">`;
+        html += `<div class="bid-block-header" style="opacity:0.5">Start Reserve Bid</div>`;
+        html += `<div class="bid-embedded">Start Reserve</div>`;
+        html += `</div>`;
+
+        // Info block about selected pairings
+        if (bidList.length > 0) {
+            html += `<div style="padding:12px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:var(--radius);margin-top:8px">`;
+            html += `<div style="font-size:11px;text-transform:uppercase;color:var(--ac-muted);font-weight:700;margin-bottom:8px">Pairings de reference (${bidList.length} selectionnes)</div>`;
+            html += `<div style="display:flex;flex-wrap:wrap;gap:6px">`;
+            bidList.forEach(b => {
+                const p = b.pairingData;
+                html += `<span style="background:var(--ac-dark);border-radius:4px;padding:4px 8px;font-size:12px;font-family:Consolas,monospace"><span style="color:var(--ac-red);font-weight:700">${p.id}</span> <span style="color:var(--ac-muted)">${p.destinations.join(',')} ${p.numDays}J $${p.allowance.toFixed(0)}</span></span>`;
+            });
+            html += `</div></div>`;
+        }
+
+        area.innerHTML = html;
+    }
+
+    function highlightSyntax(text) {
+        return text
+            .replace(/(Award Pairings|Avoid Pairings|Prefer Off)/g, '<span class="kw">$1</span>')
+            .replace(/\b(If )/g, '<span class="cond">$1</span>')
+            .replace(/(Pairing Check-In Time|Pairing Length|Duty Legs|Allowance Amount|TAFB|Departing On|Pairing Number|Pairing Credit)/g, '<span class="cond">$1</span>')
+            .replace(/(Between|And|Not)\b/g, '<span class="cond">$1</span>')
+            .replace(/(\$\d+|\d+:\d{2}|\d+ days|\d+ legs)/g, '<span class="val">$1</span>')
+            .replace(/((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4})/g, '<span class="val">$1</span>');
+    }
+
+    function getMatchingPairings() {
+        const perDiem = parseInt(document.getElementById('bidPerDiem').value);
+        const daysMin = parseInt(document.getElementById('bidDaysMin').value);
+        const daysMax = parseInt(document.getElementById('bidDaysMax').value);
+        const maxLegs = parseInt(document.getElementById('bidMaxLegs').value);
+        const tafbMin = parseInt(document.getElementById('bidTafbMin').value);
+        const noEarly = document.getElementById('bidNoEarlyCheckin').value;
+
+        return PAIRINGS_DATA.filter(p => {
+            if (perDiem > 0 && p.allowance < perDiem) return false;
+            if (p.numDays < daysMin || p.numDays > daysMax) return false;
+            if (tafbMin > 0 && (p.tafbMinutes / 60) < tafbMin) return false;
+            // Duty legs check
+            if (maxLegs > 0) {
+                const nonDhLegs = p.legs.filter(l => !l.deadhead).length;
+                const dutyPeriods = Math.max(1, p.numDays);
+                const avgLegs = nonDhLegs / dutyPeriods;
+                if (avgLegs > maxLegs) return false;
+            }
+            // Check-in time check
+            if (noEarly && p.legs.length > 0) {
+                const firstLeg = p.legs[0];
+                const depTime = String(firstLeg.dep_time).padStart(4, '0');
+                const limitTime = noEarly.replace(':', '');
+                if (depTime < limitTime) return false;
+            }
+            return true;
+        });
+    }
+
+    function countMatchingPairings() {
+        return getMatchingPairings().length;
+    }
+
+    function showMatchingPairings() {
+        const matching = getMatchingPairings();
+        const panel = document.getElementById('matchingPairingsPanel');
+        const grid = document.getElementById('matchingPairingsGrid');
+        const title = document.getElementById('matchingTitle');
+
+        title.textContent = `Pairings disponibles (${matching.length})`;
+
+        if (matching.length === 0) {
+            grid.innerHTML = `
+                <div class="no-results">
+                    <h3>Aucun pairing ne correspond</h3>
+                    <p>Ajustez vos criteres pour elargir la recherche.</p>
+                </div>`;
+        } else {
+            // Sort by allowance descending (best value first)
+            matching.sort((a, b) => b.allowance - a.allowance);
+            grid.innerHTML = matching.map(p => renderCard(p)).join('');
+        }
+
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyBidSheet() {
+        const lines = generateBidLines();
+        if (lines.length === 0) return;
+
+        let text = 'Start Pairings\n';
+        lines.forEach((line, idx) => {
+            text += `  ${idx + 1}. ${line.text}\n`;
+        });
+        text += `  ${lines.length + 1}. Award Pairings\n`;
+        text += 'Start Reserve Bid\n';
+        text += '  Start Reserve\n';
+
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('copyToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            const toast = document.getElementById('copyToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        });
+    }
+
+    // ============ STRATEGY TAB ============
+
+    // --- Destination classification ---
+    const DEST_CLASSIFICATION = {
+        canada: ['YVR','YYC','YYZ','YEG','YWG','YHZ','YYT','YOW','YQB','YQR','YQT','YQM','YLW','YYG'],
+        warm: ['PUJ','PTP','AZS','CUR','LRM','SXM','POP','CTG','FDF','BGI','PLS','NAS','CUN','SJO','LIM','GRU','SCL','DEL','CMN','ATH','BCN','FLL','MIA','MCO','TPA','SFO','LAX','HNL','PBI','CCC','MBJ','SDQ','AUA','BON','GCM'],
+        cold: ['LHR','CDG','GVA','MXP','MAD','LYS','TLS','AMS','NRT','FRA','ZRH','MUC','DUB','KEF','CPH','ARN','HEL','OSL','WAW','PRG','VIE','BRU'],
+    };
+
+    // --- Priority options ---
+    const PRIORITY_OPTIONS = [
+        {id: 'canada', label: 'Voyages au Canada'},
+        {id: 'international', label: 'Voyages a l\'exterieur du Canada'},
+        {id: 'daysoff', label: 'Journees de conge'},
+        {id: 'perdiem', label: 'Per diem eleve'},
+        {id: 'maxdays', label: 'Nombre de jours max'},
+        {id: 'mindays', label: 'Nombre de jours min'},
+        {id: 'warm', label: 'Pays chauds'},
+        {id: 'cold', label: 'Pays froids'},
+    ];
+
+    // --- User configurable state ---
+    let userSeniority = { rank: 1502, total: 1673 };
+    let userBlockCount = 2;
+    let userBlockPriorities = [
+        { p1: 'perdiem', p2: 'international' },
+        { p1: 'canada', p2: 'daysoff' },
+    ];
+
+    // --- Parsed historical results (persisted in localStorage) ---
+    let parsedHistoricalResults = [];
+    let aggregatedHistory = null;
+
+    function loadParsedResults() {
+        try {
+            const stored = localStorage.getItem('pbsResultHistory');
+            return stored ? JSON.parse(stored) : [];
+        } catch (e) { return []; }
+    }
+
+    function saveParsedResults() {
+        try {
+            localStorage.setItem('pbsResultHistory', JSON.stringify(parsedHistoricalResults));
+        } catch (e) { console.warn('Cannot save to localStorage:', e); }
+    }
+
+    const HISTORICAL_DATA = {
+        // From Mars 2026 detailed results - "Awarded to senior bidder" / total matching
+        seniorRatios: {
+            'MAD': {senior: 63, matching: 147, ratio: 0.43},
+            'GVA': {senior: 63, matching: 147, ratio: 0.43},
+            'SJO': {senior: 28, matching: 84, ratio: 0.33},
+            'LIM': {senior: 14, matching: 42, ratio: 0.33},
+            'BCN': {senior: 91, matching: 191, ratio: 0.48},
+            'LHR': {senior: 98, matching: 238, ratio: 0.41},
+            'ATH': {senior: 49, matching: 77, ratio: 0.64},
+            'GRU': {senior: 56, matching: 140, ratio: 0.40},
+            'LYS': {senior: 49, matching: 126, ratio: 0.39},
+            'CMN': {senior: 28, matching: 98, ratio: 0.29},
+            'DEL': {senior: 43, matching: 135, ratio: 0.32},
+            'NRT': {senior: 48, matching: 168, ratio: 0.29},
+            'SCL': {senior: 7, matching: 14, ratio: 0.50},
+            'CDG': {senior: 203, matching: 483, ratio: 0.42},
+            'TLS': {senior: 49, matching: 119, ratio: 0.41},
+            'MXP': {senior: 57, matching: 148, ratio: 0.39},
+        },
+        // From allowance-based bid lines in Mars 2026
+        allowanceCompetition: {
+            600: {senior: 35, filtered: 84, total: 119, ratio: 0.29},
+            500: {senior: 126, filtered: 288, total: 414, ratio: 0.30},
+            400: {senior: 341, filtered: 508, total: 849, ratio: 0.40},
+            300: {senior: 976, filtered: 1262, total: 2243, ratio: 0.44},
+            250: {senior: 1239, filtered: 0, total: 0, ratio: 0.45},
+            150: {senior: 1645, filtered: 2278, total: 4010, ratio: 0.41},
+        },
+        // Months where bids were NOT honored (all coverage awards)
+        denialMonths: ['Septembre 2025', 'Octobre 2025', 'Mars 2026'],
+        // Month where bids WERE honored
+        successMonth: 'Novembre 2025',
+        successStrategy: 'Allowance > $250 + Check-In > 14:00 + Length > 3 days',
+        seniority: 44690,
+        seniorityRank: 1502,
+        seniorityTotal: 1673,
+        base: 'YUL',
+        // What she actually received in March
+        actualAwards: [
+            {id: 'M7025', dest: 'FLL', allow: 27.9},
+            {id: 'M8418', dest: 'YHZ', allow: 94.1},
+            {id: 'M8091', dest: 'YHZ', allow: 112.1},
+            {id: 'M8265', dest: 'YYT/YOW', allow: 170.3},
+            {id: 'M7122', dest: 'YVR', allow: 94.1},
+            {id: 'M8230', dest: 'YYZ/YHZ', allow: 188.2},
+            {id: 'M8151', dest: 'YHZ', allow: 94.1},
+        ],
+    };
+
+    let strategyBuilt = false;
+    let stratData = [];
+    let stratDetailData = [];
+    let stratSortCol = 'score';
+    let stratSortDir = -1;
+    let stratDetailSortCol = 'score';
+    let stratDetailSortDir = -1;
+
+    // --- Block config UI rendering ---
+    function renderBlockConfig() {
+        const count = userBlockCount;
+        // Ensure priorities array matches block count
+        while (userBlockPriorities.length < count) {
+            userBlockPriorities.push({ p1: 'perdiem', p2: 'international' });
+        }
+        userBlockPriorities.length = count;
+
+        const grid = document.getElementById('blockConfigGrid');
+        if (!grid) return;
+
+        const optionsHtml = (selectedId) => PRIORITY_OPTIONS.map(o =>
+            `<option value="${o.id}" ${o.id === selectedId ? 'selected' : ''}>${o.label}</option>`
+        ).join('');
+
+        grid.innerHTML = userBlockPriorities.map((bp, i) => {
+            const isLast = (i === count - 1);
+            const blockName = i === 0 ? 'Bloc 1 - Bid de Block (principal)'
+                : `Bloc ${i + 1} - Bid de Block`;
+            const blockSub = i === 0 ? 'Priorite principale' : '';
+            return `
+                <div class="block-config-item">
+                    <div class="block-label">${blockName}<small>${blockSub}</small></div>
+                    <select onchange="userBlockPriorities[${i}].p1=this.value" style="flex:1;">${optionsHtml(bp.p1)}</select>
+                    <select onchange="userBlockPriorities[${i}].p2=this.value" style="flex:1;">${optionsHtml(bp.p2)}</select>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function onBlockCountChange() {
+        userBlockCount = parseInt(document.getElementById('cfgBlockCount').value);
+        renderBlockConfig();
+    }
+
+    function recalculateStrategy() {
+        // Read config values
+        const rankInput = parseInt(document.getElementById('cfgSeniorityRank').value);
+        const totalInput = parseInt(document.getElementById('cfgSeniorityTotal').value);
+
+        // Validate
+        if (isNaN(rankInput) || rankInput < 1) {
+            alert('Le rang doit etre >= 1');
+            return;
+        }
+        if (isNaN(totalInput) || totalInput < 1) {
+            alert('Le total doit etre >= 1');
+            return;
+        }
+        if (rankInput > totalInput) {
+            alert('Le rang ne peut pas depasser le total');
+            return;
+        }
+
+        userSeniority.rank = rankInput;
+        userSeniority.total = totalInput;
+        userBlockCount = parseInt(document.getElementById('cfgBlockCount').value);
+
+        // Force rebuild
+        strategyBuilt = false;
+        buildStrategyTab();
+    }
+
+    function toggleCollapsible(header) {
+        const arrow = header.querySelector('.arrow');
+        const body = header.nextElementSibling;
+        if (body.classList.contains('open')) {
+            body.classList.remove('open');
+            arrow.classList.remove('open');
+        } else {
+            body.classList.add('open');
+            arrow.classList.add('open');
+        }
+    }
+
+    // --- Priority scoring for a pairing ---
+    function scorePriority(priorityId, pairing, maxAllowance) {
+        const dest = getPairingMainDest(pairing);
+        switch (priorityId) {
+            case 'canada':
+                return DEST_CLASSIFICATION.canada.includes(dest) ? 80 : 0;
+            case 'international':
+                return !DEST_CLASSIFICATION.canada.includes(dest) ? 80 : 0;
+            case 'daysoff':
+                return pairing.numDays <= 2 ? 80 : (pairing.numDays <= 3 ? 40 : 10);
+            case 'perdiem':
+                return maxAllowance > 0 ? 80 * (pairing.allowance / maxAllowance) : 0;
+            case 'maxdays':
+                return pairing.numDays >= 5 ? 80 : (pairing.numDays >= 4 ? 60 : (pairing.numDays >= 3 ? 30 : 0));
+            case 'mindays':
+                return pairing.numDays <= 1 ? 80 : (pairing.numDays <= 2 ? 60 : 10);
+            case 'warm':
+                return DEST_CLASSIFICATION.warm.includes(dest) ? 80 : 0;
+            case 'cold':
+                return DEST_CLASSIFICATION.cold.includes(dest) ? 80 : 0;
+            default:
+                return 0;
+        }
+    }
+
+    function getPairingMainDest(p) {
+        const cities = (p.layoverCities && p.layoverCities.length > 0) ? p.layoverCities : p.destinations;
+        return cities[0] || 'N/A';
+    }
+
+    function scorePairingForBlock(pairing, p1Id, p2Id, maxAllowance) {
+        const s1 = scorePriority(p1Id, pairing, maxAllowance);
+        const s2 = scorePriority(p2Id, pairing, maxAllowance);
+        let score = s1 * 0.6 + s2 * 0.4;
+
+        // Popularity penalty: more junior = stronger penalty for popular flights
+        const dest = getPairingMainDest(pairing);
+        const juniorRatio = userSeniority.rank / userSeniority.total;
+        const histDest = HISTORICAL_DATA.seniorRatios[dest];
+        const competitionRatio = histDest ? histDest.ratio : 0.4;
+        const popularityPenalty = competitionRatio * juniorRatio * 40;
+        score -= popularityPenalty;
+
+        return Math.max(0, score);
+    }
+
+    function buildStrategyTab() {
+        if (strategyBuilt) return;
+        strategyBuilt = true;
+
+        // Render block config UI
+        renderBlockConfig();
+
+        // Aggregate pairings by destination (layover cities)
+        const destMap = {};
+        PAIRINGS_DATA.forEach(p => {
+            const mainDest = getPairingMainDest(p);
+            if (!destMap[mainDest]) {
+                destMap[mainDest] = {
+                    dest: mainDest,
+                    pairings: [],
+                    totalAllow: 0,
+                    totalDays: 0,
+                    totalBlock: 0,
+                    maxAllow: 0,
+                };
+            }
+            destMap[mainDest].pairings.push(p);
+            destMap[mainDest].totalAllow += p.allowance;
+            destMap[mainDest].totalDays += p.numDays;
+            destMap[mainDest].totalBlock += p.blockMinutes;
+            destMap[mainDest].maxAllow = Math.max(destMap[mainDest].maxAllow, p.allowance);
+        });
+
+        const targetHours = 76;
+        const monthDays = 31;
+        const minDaysOff = 11;
+        const flyableDays = monthDays - minDaysOff;
+        stratData = [];
+
+        Object.values(destMap).forEach(d => {
+            const count = d.pairings.length;
+            const avgAllow = d.totalAllow / count;
+            const avgDays = d.totalDays / count;
+            const avgBlock = d.totalBlock / count;
+
+            const daysPerPairing = avgDays + 1;
+            const pairingsPerMonth = Math.min(
+                Math.floor(flyableDays / daysPerPairing),
+                Math.floor(targetHours / (avgBlock / 60))
+            );
+            const monthlyAllow = avgAllow * Math.max(1, pairingsPerMonth);
+
+            const prob = calculateProbability(d.dest, avgAllow, avgDays, count);
+            const score = (monthlyAllow * prob) / 100;
+
+            stratData.push({
+                dest: d.dest,
+                count,
+                avgDays: Math.round(avgDays * 10) / 10,
+                avgAllow: Math.round(avgAllow * 10) / 10,
+                maxAllow: Math.round(d.maxAllow * 10) / 10,
+                avgBlock,
+                monthlyAllow: Math.round(monthlyAllow),
+                prob: Math.round(prob),
+                score: Math.round(score),
+                pairingsPerMonth: Math.max(1, pairingsPerMonth),
+            });
+        });
+
+        // Build detail data (per pairing)
+        stratDetailData = [];
+        PAIRINGS_DATA.forEach(p => {
+            const mainDest = getPairingMainDest(p);
+            const prob = calculateProbability(mainDest, p.allowance, p.numDays, 1);
+            const perDay = p.numDays > 0 ? p.allowance / p.numDays : 0;
+            const score = (p.allowance * prob) / 100;
+            stratDetailData.push({
+                id: p.id,
+                dest: mainDest,
+                days: p.numDays,
+                block: p.blockTotal,
+                blockMin: p.blockMinutes,
+                allow: p.allowance,
+                perDay: Math.round(perDay * 10) / 10,
+                prob: Math.round(prob),
+                score: Math.round(score * 10) / 10,
+            });
+        });
+
+        renderSummaryCards();
+        renderRecommendation();
+        renderProposedBid();
+        renderStrategyTable();
+        renderDetailTable();
+    }
+
+    function calculateProbability(dest, allowance, avgDays, supply) {
+        let prob = 50;
+        const seniorityShare = Math.max(2, (1 - userSeniority.rank / userSeniority.total) * 30);
+
+        // 1. Senior competition from historical data
+        const histDest = HISTORICAL_DATA.seniorRatios[dest];
+        if (histDest) {
+            const availableAfterSeniors = 1 - histDest.ratio;
+            prob = availableAfterSeniors * seniorityShare;
+        } else {
+            // No historical data - use allowance-based estimation, scaled by seniority
+            const baseFactor = seniorityShare / 12; // normalize vs original 12% factor
+            if (allowance >= 500) prob = 5 * baseFactor;
+            else if (allowance >= 400) prob = 8 * baseFactor;
+            else if (allowance >= 300) prob = 12 * baseFactor;
+            else if (allowance >= 250) prob = 18 * baseFactor;
+            else if (allowance >= 200) prob = 25 * baseFactor;
+            else if (allowance >= 150) prob = 35 * baseFactor;
+            else if (allowance >= 100) prob = 50 * baseFactor;
+            else if (allowance >= 50) prob = 65 * baseFactor;
+            else prob = 80 * baseFactor;
+        }
+
+        // 2. Supply bonus
+        if (supply > 50) prob *= 1.3;
+        else if (supply > 20) prob *= 1.15;
+        else if (supply < 5) prob *= 0.7;
+
+        // 3. Duration factor
+        if (avgDays >= 5) prob *= 1.4;
+        else if (avgDays >= 4) prob *= 1.25;
+        else if (avgDays >= 3) prob *= 1.1;
+        else if (avgDays <= 1) prob *= 0.75;
+
+        // 4. Domestic bonus
+        if (DEST_CLASSIFICATION.canada.includes(dest)) prob *= 1.5;
+
+        // 5. US regional bonus
+        const usRegional = ['BOS','DEN','DFW','IAH','BNA','ORD','EWR','LGA','TPA','FLL','MIA','MCO','PBI'];
+        if (usRegional.includes(dest)) prob *= 1.2;
+
+        // 6. Caribbean
+        const caribbean = ['PUJ','PTP','AZS','CUR','LRM','SXM','POP','CTG','FDF','BGI','PLS','NAS'];
+        if (caribbean.includes(dest)) prob *= 1.1;
+
+        return Math.max(2, Math.min(85, prob));
+    }
+
+    function getProbLabel(prob) {
+        if (prob >= 45) return '<span class="prob-badge prob-high">Elevee</span>';
+        if (prob >= 20) return '<span class="prob-badge prob-medium">Moyenne</span>';
+        return '<span class="prob-badge prob-low">Faible</span>';
+    }
+
+    function getScoreBar(score, maxScore) {
+        const pct = maxScore > 0 ? Math.min(100, (score / maxScore) * 100) : 0;
+        let color = '#e74c3c';
+        if (pct > 60) color = '#2ecc71';
+        else if (pct > 30) color = '#f1c40f';
+        return `<span class="score-bar"><span class="score-bar-fill" style="width:${pct}%;background:${color}"></span></span>${score}`;
+    }
+
+    function renderSummaryCards() {
+        const totalPairings = PAIRINGS_DATA.length;
+        const avgAllow = PAIRINGS_DATA.reduce((s, p) => s + p.allowance, 0) / totalPairings;
+        const actualMonthly = HISTORICAL_DATA.actualAwards.reduce((s, a) => s + a.allow, 0);
+        const highProb = stratData.filter(d => d.prob >= 45);
+        const bestOptimized = [...stratData].sort((a, b) => b.score - a.score)[0];
+
+        const rank = userSeniority.rank;
+        const total = userSeniority.total;
+        const pct = Math.round((rank / total) * 100);
+        const markerPos = (rank / total) * 100;
+        const juniorsBehind = total - rank;
+
+        // Seniority banner
+        document.getElementById('seniorityBanner').innerHTML = `
+            <div class="seniority-rank-block">
+                <div class="rank-big">${rank}</div>
+                <div class="rank-total">sur ${total}</div>
+            </div>
+            <div class="seniority-bar-wrapper">
+                <div class="seniority-bar-label">
+                    <span>Plus senior (#1)</span>
+                    <span>Plus junior (#${total})</span>
+                </div>
+                <div class="seniority-bar">
+                    <div class="seniority-bar-marker" style="left:${markerPos}%" data-label="Vous #${rank}"></div>
+                </div>
+                <div style="margin-top:10px;font-size:11px;color:var(--ac-muted);text-align:center;">
+                    <strong style="color:var(--ac-red);">${pct}%</strong> des FA sont plus seniors
+                    &mdash; seulement <strong>${juniorsBehind}</strong> personnes derriere
+                </div>
+            </div>
+            <div class="seniority-info">
+                <strong>Impact sur le bid:</strong><br>
+                <span class="highlight">${rank - 1}</span> personnes choisissent avant vous.<br>
+                Les vols a haut perdiem sont generalement epuises<br>
+                avant le rang ~1200. Strategie: cibler les vols<br>
+                <strong>longs, moins populaires, avec depart PM</strong>.
+            </div>
+        `;
+
+        document.getElementById('stratSummaryCards').innerHTML = `
+            <div class="strat-card">
+                <div class="label">Rang Anciennete</div>
+                <div class="value red">${rank}/${total}</div>
+            </div>
+            <div class="strat-card">
+                <div class="label">Pairings Disponibles</div>
+                <div class="value blue">${totalPairings}</div>
+            </div>
+            <div class="strat-card">
+                <div class="label">Perdiem Moy. Pool</div>
+                <div class="value">$${Math.round(avgAllow)}</div>
+            </div>
+            <div class="strat-card">
+                <div class="label">Perdiem Reel Mars</div>
+                <div class="value gold">$${Math.round(actualMonthly)}</div>
+            </div>
+            <div class="strat-card">
+                <div class="label">Dest. Prob. Elevee</div>
+                <div class="value green">${highProb.length}</div>
+            </div>
+            <div class="strat-card">
+                <div class="label">Meilleur Score</div>
+                <div class="value green">${bestOptimized ? bestOptimized.dest : '-'}</div>
+            </div>
+        `;
+    }
+
+    function renderStrategyTable() {
+        const sorted = [...stratData].sort((a, b) => {
+            const va = a[stratSortCol], vb = b[stratSortCol];
+            if (typeof va === 'string') return stratSortDir * va.localeCompare(vb);
+            return stratSortDir * (va - vb);
+        });
+
+        const maxScore = Math.max(...sorted.map(d => d.score));
+        document.getElementById('stratTableBody').innerHTML = sorted.map(d => `
+            <tr>
+                <td><strong>${d.dest}</strong></td>
+                <td>${d.count}</td>
+                <td>${d.avgDays}j</td>
+                <td>$${d.avgAllow}</td>
+                <td>$${d.maxAllow}</td>
+                <td><strong>$${d.monthlyAllow}</strong></td>
+                <td>${getSeniorBar(d.dest)}</td>
+                <td>${getProbLabel(d.prob)}</td>
+                <td>${getScoreBar(d.score, maxScore)}</td>
+            </tr>
+        `).join('');
+
+        // Update header styling
+        document.querySelectorAll('#stratTable th').forEach(th => {
+            th.classList.remove('sorted');
+        });
+    }
+
+    function getSeniorBar(dest) {
+        const hist = HISTORICAL_DATA.seniorRatios[dest];
+        if (!hist) return '<span style="color:var(--ac-muted)">N/D</span>';
+        const pct = Math.round(hist.ratio * 100);
+        let color = '#2ecc71';
+        if (pct > 50) color = '#e74c3c';
+        else if (pct > 35) color = '#f1c40f';
+        return `<span class="score-bar"><span class="score-bar-fill" style="width:${pct}%;background:${color}"></span></span>${pct}%`;
+    }
+
+    function renderDetailTable() {
+        const sorted = [...stratDetailData].sort((a, b) => {
+            const va = a[stratDetailSortCol], vb = b[stratDetailSortCol];
+            if (typeof va === 'string') return stratDetailSortDir * va.localeCompare(vb);
+            return stratDetailSortDir * (va - vb);
+        });
+
+        // Show top 200
+        const maxScore = Math.max(...sorted.map(d => d.score));
+        document.getElementById('stratDetailBody').innerHTML = sorted.map(d => `
+            <tr>
+                <td><strong>${d.id}</strong></td>
+                <td>${d.dest}</td>
+                <td>${d.days}j</td>
+                <td>${d.block}</td>
+                <td>$${d.allow.toFixed(1)}</td>
+                <td>$${d.perDay}</td>
+                <td>${getProbLabel(d.prob)}</td>
+                <td>${getScoreBar(d.score, maxScore)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function renderRecommendation() {
+        // Build optimized bid order
+        // Strategy: Mix of high-value targets and realistic "safe" picks
+        const sorted = [...stratData].sort((a, b) => b.score - a.score);
+        const highValue = sorted.filter(d => d.avgAllow >= 300 && d.prob >= 8);
+        const safeHigh = sorted.filter(d => d.prob >= 35 && d.avgAllow >= 120);
+        const safeMedium = sorted.filter(d => d.prob >= 50);
+
+        // Build recommendation list (ordered bid strategy)
+        const reco = [];
+        const used = new Set();
+
+        // Phase 1: "Reach" - High value, low probability but worth trying first
+        highValue.slice(0, 5).forEach(d => {
+            if (!used.has(d.dest)) {
+                reco.push({dest: d.dest, tag: 'reach', tagLabel: 'Aspirationnel', reason: `Perdiem moy. $${d.avgAllow} | Prob. ${d.prob}%`});
+                used.add(d.dest);
+            }
+        });
+
+        // Phase 2: "Value" - Best risk-adjusted returns
+        safeHigh.slice(0, 6).forEach(d => {
+            if (!used.has(d.dest)) {
+                reco.push({dest: d.dest, tag: 'value', tagLabel: 'Optimal', reason: `Score ${d.score} | Perdiem $${d.avgAllow} | Prob. ${d.prob}%`});
+                used.add(d.dest);
+            }
+        });
+
+        // Phase 3: "Safe" - High probability, decent perdiem
+        safeMedium.slice(0, 5).forEach(d => {
+            if (!used.has(d.dest)) {
+                reco.push({dest: d.dest, tag: 'secure', tagLabel: 'Securitaire', reason: `Prob. ${d.prob}% | Perdiem $${d.avgAllow}`});
+                used.add(d.dest);
+            }
+        });
+
+        // Realistic monthly perdiem estimate
+        // User can fly ~4-5 pairings per month (target 76h, avg pairing ~15-18h block)
+        // With optimized strategy, estimate avg perdiem per pairing she'd actually receive
+        const recoDestsData = reco.map(r => stratData.find(x => x.dest === r.dest)).filter(Boolean);
+        // Weighted average perdiem: weight by probability (higher prob = more likely to get it)
+        const totalWeight = recoDestsData.reduce((s, d) => s + d.prob, 0);
+        const weightedAvgPerDiem = totalWeight > 0
+            ? recoDestsData.reduce((s, d) => s + d.avgAllow * d.prob, 0) / totalWeight
+            : 150;
+        // Realistic pairings per month: ~4-5 based on historical data
+        const realisticPairingsPerMonth = 5;
+        const totalExpected = Math.round(weightedAvgPerDiem * realisticPairingsPerMonth);
+        const actualMonthly = Math.round(HISTORICAL_DATA.actualAwards.reduce((s,a) => s + a.allow, 0));
+
+        document.getElementById('stratRecommendation').innerHTML = `
+            <h3>Strategie de Bid Recommandee</h3>
+            <p style="font-size:13px;color:var(--ac-muted);margin-bottom:6px;">
+                <strong>Principe:</strong> Commencer par des choix ambitieux (peu de chance mais haut rendement),
+                puis descendre vers des choix optimaux (meilleur ratio risque/rendement),
+                et terminer par des choix securitaires (haute probabilite).
+                PBS lit les bid lines de haut en bas et s'arrete des qu'un bloc complet est atteint.
+            </p>
+            <p style="font-size:13px;color:var(--ac-muted);margin-bottom:16px;">
+                <strong>Strategie gagnante de Novembre 2025:</strong> <code>Allowance > $250 + Check-In > 14:00 + Length > 3 days</code> a fonctionne car les pairings longs avec depart en apres-midi sont moins convoites.
+            </p>
+            ${reco.map((r, i) => `
+                <div class="reco-item">
+                    <div class="reco-rank">${i + 1}</div>
+                    <div class="reco-text">
+                        <strong>${r.dest}</strong> - ${r.reason}
+                    </div>
+                    <span class="reco-tag tag-${r.tag}">${r.tagLabel}</span>
+                </div>
+            `).join('')}
+            <div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:13px;">
+                <strong style="color:var(--ac-gold);">Perdiem mensuel estime (~${realisticPairingsPerMonth} pairings/mois, moy. ~$${Math.round(weightedAvgPerDiem)}/pairing):</strong>
+                <strong style="color:var(--ac-green);font-size:16px;">~$${totalExpected}</strong>
+                <span style="color:var(--ac-muted);"> vs $${actualMonthly} recu en mars (coverage awards seulement)</span>
+            </div>
+
+            <div style="margin-top:16px;padding:16px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;">
+                <h4 style="color:#e74c3c;font-size:14px;margin-bottom:10px;">Comment eviter le Denial Mode</h4>
+                <p style="font-size:12px;color:var(--ac-muted);margin-bottom:8px;">
+                    Le <strong style="color:var(--ac-text);">Denial Mode</strong> est le plus grand ennemi de votre bid. Sur les 4 derniers mois, vous etes tombe(e) en Denial Mode 3 fois sur 4,
+                    resultant en pairings imposes par Coverage Awards (domestique, faible perdiem). Voici comment l'eviter:
+                </p>
+                <ul style="font-size:12px;color:var(--ac-muted);margin:0 0 0 16px;line-height:2.2;">
+                    <li><strong style="color:var(--ac-text);">Limiter les Prefer Off a 3-5 jours maximum.</strong> Chaque jour exclu reduit le pool de pairings. En Denial Mode, PBS supprime vos Prefer Off un par un (du dernier au premier) puis recommence tout le processus.</li>
+                    <li><strong style="color:var(--ac-text);">Eviter les Avoid Pairings agressifs.</strong> <code>Avoid Pairings If Pairing Length = 1 days</code> a ete refuse (Not honored) en mars. Chaque Avoid retire des pairings du pool. Si trop sont retires, PBS ne peut pas construire un bloc legal (71-80h) et passe en Denial Mode.</li>
+                    <li><strong style="color:var(--ac-text);">Ordonner les Prefer Off du moins au plus important.</strong> En Denial Mode, PBS supprime le <em>dernier</em> Prefer Off en premier. Placez vos jours les plus importants en premier dans la liste.</li>
+                    <li><strong style="color:var(--ac-text);">Ne pas combiner trop de filtres restrictifs.</strong> Ex: eviter <code>Avoid If Legs > 2</code> + <code>Avoid If Length = 1</code> + <code>Prefer Off 10 jours</code> ensemble &mdash; ca elimine trop de pairings.</li>
+                    <li><strong style="color:var(--ac-text);">Utiliser Set Condition Minimum Credit</strong> plutot que des Avoid pour controler la qualite. Ca ne retire pas de pairings du pool.</li>
+                    <li><strong style="color:var(--ac-text);">Privilegier les Award Pairings If (positifs)</strong> plutot que les Avoid (negatifs). Les bid lines positives n'eliminent rien du pool &mdash; elles disent juste a PBS ce que vous preferez.</li>
+                </ul>
+            </div>
+
+            <div style="margin-top:12px;padding:16px;background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:8px;">
+                <h4 style="color:#2ecc71;font-size:14px;margin-bottom:10px;">Maximiser ses chances avec l'anciennete #${userSeniority.rank}</h4>
+                <ul style="font-size:12px;color:var(--ac-muted);margin:0 0 0 16px;line-height:2.2;">
+                    <li><strong style="color:var(--ac-text);">Cibler les pairings longs (3-5 jours).</strong> Les seniors preferent souvent les courts (1-2j) qui offrent plus de flexibilite. Les longs courriers avec layover sont moins convoites.</li>
+                    <li><strong style="color:var(--ac-text);">Departs en apres-midi (Check-In > 14:00).</strong> C'est la strategie qui a fonctionne en Novembre 2025 &mdash; les departs matinaux sont plus populaires.</li>
+                    <li><strong style="color:var(--ac-text);">Descendre progressivement les seuils d'Allowance.</strong> Commencer a $500+, puis $400+, $300+, $250+, $200+, $150+. PBS s'arrete des qu'il complete le bloc.</li>
+                    <li><strong style="color:var(--ac-text);">Les destinations domestiques sont votre filet de securite.</strong> YHZ, YWG, YYZ, YVR ont un grand volume et moins de competition. Perdiem modeste mais assure (~$120-$200/pairing).</li>
+                    <li><strong style="color:var(--ac-text);">Ajouter <code>Average Daily Credit > 005:00</code></strong> comme filtre de qualite &mdash; ca elimine les pairings a faible ratio credit/jour sans retirer du pool.</li>
+                    <li><strong style="color:var(--ac-text);">Toujours terminer par <code>Award Pairings</code></strong> (generique sans filtre). C'est votre derniere ligne de defense avant que PBS passe au Denial Mode.</li>
+                </ul>
+            </div>
+        `;
+    }
+
+
+    // ============ PROPOSED BID GENERATOR ============
+    let proposedBidBlocks = []; // array of arrays for copy
+
+    function colorizeBidCmd(cmd) {
+        return cmd
+            .replace(/(Award Pairings|Avoid Pairings|Prefer Off|Set Condition)/g, '<span class="kw">$1</span>')
+            .replace(/(If Allowance Amount|If Pairing Length|If Pairing Check-In Time|If Average Daily Credit|If Pairing Total Credit|If Any Layover In|If Any Duty Legs|If Departing On|If Pairing Check-Out Time|And Of Duration)/g, '<span class="cond">$1</span>')
+            .replace(/(\$\d+|\d+:\d+|> \d+|< \d+|= \d+|Between \d+|Minimum \d+)/g, '<span class="val">$1</span>')
+            .replace(/\b([A-Z]{3}(?:,\s*[A-Z]{3})*)\b/g, (match) => {
+                if (match.match(/^[A-Z]{3}(,\s*[A-Z]{3})*$/)) return `<span class="dest">${match}</span>`;
+                return match;
+            });
+    }
+
+    // ========== SMART BID ALGORITHM ==========
+
+    // --- Helper: Get check-in hour from pairing (first departure) ---
+    function getCheckInHour(pairing) {
+        if (!pairing.legs || pairing.legs.length === 0) return 12;
+        const dt = pairing.legs[0].dep_time;
+        return parseInt(dt.substring(0, 2)) + parseInt(dt.substring(2, 4)) / 60;
+    }
+
+    // --- Helper: Average daily credit in minutes ---
+    function getAvgDailyCredit(pairing) {
+        return pairing.numDays > 0 ? pairing.blockMinutes / pairing.numDays : 0;
+    }
+
+    // --- Get destinations matching a priority ---
+    function getDestFilterForPriority(priorityId) {
+        switch (priorityId) {
+            case 'canada': return [...DEST_CLASSIFICATION.canada];
+            case 'international': {
+                const allDests = [...new Set(PAIRINGS_DATA.map(p => getPairingMainDest(p)))];
+                return allDests.filter(d => !DEST_CLASSIFICATION.canada.includes(d));
+            }
+            case 'warm': return [...DEST_CLASSIFICATION.warm];
+            case 'cold': return [...DEST_CLASSIFICATION.cold];
+            default: return [];
+        }
+    }
+
+    // --- Compute aggregated history from base data + uploaded results ---
+    function computeAggregatedHistory() {
+        const baseMonths = 4;
+        const baseDenial = 3;
+        let totalMonths = baseMonths;
+        let denialCount = baseDenial;
+
+        parsedHistoricalResults.forEach(r => {
+            totalMonths++;
+            if (r.denialMode) denialCount++;
+        });
+
+        const mergedRatios = {};
+        Object.entries(HISTORICAL_DATA.seniorRatios).forEach(([k, v]) => {
+            mergedRatios[k] = { ...v };
+        });
+        parsedHistoricalResults.forEach(result => {
+            (result.bidLines || []).forEach(bl => {
+                if (bl.awardedToSenior && bl.matchCount) {
+                    const m = bl.command && bl.command.match(/If Any Layover In (\w{3})/);
+                    if (m) {
+                        const dest = m[1];
+                        if (mergedRatios[dest]) {
+                            mergedRatios[dest].senior += bl.awardedToSenior;
+                            mergedRatios[dest].matching += bl.matchCount;
+                            mergedRatios[dest].ratio = mergedRatios[dest].senior / mergedRatios[dest].matching;
+                        } else {
+                            mergedRatios[dest] = { senior: bl.awardedToSenior, matching: bl.matchCount, ratio: bl.awardedToSenior / bl.matchCount };
+                        }
+                    }
+                }
+            });
+        });
+
+        const successStrategies = [HISTORICAL_DATA.successStrategy];
+        parsedHistoricalResults.forEach(result => {
+            if (!result.denialMode) {
+                (result.bidLines || []).forEach(bl => {
+                    if (bl.outcome === 'Honored' || (bl.awarded && bl.awarded > 0)) {
+                        successStrategies.push(bl.command);
+                    }
+                });
+            }
+        });
+
+        return {
+            totalMonths,
+            denialCount,
+            denialRate: totalMonths > 0 ? denialCount / totalMonths : 0.75,
+            seniorRatios: mergedRatios,
+            successStrategies,
+        };
+    }
+
+    // --- Calculate optimal line count per block ---
+    function calculateOptimalLineCount(juniorRatio, denialRate) {
+        // Base: 8 lines. Seniors get more (can be specific), juniors get fewer (need broader filters)
+        // High denial rate reduces count (more conservative)
+        const base = 8;
+        const seniorityAdj = Math.round((1 - juniorRatio) * 4); // 0-4 for seniors
+        const denialAdj = -Math.round(denialRate * 3); // -3 to 0
+        return Math.max(4, Math.min(14, base + seniorityAdj + denialAdj));
+    }
+
+    // --- Evaluate a candidate bid line against actual pairing pool ---
+    function evaluateCandidate(cmd, filterFn) {
+        const matching = PAIRINGS_DATA.filter(filterFn);
+        const totalCredit = matching.reduce((sum, p) => sum + p.blockMinutes, 0);
+        return {
+            cmd,
+            filterFn,
+            matchCount: matching.length,
+            matchIds: new Set(matching.map(p => p.id)),
+            totalCreditMin: totalCredit,
+            canBuildBlock: totalCredit >= 71 * 60,
+        };
+    }
+
+    // --- Compute priority alignment score for matching pairings ---
+    function computePriorityAlignment(matchIds, p1Id, p2Id, maxAllow) {
+        if (matchIds.size === 0) return 0;
+        let total = 0;
+        PAIRINGS_DATA.forEach(p => {
+            if (matchIds.has(p.id)) {
+                total += scorePriority(p1Id, p, maxAllow) * 0.6 + scorePriority(p2Id, p, maxAllow) * 0.4;
+            }
+        });
+        return total / matchIds.size / 80;
+    }
+
+    // --- Compute avg senior competition for matching pairings ---
+    function computeAvgSeniorComp(matchIds) {
+        if (matchIds.size === 0) return 0.4;
+        let total = 0, cnt = 0;
+        const ratios = aggregatedHistory ? aggregatedHistory.seniorRatios : HISTORICAL_DATA.seniorRatios;
+        PAIRINGS_DATA.forEach(p => {
+            if (matchIds.has(p.id)) {
+                const dest = getPairingMainDest(p);
+                const hist = ratios[dest];
+                if (hist) { total += hist.ratio; cnt++; }
+            }
+        });
+        return cnt > 0 ? total / cnt : 0.4;
+    }
+
+    // --- Generate all candidate bid lines for given priorities ---
+    function generateCandidateLines(p1Id, p2Id) {
+        const cands = [];
+        const maxAllow = Math.max(...PAIRINGS_DATA.map(p => p.allowance), 1);
+
+        // Score destinations for these priorities
+        const destScores = {};
+        PAIRINGS_DATA.forEach(p => {
+            const d = getPairingMainDest(p);
+            if (!destScores[d]) destScores[d] = { dest: d, score: 0, count: 0 };
+            destScores[d].score += scorePairingForBlock(p, p1Id, p2Id, maxAllow);
+            destScores[d].count++;
+        });
+        Object.values(destScores).forEach(d => d.avgScore = d.score / d.count);
+        const topDests = Object.values(destScores).sort((a, b) => b.avgScore - a.avgScore);
+        const topDestCodes = topDests.slice(0, 8).map(d => d.dest);
+
+        // --- Allowance-based candidates ---
+        [600, 500, 450, 400, 350, 300, 250, 200, 150, 100].forEach(t => {
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t}`, filter: p => p.allowance > t, cat: 'allow' });
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Pairing Check-In Time > 14:00`, filter: p => p.allowance > t && getCheckInHour(p) >= 14, cat: 'allow_ci' });
+            [3, 4].forEach(days => {
+                cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Pairing Length > ${days} days`, filter: p => p.allowance > t && p.numDays > days, cat: 'allow_dur' });
+            });
+            // November success pattern: allowance + check-in + duration
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Pairing Check-In Time > 14:00 If Pairing Length > 3 days`, filter: p => p.allowance > t && getCheckInHour(p) >= 14 && p.numDays > 3, cat: 'nov_pattern' });
+            // Allowance + daily credit
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Average Daily Credit > 005:00 If Pairing Length > 2 days`, filter: p => p.allowance > t && getAvgDailyCredit(p) > 300 && p.numDays > 2, cat: 'allow_cred' });
+        });
+
+        // --- Top-scored destination groups ---
+        [3, 5, 7].forEach(n => {
+            const group = topDestCodes.slice(0, n);
+            if (group.length > 0) {
+                const str = group.join(', ');
+                cands.push({ cmd: `Award Pairings If Any Layover In ${str}`, filter: p => group.includes(getPairingMainDest(p)), cat: 'dest_top' });
+                [200, 150].forEach(t => {
+                    cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Allowance Amount > $${t}`, filter: p => group.includes(getPairingMainDest(p)) && p.allowance > t, cat: 'dest_allow' });
+                });
+            }
+        });
+
+        // --- Priority-specific destination groups ---
+        [p1Id, p2Id].forEach((pid, idx) => {
+            const dests = getDestFilterForPriority(pid);
+            if (dests.length === 0) return;
+            const available = dests.filter(d => PAIRINGS_DATA.some(p => getPairingMainDest(p) === d));
+            if (available.length === 0) return;
+            // Rank by priority score
+            const scored = available.map(d => {
+                const ps = PAIRINGS_DATA.filter(p => getPairingMainDest(p) === d);
+                const avg = ps.reduce((s, p) => s + scorePairingForBlock(p, p1Id, p2Id, maxAllow), 0) / (ps.length || 1);
+                return { dest: d, avg };
+            }).sort((a, b) => b.avg - a.avg);
+            [4, 6].forEach(n => {
+                const group = scored.slice(0, n).map(s => s.dest);
+                const str = group.join(', ');
+                cands.push({ cmd: `Award Pairings If Any Layover In ${str}`, filter: p => group.includes(getPairingMainDest(p)), cat: idx === 0 ? 'p1_dest' : 'p2_dest' });
+            });
+        });
+
+        // --- Duration-based ---
+        cands.push({ cmd: 'Award Pairings If Pairing Length > 4 days If Average Daily Credit > 005:00', filter: p => p.numDays > 4 && getAvgDailyCredit(p) > 300, cat: 'dur' });
+        cands.push({ cmd: 'Award Pairings If Pairing Length > 3 days', filter: p => p.numDays > 3, cat: 'dur' });
+        cands.push({ cmd: 'Award Pairings If Pairing Length Between 2 days And 4 days', filter: p => p.numDays >= 2 && p.numDays <= 4, cat: 'dur' });
+        cands.push({ cmd: 'Award Pairings If Pairing Length < 3 days', filter: p => p.numDays < 3, cat: 'dur_short' });
+        cands.push({ cmd: 'Award Pairings If Pairing Length < 3 days If Allowance Amount > $80', filter: p => p.numDays < 3 && p.allowance > 80, cat: 'dur_short' });
+
+        // --- Check-in time ---
+        cands.push({ cmd: 'Award Pairings If Pairing Check-In Time > 14:00', filter: p => getCheckInHour(p) >= 14, cat: 'ci' });
+        cands.push({ cmd: 'Award Pairings If Pairing Check-In Time > 14:00 If Pairing Length > 2 days', filter: p => getCheckInHour(p) >= 14 && p.numDays > 2, cat: 'ci_dur' });
+
+        // --- Combined priority-aware lines ---
+        if (p1Id === 'perdiem' || p2Id === 'perdiem') {
+            [350, 250, 200].forEach(t => {
+                const dFilter = getDestFilterForPriority(p1Id === 'perdiem' ? p2Id : p1Id);
+                if (dFilter.length > 0) {
+                    const avail = dFilter.filter(d => PAIRINGS_DATA.some(p => getPairingMainDest(p) === d)).slice(0, 5);
+                    if (avail.length > 0) {
+                        const str = avail.join(', ');
+                        cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Allowance Amount > $${t}`, filter: p => avail.includes(getPairingMainDest(p)) && p.allowance > t, cat: 'combo' });
+                    }
+                }
+            });
+        }
+
+        return cands;
+    }
+
+    // --- Select optimal lines from candidates using greedy diversity-aware selection ---
+    function selectOptimalLines(candidates, targetCount, p1Id, p2Id) {
+        const maxAllow = Math.max(...PAIRINGS_DATA.map(p => p.allowance), 1);
+
+        // Evaluate all candidates
+        const evaluated = [];
+        for (const c of candidates) {
+            const ev = evaluateCandidate(c.cmd, c.filter);
+            if (ev.matchCount === 0) continue;
+
+            const priority = computePriorityAlignment(ev.matchIds, p1Id, p2Id, maxAllow);
+            const seniorComp = computeAvgSeniorComp(ev.matchIds);
+            const matchFactor = Math.min(1, ev.matchCount / 150);
+            const compFactor = 1 - seniorComp;
+            const feasibility = ev.canBuildBlock ? 1 : 0.3;
+
+            const score = priority * 0.40 + matchFactor * 0.15 + compFactor * 0.25 + feasibility * 0.20;
+
+            evaluated.push({ ...c, ...ev, priorityScore: priority, seniorComp, optimizationScore: score });
+        }
+
+        evaluated.sort((a, b) => b.optimizationScore - a.optimizationScore);
+
+        // Greedy selection with diversity constraints
+        const selected = [];
+        const catCount = {};
+        const coveredIds = new Set();
+
+        for (const cand of evaluated) {
+            if (selected.length >= targetCount) break;
+
+            // Category limits
+            const maxPerCat = (cand.cat === 'allow' || cand.cat === 'nov_pattern') ? 3 : 2;
+            if ((catCount[cand.cat] || 0) >= maxPerCat) continue;
+
+            // Diversity: check how many NEW pairings this line adds
+            let newCount = 0;
+            cand.matchIds.forEach(id => { if (!coveredIds.has(id)) newCount++; });
+            const novelty = cand.matchCount > 0 ? newCount / cand.matchCount : 0;
+
+            // Skip if this line adds < 10% new pairings (too redundant)
+            if (selected.length > 0 && novelty < 0.10) continue;
+
+            selected.push(cand);
+            catCount[cand.cat] = (catCount[cand.cat] || 0) + 1;
+            cand.matchIds.forEach(id => coveredIds.add(id));
+        }
+
+        // Sort selected: fewest matches first (most selective → least selective)
+        selected.sort((a, b) => a.matchCount - b.matchCount);
+
+        return selected;
+    }
+
+    // --- THE MAIN SMART ALGORITHM ---
+    function generateBlockBidLines(blockIndex, p1Id, p2Id) {
+        const juniorRatio = userSeniority.rank / userSeniority.total;
+        const denialRate = aggregatedHistory ? aggregatedHistory.denialRate : 0.75;
+
+        // Step 1: Optimal line count
+        const optimalCount = calculateOptimalLineCount(juniorRatio, denialRate);
+
+        // Step 2: Generate all candidates
+        const candidates = generateCandidateLines(p1Id, p2Id);
+
+        // Step 3: Select optimal set
+        const selected = selectOptimalLines(candidates, optimalCount, p1Id, p2Id);
+
+        // Step 4: Build final lines
+        const lines = [];
+        let lineNum = 0;
+
+        lineNum++;
+        lines.push({
+            num: lineNum, cmd: 'Set Condition Minimum Credit',
+            matchCount: PAIRINGS_DATA.length, canBuildBlock: true,
+            tag: 'condition', tagLabel: 'Condition',
+            comment: 'Maximise les heures de vol',
+        });
+
+        selected.forEach(s => {
+            lineNum++;
+            const isAspirational = s.matchCount < 80;
+            const isSecure = s.matchCount > 300;
+            lines.push({
+                num: lineNum, cmd: s.cmd,
+                matchCount: s.matchCount,
+                creditMinutes: s.totalCreditMin,
+                canBuildBlock: s.canBuildBlock,
+                priorityPct: Math.round(s.priorityScore * 100),
+                seniorCompPct: Math.round(s.seniorComp * 100),
+                tag: isAspirational ? 'reach' : (isSecure ? 'secure' : 'value'),
+                tagLabel: isAspirational ? 'Aspirationnel' : (isSecure ? 'Securitaire' : 'Optimal'),
+                comment: `${s.matchCount} pairings | Priorite: ${Math.round(s.priorityScore * 100)}% | Senior: ${Math.round(s.seniorComp * 100)}%`,
+            });
+        });
+
+        lineNum++;
+        lines.push({
+            num: lineNum, cmd: 'Award Pairings',
+            matchCount: PAIRINGS_DATA.length, canBuildBlock: true,
+            tag: '', tagLabel: '',
+            comment: `Filet de securite - ${PAIRINGS_DATA.length} pairings`,
+        });
+
+        return lines;
+    }
+
+    function renderProposedBid() {
+        proposedBidBlocks = [];
+        const juniorRatio = userSeniority.rank / userSeniority.total;
+        const denialRate = aggregatedHistory ? aggregatedHistory.denialRate : 0.75;
+        const optimalLines = calculateOptimalLineCount(juniorRatio, denialRate);
+        const histMonths = aggregatedHistory ? aggregatedHistory.totalMonths : 4;
+
+        let html = '';
+
+        // Algorithm summary bar
+        html += '<div class="algo-summary">';
+        html += `<div class="algo-stat"><span class="algo-label">Lignes/bloc</span><span class="algo-value">${optimalLines}</span></div>`;
+        html += `<div class="algo-stat"><span class="algo-label">Denial hist.</span><span class="algo-value" style="color:${denialRate > 0.5 ? '#e74c3c' : '#2ecc71'}">${Math.round(denialRate * 100)}%</span></div>`;
+        html += `<div class="algo-stat"><span class="algo-label">Seniorite</span><span class="algo-value">${Math.round(juniorRatio * 100)}%</span></div>`;
+        html += `<div class="algo-stat"><span class="algo-label">Pool</span><span class="algo-value">${PAIRINGS_DATA.length}</span></div>`;
+        html += `<div class="algo-stat"><span class="algo-label">Mois analyses</span><span class="algo-value">${histMonths}</span></div>`;
+        html += '</div>';
+
+        // Instructions
+        html += '<div style="margin-bottom:16px;padding:12px;background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:8px;font-size:12px;color:var(--ac-muted);">';
+        html += '<strong style="color:var(--ac-green);">Algorithme optimise:</strong> ';
+        html += `Chaque ligne a ete evaluee contre les ${PAIRINGS_DATA.length} pairings reels. L'algorithme selectionne ${optimalLines} lignes/bloc pour maximiser vos priorites tout en minimisant le risque Denial Mode. `;
+        html += 'Ajoutez vos <code>Prefer Off</code> manuellement dans PBS (max 3-5 jours pour eviter le denial).';
+        html += '</div>';
+
+        for (let i = 0; i < userBlockCount; i++) {
+            const bp = userBlockPriorities[i] || { p1: 'perdiem', p2: 'international' };
+            const blockName = i === 0 ? 'Bloc 1 - Bid de Block (principal)'
+                : `Bloc ${i + 1} - Bid de Block`;
+
+            const p1Label = PRIORITY_OPTIONS.find(o => o.id === bp.p1)?.label || bp.p1;
+            const p2Label = PRIORITY_OPTIONS.find(o => o.id === bp.p2)?.label || bp.p2;
+
+            const lines = generateBlockBidLines(i, bp.p1, bp.p2);
+            const blockCmds = lines.map(l => l.cmd);
+            proposedBidBlocks.push({ name: blockName, lines: blockCmds });
+
+            // Calculate block-level stats
+            const awardLines = lines.filter(l => l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings');
+            const avgMatch = awardLines.length > 0 ? Math.round(awardLines.reduce((s, l) => s + l.matchCount, 0) / awardLines.length) : 0;
+            const allCanBuild = awardLines.every(l => l.canBuildBlock !== false);
+            const riskLevel = allCanBuild ? 'low' : (awardLines.filter(l => l.canBuildBlock).length > awardLines.length / 2 ? 'medium' : 'high');
+            const riskLabel = riskLevel === 'low' ? 'Faible' : (riskLevel === 'medium' ? 'Moyen' : 'Eleve');
+
+            html += `<div class="bid-block-section">`;
+            html += `<div class="bid-block-header">`;
+            html += `<h4>${blockName}</h4>`;
+            html += `<div class="bid-block-priorities">`;
+            html += `<span class="priority-tag">${p1Label}</span>`;
+            html += `<span class="priority-tag">${p2Label}</span>`;
+            html += `</div></div>`;
+            html += `<div class="bid-block-body"><div class="bid-proposed">`;
+
+            html += '<div class="bid-group-header">Start Pairings</div>';
+
+            lines.forEach(l => {
+                const cmdHtml = colorizeBidCmd(l.cmd);
+                let tagHtml = '';
+                if (l.tag) {
+                    tagHtml = `<span class="bid-tag tag-${l.tag}">${l.tagLabel}</span>`;
+                }
+                // Match count badge
+                let matchHtml = '';
+                if (l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit') {
+                    const mc = l.matchCount;
+                    const cls = mc >= 200 ? 'good' : (mc >= 50 ? 'medium' : 'low');
+                    matchHtml = `<span class="match-badge ${cls}">${mc} pairings</span>`;
+                }
+                html += `<div class="bid-line">
+                    <span class="bid-num">${l.num}.</span>
+                    <span class="bid-cmd">${cmdHtml}</span>
+                    ${tagHtml}${matchHtml}
+                </div>`;
+                if (l.comment) {
+                    html += `<div class="bid-comment">${l.comment}</div>`;
+                }
+            });
+
+            // Denial risk meter for this block
+            html += `<div class="denial-risk-meter ${riskLevel}">`;
+            html += `<strong>Risque Denial Mode: ${riskLabel}</strong>`;
+            html += ` | Moy. ${avgMatch} pairings/ligne | ${lines.length - 2} lignes optimisees`;
+            html += `</div>`;
+
+            html += '</div></div></div>';
+        }
+
+        document.getElementById('stratProposedBid').innerHTML = html;
+    }
+
+    function copyProposedBid() {
+        let text = '';
+        proposedBidBlocks.forEach((block, bi) => {
+            text += (bi === 0 ? '' : '\n') + 'Start Pairings\n';
+            block.lines.forEach((line, idx) => {
+                text += `  ${idx + 1}. ${line}\n`;
+            });
+        });
+
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('copyToast');
+            toast.textContent = 'Bid propose copie dans le presse-papier!';
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); toast.textContent = 'Bid Sheet copie dans le presse-papier!'; }, 2500);
+        }).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            const toast = document.getElementById('copyToast');
+            toast.textContent = 'Bid propose copie dans le presse-papier!';
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); toast.textContent = 'Bid Sheet copie dans le presse-papier!'; }, 2500);
+        });
+    }
+
+    function sortStratTable(col) {
+        if (stratSortCol === col) stratSortDir *= -1;
+        else { stratSortCol = col; stratSortDir = -1; }
+        renderStrategyTable();
+    }
+
+    function sortStratDetail(col) {
+        if (stratDetailSortCol === col) stratDetailSortDir *= -1;
+        else { stratDetailSortCol = col; stratDetailSortDir = -1; }
+        renderDetailTable();
+    }
+
+    function exportStrategyCSV() {
+        const sorted = [...stratData].sort((a, b) => b.score - a.score);
+        let csv = '\uFEFF'; // BOM for Excel
+        csv += 'Destination;Nb Pairings;Duree Moy (j);Perdiem Moy ($);Perdiem Max ($);Perdiem Mensuel Est ($);Competition Senior (%);Probabilite (%);Score Optimise\n';
+        sorted.forEach(d => {
+            const hist = HISTORICAL_DATA.seniorRatios[d.dest];
+            const compPct = hist ? Math.round(hist.ratio * 100) : 'N/D';
+            csv += `${d.dest};${d.count};${d.avgDays};${d.avgAllow};${d.maxAllow};${d.monthlyAllow};${compPct};${d.prob};${d.score}\n`;
+        });
+
+        csv += '\n\nDetail des Pairings (tous, tries par score)\n';
+        csv += 'Pairing ID;Destination;Jours;Block Time;Perdiem ($);$/Jour;Probabilite (%);Score\n';
+        const detailSorted = [...stratDetailData].sort((a, b) => b.score - a.score);
+        detailSorted.forEach(d => {
+            csv += `${d.id};${d.dest};${d.days};${d.block};${d.allow.toFixed(1)};${d.perDay};${d.prob};${d.score}\n`;
+        });
+
+        csv += '\n\nMethodologie\n';
+        csv += 'Score = (Perdiem_mensuel_estime x Probabilite) / 100\n';
+        csv += 'Perdiem_mensuel_estime = Perdiem_moyen x (76h_cible / Block_moyen_heures)\n';
+        csv += 'Probabilite basee sur: ratio senior historique + supply + duree + type destination\n';
+        csv += `Anciennete: Rang ${userSeniority.rank}/${userSeniority.total} | Base: ${HISTORICAL_DATA.base}\n`;
+        csv += 'Donnees: Sep 2025; Oct 2025; Nov 2025; Mars 2026\n';
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'strategie_bid.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // ============ PDF RESULT PARSER & UPLOAD ============
+
+    // Set pdf.js worker
+    if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    // Extract text from PDF with proper line ordering
+    async function extractTextFromPDF(arrayBuffer) {
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const tc = await page.getTextContent();
+            const lineMap = {};
+            tc.items.forEach(item => {
+                const y = Math.round(item.transform[5]);
+                const x = item.transform[4];
+                if (!lineMap[y]) lineMap[y] = [];
+                lineMap[y].push({ x, text: item.str });
+            });
+            const sortedYs = Object.keys(lineMap).map(Number).sort((a, b) => b - a);
+            sortedYs.forEach(y => {
+                const items = lineMap[y].sort((a, b) => a.x - b.x);
+                const line = items.map(it => it.text).join(' ').trim();
+                if (line) fullText += line + '\n';
+            });
+            fullText += '\n';
+        }
+        return fullText;
+    }
+
+    // Parse PBS result text into structured data
+    function parseResultText(text) {
+        const result = {
+            seniority: null, category: null, name: null, employeeId: null,
+            minimumWindow: null, threshold: null, maximumWindow: null,
+            denialMode: false, preAwards: [], coverageAwards: [],
+            bidLines: [], postAwards: [], month: null,
+        };
+
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+        // Header
+        for (const line of lines) {
+            const sm = line.match(/Seniority\s+(\d+)\s+Category\s+([\w-]+)\s+(\w+)\s+(\d+)/);
+            if (sm) { result.seniority = parseInt(sm[1]); result.category = sm[2]; result.name = sm[3]; result.employeeId = sm[4]; break; }
+        }
+        for (const line of lines) {
+            const wm = line.match(/Minimum window\s*<([\d:]+)>\s+Threshold\s*<([\d:]+)>\s+Maximum window\s*<([\d:]+)>/);
+            if (wm) { result.minimumWindow = wm[1]; result.threshold = wm[2]; result.maximumWindow = wm[3]; break; }
+        }
+
+        // Denial mode
+        result.denialMode = text.includes('Affected By Denial Mode');
+
+        // Parse sections
+        let section = null;
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line === 'Pre-Awards' || line.startsWith('Pre-Awards')) { section = 'pre'; continue; }
+            if (line === 'Coverage Awards' || line.startsWith('Coverage Awards')) { section = 'coverage'; continue; }
+            if (line.includes('Current Bid')) { section = 'bid'; continue; }
+            if (line === 'Post-Awards' || line.startsWith('Post-Awards')) { section = 'post'; continue; }
+            if (line.match(/^-+$/)) continue;
+
+            if (section === 'pre') {
+                const m = line.match(/^(\w+\*?)\s+([\d-]+)\s+\(([\d:]+)\)/);
+                if (m) result.preAwards.push({ code: m[1], date: m[2], credit: m[3] });
+                if (line.match(/Pre-Awarded/)) section = null;
+            }
+            if (section === 'coverage') {
+                const m = line.match(/^(\w+\*?)\s+([\d-]+)\s+\(([\d:]+)\)/);
+                if (m) {
+                    const fromBid = line.match(/from Bid (\d+)/);
+                    const pos = line.match(/\(([A-Z:]+)\)\s*$/);
+                    result.coverageAwards.push({ code: m[1], date: m[2], credit: m[3], fromBid: fromBid ? parseInt(fromBid[1]) : null, position: pos ? pos[1] : null });
+                }
+                if (line.match(/Awarded, Running total/)) section = null;
+            }
+            if (section === 'bid') {
+                const bidMatch = line.match(/^(\d+)\.\s+(.+)$/);
+                if (bidMatch) {
+                    const bl = { number: parseInt(bidMatch[1]), command: bidMatch[2].trim(), outcome: null, matchCount: null, awardedToSenior: null, awarded: null };
+                    // Check next lines for outcomes
+                    for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+                        const nl = lines[j];
+                        if (nl.match(/^(Honored|Partially honored|Not honored|Not used)$/)) { bl.outcome = nl; i = j; break; }
+                        const scm = nl.match(/^Schedule is complete:\s*(\d+)/);
+                        if (scm) { bl.outcome = 'Schedule complete'; bl.matchCount = parseInt(scm[1]); i = j; break; }
+                        const senm = nl.match(/^Awarded to senior bidder:\s*(\d+)/);
+                        if (senm) { bl.awardedToSenior = parseInt(senm[1]); i = j; continue; }
+                        const mm = nl.match(/^Matching:\s*(\d+)/);
+                        if (mm) { bl.matchCount = parseInt(mm[1]); i = j; continue; }
+                        const awm = nl.match(/^\((\d+) Awarded,\s*(\d+) Matching/);
+                        if (awm) { bl.awarded = parseInt(awm[1]); bl.matchCount = parseInt(awm[2]); i = j; break; }
+                        if (nl.match(/^\d+\.\s/) || nl.match(/^Awarded for coverage/) || nl.match(/^-+$/)) break;
+                    }
+                    result.bidLines.push(bl);
+                }
+            }
+            if (section === 'post') {
+                const m = line.match(/^(\w+)\s+([\d-]+)\s+\(([\d:]+)\)/);
+                if (m) result.postAwards.push({ code: m[1], date: m[2], credit: m[3] });
+                if (line.match(/Post-Awarded/)) section = null;
+            }
+        }
+
+        // Determine month from dates
+        const allDates = [...result.coverageAwards, ...result.postAwards].map(a => a.date).filter(Boolean);
+        if (allDates.length > 0) {
+            const months = ['', 'Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Decembre'];
+            const parts = allDates[0].split('-');
+            if (parts.length === 3) {
+                const mi = parseInt(parts[1]);
+                result.month = `${months[mi] || 'Mois ' + mi} ${parts[0]}`;
+            }
+        }
+
+        return result;
+    }
+
+    // Handle file upload
+    async function handleResultUpload(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+
+        const statusEl = document.getElementById('uploadStatus');
+        statusEl.textContent = `Traitement de ${files.length} fichier(s)...`;
+
+        let processed = 0;
+        for (const file of files) {
+            try {
+                statusEl.textContent = `Traitement: ${file.name}...`;
+                const arrayBuffer = await file.arrayBuffer();
+                const text = await extractTextFromPDF(arrayBuffer);
+                const parsed = parseResultText(text);
+                parsed.fileName = file.name;
+                parsed.uploadedAt = new Date().toISOString();
+
+                // Deduplicate by month
+                const existingIdx = parsedHistoricalResults.findIndex(r => r.month === parsed.month);
+                if (existingIdx >= 0) {
+                    parsedHistoricalResults[existingIdx] = parsed;
+                } else {
+                    parsedHistoricalResults.push(parsed);
+                }
+                processed++;
+            } catch (err) {
+                console.error('Error parsing PDF:', file.name, err);
+                statusEl.textContent = `Erreur pour ${file.name}: ${err.message}`;
+            }
+        }
+
+        saveParsedResults();
+        aggregatedHistory = computeAggregatedHistory();
+        renderUploadedHistory();
+        statusEl.textContent = `${processed} fichier(s) importe(s). ${parsedHistoricalResults.length} resultat(s) total. Cliquez "Recalculer" pour mettre a jour.`;
+        event.target.value = '';
+    }
+
+    function renderUploadedHistory() {
+        const el = document.getElementById('uploadedHistory');
+        if (!el) return;
+
+        if (parsedHistoricalResults.length === 0) {
+            el.innerHTML = '<p style="color:var(--ac-muted);font-size:12px;margin-top:6px;">Aucun resultat importe. Uploadez vos PDFs de resultats PBS pour ameliorer l\'algorithme.</p>';
+            return;
+        }
+
+        el.innerHTML = parsedHistoricalResults.map((r, i) => `
+            <div class="history-item ${r.denialMode ? 'denial' : 'success'}">
+                <span class="history-month">${r.month || r.fileName}</span>
+                <span class="history-status">${r.denialMode ? 'Denial Mode' : 'Succes'}</span>
+                <span class="history-detail">${r.bidLines.length} lignes | ${r.coverageAwards.length} coverage | ${r.preAwards.length} pre-awards</span>
+                <button onclick="removeHistoryResult(${i})" class="history-remove" title="Supprimer">&times;</button>
+            </div>
+        `).join('');
+    }
+
+    function removeHistoryResult(index) {
+        parsedHistoricalResults.splice(index, 1);
+        saveParsedResults();
+        aggregatedHistory = computeAggregatedHistory();
+        renderUploadedHistory();
+    }
+
+    // ============ START ============
+    // Load persisted results and compute aggregated history
+    parsedHistoricalResults = loadParsedResults();
+    aggregatedHistory = computeAggregatedHistory();
+
+    init();
+
+    // Render uploaded history on strategy tab init
+    setTimeout(() => { renderUploadedHistory(); }, 100);
+    </script>
+</body>
+</html>
