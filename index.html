@@ -3067,6 +3067,7 @@
         {id: 'mindays', label: 'Nombre de jours min'},
         {id: 'warm', label: 'Pays chauds'},
         {id: 'cold', label: 'Pays froids'},
+        {id: 'minlegs', label: 'Minimum de legs par jour'},
     ];
 
     // --- User configurable state ---
@@ -3248,6 +3249,20 @@
                 return DEST_CLASSIFICATION.warm.includes(dest) ? 80 : 0;
             case 'cold':
                 return DEST_CLASSIFICATION.cold.includes(dest) ? 80 : 0;
+            case 'minlegs': {
+                const duties = [];
+                let curLegs = 0;
+                for (let i = 0; i < pairing.legs.length; i++) {
+                    const leg = pairing.legs[i];
+                    if (!leg.deadhead) curLegs++;
+                    if (leg.layover || i === pairing.legs.length - 1) {
+                        duties.push(curLegs);
+                        curLegs = 0;
+                    }
+                }
+                const maxLegsInDay = Math.max(...duties, 1);
+                return maxLegsInDay <= 1 ? 80 : (maxLegsInDay <= 2 ? 50 : (maxLegsInDay <= 3 ? 20 : 0));
+            }
             default:
                 return 0;
         }
@@ -3670,7 +3685,7 @@
     function colorizeBidCmd(cmd) {
         return cmd
             .replace(/(Award Pairings|Avoid Pairings|Prefer Off|Set Condition)/g, '<span class="kw">$1</span>')
-            .replace(/(If Allowance Amount|If Pairing Length|If Pairing Check-In Time|If Average Daily Credit|If Pairing Total Credit|If Any Layover In|If Any Duty Legs|If Departing On|If Pairing Check-Out Time|And Of Duration)/g, '<span class="cond">$1</span>')
+            .replace(/(If Allowance Amount|If Pairing Length|If Pairing Check-In Time|If Pairing Check-Out Time|If Average Daily Credit|If Pairing Total Credit|If Any Layover In|If Any Duty Legs|If Departing On|If TAFB|And Of Duration)/g, '<span class="cond">$1</span>')
             .replace(/(\$\d+|\d+:\d+|> \d+|< \d+|= \d+|Between \d+|Minimum \d+)/g, '<span class="val">$1</span>')
             .replace(/\b([A-Z]{3}(?:,\s*[A-Z]{3})*)\b/g, (match) => {
                 if (match.match(/^[A-Z]{3}(,\s*[A-Z]{3})*$/)) return `<span class="dest">${match}</span>`;
@@ -3811,10 +3826,55 @@
         return cnt > 0 ? total / cnt : 0.4;
     }
 
+    // --- Helper: get check-out hour (last arrival time) ---
+    function getCheckOutHour(pairing) {
+        if (!pairing.legs || pairing.legs.length === 0) return 18;
+        const last = pairing.legs[pairing.legs.length - 1];
+        return parseInt(last.arr_time.substring(0, 2)) + parseInt(last.arr_time.substring(2, 4)) / 60;
+    }
+
+    // --- Helper: get total credit in HH:MM string for PBS ---
+    function formatCreditHHMM(minutes) {
+        const h = String(Math.floor(minutes / 60)).padStart(3, '0');
+        const m = String(minutes % 60).padStart(2, '0');
+        return `${h}:${m}`;
+    }
+
+    // --- Helper: get TAFB in HH:MM string for PBS ---
+    function formatTafbHHMM(minutes) {
+        const h = String(Math.floor(minutes / 60)).padStart(2, '0');
+        const m = String(minutes % 60).padStart(2, '0');
+        return `${h}:${m}`;
+    }
+
+    // --- Helper: compute percentile value from pairing data ---
+    function getPercentile(values, pct) {
+        const sorted = [...values].sort((a, b) => a - b);
+        const idx = Math.floor(sorted.length * pct / 100);
+        return sorted[Math.min(idx, sorted.length - 1)];
+    }
+
     // --- Generate all candidate bid lines for given priorities ---
+    // STRATEGY: Use every PBS condition type to maximize diversity and exploit
+    // niche filters that senior crew ignore (= less competition for junior crew)
     function generateCandidateLines(p1Id, p2Id) {
         const cands = [];
         const maxAllow = Math.max(...PAIRINGS_DATA.map(p => p.allowance), 1);
+
+        // Pre-compute data-driven thresholds from actual pairing pool
+        const allAllowances = PAIRINGS_DATA.filter(p => p.allowance > 0).map(p => p.allowance);
+        const allowP50 = getPercentile(allAllowances, 50);
+        const allowP70 = getPercentile(allAllowances, 70);
+        const allowP85 = getPercentile(allAllowances, 85);
+        const allTafb = PAIRINGS_DATA.map(p => p.tafbMinutes);
+        const tafbP60 = getPercentile(allTafb, 60);
+        const tafbP75 = getPercentile(allTafb, 75);
+        const allCredit = PAIRINGS_DATA.map(p => p.blockMinutes);
+        const creditP60 = getPercentile(allCredit, 60);
+        const creditP75 = getPercentile(allCredit, 75);
+        const allDailyCredit = PAIRINGS_DATA.filter(p => p.numDays > 0).map(p => p.blockMinutes / p.numDays);
+        const dcP60 = getPercentile(allDailyCredit, 60);
+        const dcP75 = getPercentile(allDailyCredit, 75);
 
         // Score destinations for these priorities
         const destScores = {};
@@ -3826,97 +3886,395 @@
         });
         Object.values(destScores).forEach(d => d.avgScore = d.score / d.count);
         const topDests = Object.values(destScores).sort((a, b) => b.avgScore - a.avgScore);
-        const topDestCodes = topDests.slice(0, 8).map(d => d.dest);
+        const topDestCodes = topDests.slice(0, 10).map(d => d.dest);
 
-        // --- Allowance-based candidates ---
-        [600, 500, 450, 400, 350, 300, 250, 200, 150, 100].forEach(t => {
-            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t}`, filter: p => p.allowance > t, cat: 'allow' });
-            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Pairing Check-In Time > 14:00`, filter: p => p.allowance > t && getCheckInHour(p) >= 14, cat: 'allow_ci' });
-            [3, 4].forEach(days => {
-                cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Pairing Length > ${days} days`, filter: p => p.allowance > t && p.numDays > days, cat: 'allow_dur' });
-            });
-            // November success pattern: allowance + check-in + duration
-            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Pairing Check-In Time > 14:00 If Pairing Length > 3 days`, filter: p => p.allowance > t && getCheckInHour(p) >= 14 && p.numDays > 3, cat: 'nov_pattern' });
-            // Allowance + daily credit
-            cands.push({ cmd: `Award Pairings If Allowance Amount > $${t} If Average Daily Credit > 005:00 If Pairing Length > 2 days`, filter: p => p.allowance > t && getAvgDailyCredit(p) > 300 && p.numDays > 2, cat: 'allow_cred' });
+        // Identify "hidden gem" destinations: high priority score but low senior competition
+        const ratios = aggregatedHistory ? aggregatedHistory.seniorRatios : HISTORICAL_DATA.seniorRatios;
+        const gemDests = topDests.filter(d => {
+            const hist = ratios[d.dest];
+            return hist ? hist.ratio < 0.35 : true; // low competition
+        }).slice(0, 8).map(d => d.dest);
+
+        // ============================================
+        // 1. ALLOWANCE-BASED (money maximizer)
+        // ============================================
+        [allowP85, allowP70, allowP50, 400, 350, 300, 250, 200, 150, 100].forEach(t => {
+            const thresh = Math.round(t);
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${thresh}`, filter: p => p.allowance > thresh, cat: 'allow' });
         });
 
-        // --- Top-scored destination groups ---
-        [3, 5, 7].forEach(n => {
+        // Allowance + check-in combos (afternoon departures = better lifestyle)
+        [allowP85, allowP70, 300, 200, 150].forEach(t => {
+            const thresh = Math.round(t);
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${thresh} If Pairing Check-In Time > 14:00`, filter: p => p.allowance > thresh && getCheckInHour(p) >= 14, cat: 'allow_ci' });
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${thresh} If Pairing Check-In Time > 12:00`, filter: p => p.allowance > thresh && getCheckInHour(p) >= 12, cat: 'allow_ci' });
+        });
+
+        // Allowance + duration combos
+        [allowP70, 300, 250, 200, 150].forEach(t => {
+            const thresh = Math.round(t);
+            [2, 3, 4].forEach(days => {
+                cands.push({ cmd: `Award Pairings If Allowance Amount > $${thresh} If Pairing Length > ${days} days`, filter: p => p.allowance > thresh && p.numDays > days, cat: 'allow_dur' });
+            });
+        });
+
+        // ============================================
+        // 2. TAFB-BASED (time away = more per diem potential)
+        // ============================================
+        [tafbP75, tafbP60, 48 * 60, 36 * 60, 24 * 60].forEach(t => {
+            const hh = formatTafbHHMM(Math.round(t));
+            cands.push({ cmd: `Award Pairings If TAFB > ${hh}`, filter: p => p.tafbMinutes > t, cat: 'tafb' });
+        });
+        // TAFB + allowance combo (double money filter)
+        [tafbP60, 36 * 60].forEach(t => {
+            const hh = formatTafbHHMM(Math.round(t));
+            [200, 150].forEach(a => {
+                cands.push({ cmd: `Award Pairings If TAFB > ${hh} If Allowance Amount > $${a}`, filter: p => p.tafbMinutes > t && p.allowance > a, cat: 'tafb_allow' });
+            });
+        });
+        // TAFB + duration (long trips with high TAFB = jackpot)
+        [tafbP60].forEach(t => {
+            const hh = formatTafbHHMM(Math.round(t));
+            cands.push({ cmd: `Award Pairings If TAFB > ${hh} If Pairing Length > 3 days`, filter: p => p.tafbMinutes > t && p.numDays > 3, cat: 'tafb_dur' });
+        });
+
+        // ============================================
+        // 3. PAIRING TOTAL CREDIT (maximize block hours)
+        // ============================================
+        [creditP75, creditP60].forEach(t => {
+            const hhmm = formatCreditHHMM(Math.round(t));
+            cands.push({ cmd: `Award Pairings If Pairing Total Credit > ${hhmm}`, filter: p => p.blockMinutes > t, cat: 'credit' });
+        });
+        // Total credit + check-in (high credit + good schedule)
+        [creditP60].forEach(t => {
+            const hhmm = formatCreditHHMM(Math.round(t));
+            cands.push({ cmd: `Award Pairings If Pairing Total Credit > ${hhmm} If Pairing Check-In Time > 12:00`, filter: p => p.blockMinutes > t && getCheckInHour(p) >= 12, cat: 'credit_ci' });
+        });
+        // Total credit + allowance
+        [creditP60].forEach(t => {
+            const hhmm = formatCreditHHMM(Math.round(t));
+            [200, 150].forEach(a => {
+                cands.push({ cmd: `Award Pairings If Pairing Total Credit > ${hhmm} If Allowance Amount > $${a}`, filter: p => p.blockMinutes > t && p.allowance > a, cat: 'credit_allow' });
+            });
+        });
+
+        // ============================================
+        // 4. AVERAGE DAILY CREDIT (efficiency per day)
+        // ============================================
+        [dcP75, dcP60, 300, 270].forEach(t => {
+            const hhmm = formatCreditHHMM(Math.round(t));
+            cands.push({ cmd: `Award Pairings If Average Daily Credit > ${hhmm}`, filter: p => p.numDays > 0 && (p.blockMinutes / p.numDays) > t, cat: 'daily_credit' });
+        });
+        // Daily credit + duration (efficient multi-day trips)
+        [dcP60, 300].forEach(t => {
+            const hhmm = formatCreditHHMM(Math.round(t));
+            [2, 3].forEach(days => {
+                cands.push({ cmd: `Award Pairings If Average Daily Credit > ${hhmm} If Pairing Length > ${days} days`, filter: p => p.numDays > days && (p.blockMinutes / p.numDays) > t, cat: 'daily_credit_dur' });
+            });
+        });
+        // Daily credit + allowance
+        [dcP60].forEach(t => {
+            const hhmm = formatCreditHHMM(Math.round(t));
+            [200, 150].forEach(a => {
+                cands.push({ cmd: `Award Pairings If Average Daily Credit > ${hhmm} If Allowance Amount > $${a}`, filter: p => p.numDays > 0 && (p.blockMinutes / p.numDays) > t && p.allowance > a, cat: 'daily_credit_allow' });
+            });
+        });
+
+        // ============================================
+        // 5. CHECK-IN / CHECK-OUT TIME (schedule quality)
+        // ============================================
+        [14, 12, 11, 10].forEach(h => {
+            const hStr = `${String(h).padStart(2, '0')}:00`;
+            cands.push({ cmd: `Award Pairings If Pairing Check-In Time > ${hStr}`, filter: p => getCheckInHour(p) >= h, cat: 'ci' });
+        });
+        // Check-out time (early return home)
+        [18, 20].forEach(h => {
+            const hStr = `${String(h).padStart(2, '0')}:00`;
+            cands.push({ cmd: `Award Pairings If Pairing Check-Out Time < ${hStr}`, filter: p => getCheckOutHour(p) < h, cat: 'co' });
+        });
+        // Check-in + duration combos
+        [14, 12].forEach(h => {
+            const hStr = `${String(h).padStart(2, '0')}:00`;
+            [2, 3].forEach(days => {
+                cands.push({ cmd: `Award Pairings If Pairing Check-In Time > ${hStr} If Pairing Length > ${days} days`, filter: p => getCheckInHour(p) >= h && p.numDays > days, cat: 'ci_dur' });
+            });
+        });
+        // Check-in + check-out (best schedule window)
+        cands.push({ cmd: 'Award Pairings If Pairing Check-In Time > 10:00 If Pairing Check-Out Time < 20:00', filter: p => getCheckInHour(p) >= 10 && getCheckOutHour(p) < 20, cat: 'ci_co' });
+        cands.push({ cmd: 'Award Pairings If Pairing Check-In Time > 12:00 If Pairing Check-Out Time < 20:00', filter: p => getCheckInHour(p) >= 12 && getCheckOutHour(p) < 20, cat: 'ci_co' });
+
+        // ============================================
+        // 6. DURATION-BASED (length preferences)
+        // ============================================
+        [1, 2, 3, 4, 5].forEach(d => {
+            cands.push({ cmd: `Award Pairings If Pairing Length > ${d} days`, filter: p => p.numDays > d, cat: 'dur' });
+        });
+        cands.push({ cmd: 'Award Pairings If Pairing Length Between 2 days And 4 days', filter: p => p.numDays >= 2 && p.numDays <= 4, cat: 'dur_range' });
+        cands.push({ cmd: 'Award Pairings If Pairing Length Between 3 days And 5 days', filter: p => p.numDays >= 3 && p.numDays <= 5, cat: 'dur_range' });
+        cands.push({ cmd: 'Award Pairings If Pairing Length < 3 days', filter: p => p.numDays < 3, cat: 'dur_short' });
+        cands.push({ cmd: 'Award Pairings If Pairing Length = 1 days', filter: p => p.numDays === 1, cat: 'dur_exact' });
+
+        // ============================================
+        // 7. DESTINATION GROUPS (targeted layovers)
+        // ============================================
+        // Top priority-scored destinations in various group sizes
+        [2, 3, 4, 5, 7].forEach(n => {
             const group = topDestCodes.slice(0, n);
             if (group.length > 0) {
                 const str = group.join(', ');
                 cands.push({ cmd: `Award Pairings If Any Layover In ${str}`, filter: p => group.includes(getPairingMainDest(p)), cat: 'dest_top' });
-                [200, 150].forEach(t => {
+            }
+        });
+
+        // Destination + allowance combos
+        [3, 5].forEach(n => {
+            const group = topDestCodes.slice(0, n);
+            if (group.length > 0) {
+                const str = group.join(', ');
+                [300, 200, 150].forEach(t => {
                     cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Allowance Amount > $${t}`, filter: p => group.includes(getPairingMainDest(p)) && p.allowance > t, cat: 'dest_allow' });
                 });
             }
         });
 
-        // --- Priority-specific destination groups ---
+        // Destination + TAFB combos (long stays at good destinations)
+        [3, 5].forEach(n => {
+            const group = topDestCodes.slice(0, n);
+            if (group.length > 0) {
+                const str = group.join(', ');
+                const hh = formatTafbHHMM(Math.round(tafbP60));
+                cands.push({ cmd: `Award Pairings If Any Layover In ${str} If TAFB > ${hh}`, filter: p => group.includes(getPairingMainDest(p)) && p.tafbMinutes > tafbP60, cat: 'dest_tafb' });
+            }
+        });
+
+        // Destination + check-in
+        [3, 5].forEach(n => {
+            const group = topDestCodes.slice(0, n);
+            if (group.length > 0) {
+                const str = group.join(', ');
+                cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Pairing Check-In Time > 12:00`, filter: p => group.includes(getPairingMainDest(p)) && getCheckInHour(p) >= 12, cat: 'dest_ci' });
+            }
+        });
+
+        // Hidden gem destinations (low competition, high priority score)
+        if (gemDests.length > 0) {
+            [3, 5, Math.min(gemDests.length, 7)].forEach(n => {
+                const group = gemDests.slice(0, n);
+                if (group.length > 0) {
+                    const str = group.join(', ');
+                    cands.push({ cmd: `Award Pairings If Any Layover In ${str}`, filter: p => group.includes(getPairingMainDest(p)), cat: 'dest_gem' });
+                    [200, 150].forEach(t => {
+                        cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Allowance Amount > $${t}`, filter: p => group.includes(getPairingMainDest(p)) && p.allowance > t, cat: 'dest_gem_allow' });
+                    });
+                }
+            });
+        }
+
+        // Individual top destinations (sniper lines for specific cities)
+        topDestCodes.slice(0, 4).forEach(dest => {
+            cands.push({ cmd: `Award Pairings If Any Layover In ${dest}`, filter: p => getPairingMainDest(p) === dest, cat: 'dest_single' });
+            cands.push({ cmd: `Award Pairings If Any Layover In ${dest} If Pairing Check-In Time > 12:00`, filter: p => getPairingMainDest(p) === dest && getCheckInHour(p) >= 12, cat: 'dest_single_ci' });
+        });
+
+        // Priority-specific destination groups
         [p1Id, p2Id].forEach((pid, idx) => {
             const dests = getDestFilterForPriority(pid);
             if (dests.length === 0) return;
             const available = dests.filter(d => PAIRINGS_DATA.some(p => getPairingMainDest(p) === d));
             if (available.length === 0) return;
-            // Rank by priority score
             const scored = available.map(d => {
                 const ps = PAIRINGS_DATA.filter(p => getPairingMainDest(p) === d);
                 const avg = ps.reduce((s, p) => s + scorePairingForBlock(p, p1Id, p2Id, maxAllow), 0) / (ps.length || 1);
                 return { dest: d, avg };
             }).sort((a, b) => b.avg - a.avg);
-            [4, 6].forEach(n => {
+            [3, 4, 6, 8].forEach(n => {
                 const group = scored.slice(0, n).map(s => s.dest);
                 const str = group.join(', ');
                 cands.push({ cmd: `Award Pairings If Any Layover In ${str}`, filter: p => group.includes(getPairingMainDest(p)), cat: idx === 0 ? 'p1_dest' : 'p2_dest' });
             });
         });
 
-        // --- Duration-based ---
-        cands.push({ cmd: 'Award Pairings If Pairing Length > 4 days If Average Daily Credit > 005:00', filter: p => p.numDays > 4 && getAvgDailyCredit(p) > 300, cat: 'dur' });
-        cands.push({ cmd: 'Award Pairings If Pairing Length > 3 days', filter: p => p.numDays > 3, cat: 'dur' });
-        cands.push({ cmd: 'Award Pairings If Pairing Length Between 2 days And 4 days', filter: p => p.numDays >= 2 && p.numDays <= 4, cat: 'dur' });
-        cands.push({ cmd: 'Award Pairings If Pairing Length < 3 days', filter: p => p.numDays < 3, cat: 'dur_short' });
-        cands.push({ cmd: 'Award Pairings If Pairing Length < 3 days If Allowance Amount > $80', filter: p => p.numDays < 3 && p.allowance > 80, cat: 'dur_short' });
+        // ============================================
+        // 8. TRIPLE COMBOS (the power plays)
+        // ============================================
+        // Allowance + check-in + duration (the "November success" pattern)
+        [allowP70, 300, 250, 200, 150].forEach(t => {
+            const thresh = Math.round(t);
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${thresh} If Pairing Check-In Time > 14:00 If Pairing Length > 3 days`, filter: p => p.allowance > thresh && getCheckInHour(p) >= 14 && p.numDays > 3, cat: 'triple_nov' });
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${thresh} If Pairing Check-In Time > 12:00 If Pairing Length > 2 days`, filter: p => p.allowance > thresh && getCheckInHour(p) >= 12 && p.numDays > 2, cat: 'triple_nov' });
+        });
 
-        // --- Check-in time ---
-        cands.push({ cmd: 'Award Pairings If Pairing Check-In Time > 14:00', filter: p => getCheckInHour(p) >= 14, cat: 'ci' });
-        cands.push({ cmd: 'Award Pairings If Pairing Check-In Time > 14:00 If Pairing Length > 2 days', filter: p => getCheckInHour(p) >= 14 && p.numDays > 2, cat: 'ci_dur' });
+        // Allowance + daily credit + duration (credit optimizer)
+        [allowP70, 250, 200].forEach(t => {
+            const thresh = Math.round(t);
+            const dcStr = formatCreditHHMM(Math.round(dcP60));
+            cands.push({ cmd: `Award Pairings If Allowance Amount > $${thresh} If Average Daily Credit > ${dcStr} If Pairing Length > 2 days`, filter: p => p.allowance > thresh && p.numDays > 2 && (p.blockMinutes / Math.max(1, p.numDays)) > dcP60, cat: 'triple_cred' });
+        });
 
-        // --- Combined priority-aware lines ---
-        if (p1Id === 'perdiem' || p2Id === 'perdiem') {
-            [350, 250, 200].forEach(t => {
-                const dFilter = getDestFilterForPriority(p1Id === 'perdiem' ? p2Id : p1Id);
-                if (dFilter.length > 0) {
-                    const avail = dFilter.filter(d => PAIRINGS_DATA.some(p => getPairingMainDest(p) === d)).slice(0, 5);
-                    if (avail.length > 0) {
-                        const str = avail.join(', ');
-                        cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Allowance Amount > $${t}`, filter: p => avail.includes(getPairingMainDest(p)) && p.allowance > t, cat: 'combo' });
-                    }
-                }
+        // TAFB + allowance + check-in (premium schedule with money)
+        {
+            const hh = formatTafbHHMM(Math.round(tafbP60));
+            [200, 150].forEach(a => {
+                cands.push({ cmd: `Award Pairings If TAFB > ${hh} If Allowance Amount > $${a} If Pairing Check-In Time > 12:00`, filter: p => p.tafbMinutes > tafbP60 && p.allowance > a && getCheckInHour(p) >= 12, cat: 'triple_tafb' });
             });
+        }
+
+        // Destination + allowance + check-in (the dream combo)
+        [3, 5].forEach(n => {
+            const group = topDestCodes.slice(0, n);
+            if (group.length > 0) {
+                const str = group.join(', ');
+                [200, 150].forEach(t => {
+                    cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Allowance Amount > $${t} If Pairing Check-In Time > 12:00`, filter: p => group.includes(getPairingMainDest(p)) && p.allowance > t && getCheckInHour(p) >= 12, cat: 'triple_dest' });
+                });
+            }
+        });
+
+        // ============================================
+        // 9. DEPARTING ON (day-of-week targeting)
+        // ============================================
+        // Target specific departure days that have less competition
+        // Map weekday numbers to PBS day names
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        // Analyze which departure days have best priority scores
+        const dayScores = {};
+        PAIRINGS_DATA.forEach(p => {
+            if (p.operatingDates && p.operatingDates.length > 0) {
+                // Use first operating date to get day of week
+                const month = parseInt(PAIRINGS_METADATA.monthCode.split('-')[1]) - 1;
+                const year = parseInt(PAIRINGS_METADATA.monthCode.split('-')[0]);
+                p.operatingDates.forEach(d => {
+                    const dow = new Date(year, month, d).getDay();
+                    if (!dayScores[dow]) dayScores[dow] = { score: 0, count: 0 };
+                    dayScores[dow].score += scorePairingForBlock(p, p1Id, p2Id, maxAllow);
+                    dayScores[dow].count++;
+                });
+            }
+        });
+        // Find best departure days
+        const rankedDays = Object.entries(dayScores)
+            .map(([dow, data]) => ({ dow: parseInt(dow), avg: data.score / data.count }))
+            .sort((a, b) => b.avg - a.avg);
+        if (rankedDays.length >= 2) {
+            // Best 2 departure days
+            const bestDays = rankedDays.slice(0, 2).map(d => dayNames[d.dow]);
+            bestDays.forEach(dayName => {
+                cands.push({
+                    cmd: `Award Pairings If Departing On ${dayName}`,
+                    filter: p => {
+                        const month = parseInt(PAIRINGS_METADATA.monthCode.split('-')[1]) - 1;
+                        const year = parseInt(PAIRINGS_METADATA.monthCode.split('-')[0]);
+                        return p.operatingDates && p.operatingDates.some(d => dayNames[new Date(year, month, d).getDay()] === dayName);
+                    },
+                    cat: 'depart_day'
+                });
+            });
+            // Departing on + allowance
+            const bestDay = bestDays[0];
+            [200, 150].forEach(t => {
+                cands.push({
+                    cmd: `Award Pairings If Departing On ${bestDay} If Allowance Amount > $${t}`,
+                    filter: p => {
+                        const month = parseInt(PAIRINGS_METADATA.monthCode.split('-')[1]) - 1;
+                        const year = parseInt(PAIRINGS_METADATA.monthCode.split('-')[0]);
+                        return p.allowance > t && p.operatingDates && p.operatingDates.some(d => dayNames[new Date(year, month, d).getDay()] === bestDay);
+                    },
+                    cat: 'depart_day_allow'
+                });
+            });
+        }
+
+        // ============================================
+        // 10. COMBINED PRIORITY-AWARE (smart combos)
+        // ============================================
+        if (p1Id === 'perdiem' || p2Id === 'perdiem') {
+            const otherPid = p1Id === 'perdiem' ? p2Id : p1Id;
+            const dFilter = getDestFilterForPriority(otherPid);
+            if (dFilter.length > 0) {
+                const avail = dFilter.filter(d => PAIRINGS_DATA.some(p => getPairingMainDest(p) === d)).slice(0, 6);
+                if (avail.length > 0) {
+                    const str = avail.join(', ');
+                    [400, 300, 250, 200].forEach(t => {
+                        cands.push({ cmd: `Award Pairings If Any Layover In ${str} If Allowance Amount > $${t}`, filter: p => avail.includes(getPairingMainDest(p)) && p.allowance > t, cat: 'combo_perdiem' });
+                    });
+                    // Destination + TAFB (money at good destinations)
+                    const hh = formatTafbHHMM(Math.round(tafbP60));
+                    cands.push({ cmd: `Award Pairings If Any Layover In ${str} If TAFB > ${hh}`, filter: p => avail.includes(getPairingMainDest(p)) && p.tafbMinutes > tafbP60, cat: 'combo_perdiem_tafb' });
+                }
+            }
+        }
+
+        // Priority-specific for short duration preferences
+        if (p1Id === 'daysoff' || p2Id === 'daysoff' || p1Id === 'mindays' || p2Id === 'mindays') {
+            cands.push({ cmd: 'Award Pairings If Pairing Length < 2 days', filter: p => p.numDays < 2, cat: 'prio_short' });
+            cands.push({ cmd: 'Award Pairings If Pairing Length < 2 days If Pairing Check-In Time > 14:00', filter: p => p.numDays < 2 && getCheckInHour(p) >= 14, cat: 'prio_short' });
+            cands.push({ cmd: 'Award Pairings If Pairing Length = 1 days If Average Daily Credit > 005:00', filter: p => p.numDays === 1 && getAvgDailyCredit(p) > 300, cat: 'prio_short' });
+            [100, 80, 50].forEach(t => {
+                cands.push({ cmd: `Award Pairings If Pairing Length < 3 days If Allowance Amount > $${t}`, filter: p => p.numDays < 3 && p.allowance > t, cat: 'prio_short_allow' });
+            });
+        }
+
+        if (p1Id === 'maxdays' || p2Id === 'maxdays') {
+            [5, 4].forEach(d => {
+                cands.push({ cmd: `Award Pairings If Pairing Length > ${d} days`, filter: p => p.numDays > d, cat: 'prio_long' });
+                cands.push({ cmd: `Award Pairings If Pairing Length > ${d} days If Pairing Check-In Time > 12:00`, filter: p => p.numDays > d && getCheckInHour(p) >= 12, cat: 'prio_long_ci' });
+            });
+            [300, 250, 200].forEach(t => {
+                cands.push({ cmd: `Award Pairings If Pairing Length > 3 days If Allowance Amount > $${t}`, filter: p => p.numDays > 3 && p.allowance > t, cat: 'prio_long_allow' });
+            });
+        }
+
+        if (p1Id === 'minlegs' || p2Id === 'minlegs') {
+            // Long pairings tend to have fewer legs per duty day
+            [3, 4].forEach(d => {
+                cands.push({ cmd: `Award Pairings If Pairing Length > ${d} days If Average Daily Credit > 005:00`, filter: p => p.numDays > d && getAvgDailyCredit(p) > 300, cat: 'prio_minlegs' });
+                [250, 200].forEach(t => {
+                    cands.push({ cmd: `Award Pairings If Pairing Length > ${d} days If Allowance Amount > $${t}`, filter: p => p.numDays > d && p.allowance > t, cat: 'prio_minlegs_allow' });
+                });
+            });
+            cands.push({ cmd: 'Award Pairings If Pairing Length > 2 days If Pairing Check-In Time > 14:00', filter: p => p.numDays > 2 && getCheckInHour(p) >= 14, cat: 'prio_minlegs_ci' });
         }
 
         return cands;
     }
 
     // --- Select optimal lines from candidates using greedy diversity-aware selection ---
-    function selectOptimalLines(candidates, targetCount, p1Id, p2Id) {
+    // riskProfile: 'conservative' (early blocks), 'balanced' (middle), 'aggressive' (last block)
+    function selectOptimalLines(candidates, targetCount, p1Id, p2Id, riskProfile) {
+        riskProfile = riskProfile || 'balanced';
         const maxAllow = Math.max(...PAIRINGS_DATA.map(p => p.allowance), 1);
+
+        // Risk-adjusted scoring weights
+        let wPriority, wMatch, wComp, wFeasibility, matchCap, noveltyThreshold;
+        switch (riskProfile) {
+            case 'conservative':
+                wPriority = 0.35; wMatch = 0.25; wComp = 0.15; wFeasibility = 0.25;
+                matchCap = 250; noveltyThreshold = 0.10;
+                break;
+            case 'aggressive':
+                wPriority = 0.60; wMatch = 0.05; wComp = 0.15; wFeasibility = 0.20;
+                matchCap = 80; noveltyThreshold = 0.05;
+                break;
+            default: // balanced
+                wPriority = 0.45; wMatch = 0.15; wComp = 0.20; wFeasibility = 0.20;
+                matchCap = 150; noveltyThreshold = 0.08;
+        }
 
         // Evaluate all candidates
         const evaluated = [];
         for (const c of candidates) {
             const ev = evaluateCandidate(c.cmd, c.filter);
             if (ev.matchCount === 0) continue;
+            // Conservative blocks skip very selective lines
+            if (riskProfile === 'conservative' && ev.matchCount < 50) continue;
 
             const priority = computePriorityAlignment(ev.matchIds, p1Id, p2Id, maxAllow);
             const seniorComp = computeAvgSeniorComp(ev.matchIds);
-            const matchFactor = Math.min(1, ev.matchCount / 150);
+            const matchFactor = Math.min(1, ev.matchCount / matchCap);
             const compFactor = 1 - seniorComp;
-            const feasibility = ev.canBuildBlock ? 1 : 0.3;
+            const feasibility = ev.canBuildBlock ? 1 : (riskProfile === 'aggressive' ? 0.5 : 0.3);
 
-            const score = priority * 0.40 + matchFactor * 0.15 + compFactor * 0.25 + feasibility * 0.20;
+            const score = priority * wPriority + matchFactor * wMatch + compFactor * wComp + feasibility * wFeasibility;
 
             evaluated.push({ ...c, ...ev, priorityScore: priority, seniorComp, optimizationScore: score });
         }
@@ -3931,8 +4289,8 @@
         for (const cand of evaluated) {
             if (selected.length >= targetCount) break;
 
-            // Category limits
-            const maxPerCat = (cand.cat === 'allow' || cand.cat === 'nov_pattern') ? 3 : 2;
+            // Category limits - enforce diversity across many condition types
+            const maxPerCat = riskProfile === 'aggressive' ? 2 : 2;
             if ((catCount[cand.cat] || 0) >= maxPerCat) continue;
 
             // Diversity: check how many NEW pairings this line adds
@@ -3940,8 +4298,7 @@
             cand.matchIds.forEach(id => { if (!coveredIds.has(id)) newCount++; });
             const novelty = cand.matchCount > 0 ? newCount / cand.matchCount : 0;
 
-            // Skip if this line adds < 10% new pairings (too redundant)
-            if (selected.length > 0 && novelty < 0.10) continue;
+            if (selected.length > 0 && novelty < noveltyThreshold) continue;
 
             selected.push(cand);
             catCount[cand.cat] = (catCount[cand.cat] || 0) + 1;
@@ -3965,8 +4322,21 @@
         // Step 2: Generate all candidates
         const candidates = generateCandidateLines(p1Id, p2Id);
 
-        // Step 3: Select optimal set
-        const selected = selectOptimalLines(candidates, optimalCount, p1Id, p2Id);
+        // Step 3: Determine risk profile based on block position
+        // First blocks = conservative (safe), last block = aggressive (optimistic)
+        let riskProfile;
+        if (userBlockCount <= 1) {
+            riskProfile = 'balanced';
+        } else if (blockIndex === userBlockCount - 1) {
+            riskProfile = 'aggressive';
+        } else if (blockIndex === 0) {
+            riskProfile = 'conservative';
+        } else {
+            riskProfile = 'balanced';
+        }
+
+        // Step 4: Select optimal set with risk-adjusted scoring
+        const selected = selectOptimalLines(candidates, optimalCount, p1Id, p2Id, riskProfile);
 
         // Step 4: Build final lines
         const lines = [];
@@ -3987,6 +4357,7 @@
             lines.push({
                 num: lineNum, cmd: s.cmd,
                 matchCount: s.matchCount,
+                matchIds: s.matchIds,
                 creditMinutes: s.totalCreditMin,
                 canBuildBlock: s.canBuildBlock,
                 priorityPct: Math.round(s.priorityScore * 100),
@@ -4005,7 +4376,7 @@
             comment: `Filet de securite - ${PAIRINGS_DATA.length} pairings`,
         });
 
-        return lines;
+        return { lines, riskProfile };
     }
 
     function renderProposedBid() {
@@ -4041,7 +4412,9 @@
             const p1Label = PRIORITY_OPTIONS.find(o => o.id === bp.p1)?.label || bp.p1;
             const p2Label = PRIORITY_OPTIONS.find(o => o.id === bp.p2)?.label || bp.p2;
 
-            const lines = generateBlockBidLines(i, bp.p1, bp.p2);
+            const blockResult = generateBlockBidLines(i, bp.p1, bp.p2);
+            const lines = blockResult.lines;
+            const blockRiskProfile = blockResult.riskProfile;
             const blockCmds = lines.map(l => l.cmd);
             proposedBidBlocks.push({ name: blockName, lines: blockCmds });
 
@@ -4049,8 +4422,22 @@
             const awardLines = lines.filter(l => l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings');
             const avgMatch = awardLines.length > 0 ? Math.round(awardLines.reduce((s, l) => s + l.matchCount, 0) / awardLines.length) : 0;
             const allCanBuild = awardLines.every(l => l.canBuildBlock !== false);
-            const riskLevel = allCanBuild ? 'low' : (awardLines.filter(l => l.canBuildBlock).length > awardLines.length / 2 ? 'medium' : 'high');
-            const riskLabel = riskLevel === 'low' ? 'Faible' : (riskLevel === 'medium' ? 'Moyen' : 'Eleve');
+            // Risk level adjusted by block profile
+            let riskLevel, riskLabel;
+            if (blockRiskProfile === 'aggressive') {
+                // Last block: always medium or high risk
+                const feasibleRatio = awardLines.length > 0 ? awardLines.filter(l => l.canBuildBlock).length / awardLines.length : 1;
+                riskLevel = feasibleRatio > 0.7 ? 'medium' : 'high';
+                riskLabel = riskLevel === 'medium' ? 'Moyen' : 'Eleve';
+            } else if (blockRiskProfile === 'conservative') {
+                // First block: always low
+                riskLevel = 'low';
+                riskLabel = 'Faible';
+            } else {
+                // Balanced: compute normally
+                riskLevel = allCanBuild ? 'low' : (awardLines.filter(l => l.canBuildBlock).length > awardLines.length / 2 ? 'medium' : 'high');
+                riskLabel = riskLevel === 'low' ? 'Faible' : (riskLevel === 'medium' ? 'Moyen' : 'Eleve');
+            }
 
             html += `<div class="bid-block-section">`;
             html += `<div class="bid-block-header">`;
@@ -4086,10 +4473,32 @@
                 }
             });
 
+            // Estimated per diem for this block
+            const blockMatchIds = new Set();
+            awardLines.forEach(l => { if (l.matchIds) l.matchIds.forEach(id => blockMatchIds.add(id)); });
+            const blockMatchPairings = PAIRINGS_DATA.filter(p => blockMatchIds.has(p.id));
+            const estPerDiem = blockMatchPairings.length > 0
+                ? blockMatchPairings.reduce((s, p) => s + p.allowance, 0) / blockMatchPairings.length
+                : 0;
+            const minPerDiem = blockMatchPairings.length > 0
+                ? Math.min(...blockMatchPairings.map(p => p.allowance))
+                : 0;
+            const maxPerDiem = blockMatchPairings.length > 0
+                ? Math.max(...blockMatchPairings.map(p => p.allowance))
+                : 0;
+
+            html += `<div style="margin:8px 0;padding:8px 12px;background:rgba(52,152,219,0.08);border:1px solid rgba(52,152,219,0.2);border-radius:6px;font-size:12px;color:var(--ac-muted);display:flex;gap:16px;align-items:center;">`;
+            html += `<span><strong style="color:#3498db;">Per diem estime:</strong> $${estPerDiem.toFixed(0)} moy.</span>`;
+            html += `<span>Min: $${minPerDiem.toFixed(0)}</span>`;
+            html += `<span>Max: $${maxPerDiem.toFixed(0)}</span>`;
+            html += `<span>(${blockMatchPairings.length} pairings dans le pool)</span>`;
+            html += `</div>`;
+
             // Denial risk meter for this block
+            const profileLabel = blockRiskProfile === 'conservative' ? 'Conservateur' : (blockRiskProfile === 'aggressive' ? 'Optimiste' : 'Equilibre');
             html += `<div class="denial-risk-meter ${riskLevel}">`;
             html += `<strong>Risque Denial Mode: ${riskLabel}</strong>`;
-            html += ` | Moy. ${avgMatch} pairings/ligne | ${lines.length - 2} lignes optimisees`;
+            html += ` | Strategie: ${profileLabel} | Moy. ${avgMatch} pairings/ligne | ${lines.length - 2} lignes optimisees`;
             html += `</div>`;
 
             html += '</div></div></div>';
