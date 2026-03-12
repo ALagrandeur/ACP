@@ -1932,7 +1932,20 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        #mapContainer { background: var(--ac-darker); border-radius: var(--radius); }
+        .leaflet-popup-content-wrapper { background: var(--ac-card) !important; color: var(--ac-text) !important; border-radius: 8px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important; }
+        .leaflet-popup-tip { background: var(--ac-card) !important; }
+        .leaflet-popup-content { margin: 10px 14px !important; font-size: 13px; line-height: 1.5; }
+        .leaflet-popup-content .map-popup-title { font-size: 15px; font-weight: bold; color: white; margin-bottom: 4px; }
+        .leaflet-popup-content .map-popup-code { color: var(--ac-red); font-weight: bold; }
+        .leaflet-popup-content .map-popup-stat { color: var(--ac-muted); font-size: 12px; }
+        .map-legend { position: absolute; bottom: 20px; left: 20px; background: var(--ac-card); border-radius: 8px; padding: 12px 16px; z-index: 1000; color: var(--ac-text); font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+        .map-legend-title { font-weight: bold; color: white; margin-bottom: 6px; }
+        .map-legend-item { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
+        .map-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
     </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
@@ -1976,6 +1989,7 @@
         <button class="tab-btn" onclick="switchTab('bid')">Bid Sheet <span class="tab-badge" id="bidCount" style="display:none">0</span></button>
         <button class="tab-btn" onclick="switchTab('strategy')">Strategie Bid</button>
         <button class="tab-btn" onclick="switchTab('compare')">Comparaison</button>
+        <button class="tab-btn" onclick="switchTab('map')">Carte</button>
     </div>
 
     <!-- TAB: PAIRINGS -->
@@ -2332,8 +2346,14 @@
         </div>
     </div>
 
+    <!-- TAB: MAP -->
+    <div class="tab-content" id="tabMap">
+        <div id="mapContainer" style="width:100%;height:calc(100vh - 120px);min-height:500px;"></div>
+    </div>
+
     <div class="copy-toast" id="copyToast">Bid Sheet copie dans le presse-papier!</div>
 
+    <script src="data/months.js"></script>
     <script src="data/pairings.js"></script>
     <script>
     // ============ CONSTANTS ============
@@ -2406,23 +2426,16 @@
     let availableMonths = [];
     let currentMonthCode = null;
 
-    async function loadMonthsManifest() {
-        try {
-            const resp = await fetch('data/months.json');
-            if (resp.ok) {
-                availableMonths = await resp.json();
-            }
-        } catch (e) {
-            // Fallback: at least show the currently loaded month
-            availableMonths = [];
-        }
+    function loadMonthsManifest() {
+        // Load from global var (months.js) - works with file:// protocol
+        availableMonths = (typeof MONTHS_MANIFEST !== 'undefined') ? MONTHS_MANIFEST.slice() : [];
         // Always ensure the current month is in the list
         currentMonthCode = PAIRINGS_METADATA.monthCode;
         if (!availableMonths.some(m => m.monthCode === currentMonthCode)) {
             availableMonths.push({
                 monthCode: currentMonthCode,
                 label: PAIRINGS_METADATA.month,
-                file: currentMonthCode + '.json',
+                file: currentMonthCode,
                 totalPairings: PAIRINGS_DATA.length
             });
             availableMonths.sort((a, b) => a.monthCode.localeCompare(b.monthCode));
@@ -2472,6 +2485,22 @@
         }
     }
 
+    function loadMonthDataJS(fileBase) {
+        return new Promise(function(resolve, reject) {
+            var varName = 'MONTH_DATA_' + fileBase.replace(/-/g, '_');
+            // Check if already loaded
+            if (window[varName]) { resolve(window[varName]); return; }
+            var script = document.createElement('script');
+            script.src = 'data/' + fileBase + '.js';
+            script.onload = function() {
+                if (window[varName]) resolve(window[varName]);
+                else reject(new Error('Donnees non trouvees'));
+            };
+            script.onerror = function() { reject(new Error('Fichier non trouve')); };
+            document.head.appendChild(script);
+        });
+    }
+
     async function switchMonth(monthCode, file) {
         if (monthCode === currentMonthCode) {
             document.getElementById('monthDropdown').classList.remove('show');
@@ -2486,9 +2515,7 @@
         document.body.appendChild(overlay);
 
         try {
-            const resp = await fetch('data/' + file);
-            if (!resp.ok) throw new Error('Fichier non trouve');
-            const data = await resp.json();
+            const data = await loadMonthDataJS(file);
 
             // Update global data
             PAIRINGS_METADATA = data.metadata;
@@ -3081,13 +3108,15 @@
                 (i === 0 && tab === 'pairings') ||
                 (i === 1 && tab === 'bid') ||
                 (i === 2 && tab === 'strategy') ||
-                (i === 3 && tab === 'compare')
+                (i === 3 && tab === 'compare') ||
+                (i === 4 && tab === 'map')
             );
         });
         document.getElementById('tabPairings').classList.toggle('active', tab === 'pairings');
         document.getElementById('tabBid').classList.toggle('active', tab === 'bid');
         document.getElementById('tabStrategy').classList.toggle('active', tab === 'strategy');
         document.getElementById('tabCompare').classList.toggle('active', tab === 'compare');
+        document.getElementById('tabMap').classList.toggle('active', tab === 'map');
         if (tab === 'bid') {
             buildBidDaysOff();
             updateBidConfig();
@@ -3097,6 +3126,9 @@
         }
         if (tab === 'compare') {
             buildCompareTab();
+        }
+        if (tab === 'map') {
+            buildMapTab();
         }
     }
 
@@ -4184,9 +4216,7 @@
         if (!monthInfo) return null;
 
         try {
-            const resp = await fetch('data/' + monthInfo.file);
-            if (!resp.ok) return null;
-            const data = await resp.json();
+            const data = await loadMonthDataJS(monthInfo.file);
             compareDataCache[monthCode] = data;
             return data;
         } catch (e) {
@@ -5380,6 +5410,213 @@
     // Load persisted results and compute aggregated history
     parsedHistoricalResults = loadParsedResults();
     aggregatedHistory = computeAggregatedHistory();
+
+    // ============ MAP TAB ============
+    const AIRPORT_COORDS = {
+        'YUL': [45.4706, -73.7408], 'YYZ': [43.6777, -79.6248], 'YVR': [49.1947, -123.1790],
+        'YYC': [51.1215, -114.0076], 'YEG': [53.3097, -113.5800], 'YWG': [49.9100, -97.2399],
+        'YHZ': [44.8808, -63.5085], 'YOW': [45.3225, -75.6692], 'YQB': [46.7911, -71.3933],
+        'YYT': [47.6186, -52.7519], 'YQM': [46.1122, -64.6786], 'YQR': [50.4319, -104.6658],
+        'YQT': [48.3722, -89.3239], 'YYG': [46.2900, -63.1211], 'YLW': [49.9561, -119.3778],
+        'NRT': [35.7647, 140.3864], 'DEL': [28.5562, 77.1000], 'LHR': [51.4700, -0.4543],
+        'CDG': [49.0097, 2.5479], 'FRA': [50.0379, 8.5622], 'FCO': [41.8003, 12.2389],
+        'BCN': [41.2974, 2.0833], 'MAD': [40.4983, -3.5676], 'LIS': [38.7742, -9.1342],
+        'ATH': [37.9364, 23.9445], 'AMS': [52.3105, 4.7683], 'BRU': [50.9014, 4.4844],
+        'GVA': [46.2381, 6.1089], 'MXP': [45.6306, 8.7281], 'LYS': [45.7256, 5.0811],
+        'TLS': [43.6291, 1.3678], 'CMN': [33.3675, -7.5898],
+        'PUJ': [18.5674, -68.3634], 'CUN': [21.0365, -86.8771], 'MBJ': [18.5037, -77.9134],
+        'NAS': [25.0390, -77.4662], 'PVR': [20.6801, -105.2543], 'SJD': [23.1518, -109.7215],
+        'SXM': [18.0410, -63.1089], 'BGI': [13.0746, -59.4925], 'PTP': [16.2653, -61.5318],
+        'FDF': [14.5910, -61.0032], 'CUR': [12.1889, -68.9598], 'PLS': [21.7736, -72.2659],
+        'AZS': [19.2670, -69.7420], 'LRM': [18.4507, -68.9118], 'POP': [19.7579, -70.5700],
+        'CZM': [20.5224, -86.9265], 'LIR': [10.5933, -85.5444], 'SJO': [9.9939, -84.2088],
+        'ZIH': [17.6016, -101.4606], 'TQO': [20.2363, -87.4280],
+        'MEX': [19.4363, -99.0721], 'BOG': [4.7016, -74.1469], 'CTG': [10.4424, -75.5130],
+        'GUA': [14.5833, -90.5275], 'LIM': [-12.0219, -77.1143], 'GRU': [-23.4356, -46.4731],
+        'EZE': [-34.8222, -58.5358], 'SCL': [-33.3930, -70.7858],
+        'LAX': [33.9425, -118.4081], 'SFO': [37.6213, -122.3790], 'ORD': [41.9742, -87.9073],
+        'MIA': [25.7959, -80.2870], 'BOS': [42.3656, -71.0096], 'EWR': [40.6895, -74.1745],
+        'LGA': [40.7769, -73.8740], 'DFW': [32.8998, -97.0403], 'DEN': [39.8561, -104.6737],
+        'SEA': [47.4502, -122.3088], 'IAH': [29.9844, -95.3414], 'LAS': [36.0840, -115.1537],
+        'FLL': [26.0726, -80.1527], 'MCO': [28.4312, -81.3081], 'TPA': [27.9755, -82.5332],
+        'BNA': [36.1263, -86.6774], 'PBI': [26.6832, -80.0956],
+        'MSP': [44.8848, -93.2223], 'SAN': [32.7338, -117.1933],
+        'HNL': [21.3187, -157.9224], 'SNN': [52.7020, -8.9248],
+        'DUB': [53.4264, -6.2499], 'ZRH': [47.4647, 8.5492],
+        'ICN': [37.4602, 126.4407], 'HKG': [22.3080, 113.9185],
+        'PEK': [40.0799, 116.6031], 'SIN': [1.3502, 103.9940],
+        'MNL': [14.5086, 121.0197], 'BOM': [19.0896, 72.8656],
+        'DOH': [25.2732, 51.6081], 'DXB': [25.2528, 55.3644],
+        'TLV': [32.0114, 34.8867], 'ADD': [8.9779, 38.7994],
+        'ALG': [36.6910, 3.2154], 'DAK': [14.7397, -17.4902],
+        'MSY': [29.9934, -90.2580], 'RDU': [35.8776, -78.7875],
+        'PHX': [33.4373, -112.0078], 'SLC': [40.7884, -111.9778],
+    };
+
+    let routeMap = null;
+    let mapRoutesLayer = null;
+
+    function buildMapTab() {
+        if (!routeMap) {
+            routeMap = L.map('mapContainer', {
+                center: [35, -40],
+                zoom: 3,
+                zoomControl: true,
+                attributionControl: false,
+                worldCopyJump: true,
+                maxBoundsViscosity: 0
+            });
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 18
+            }).addTo(routeMap);
+            mapRoutesLayer = L.layerGroup().addTo(routeMap);
+        }
+        setTimeout(function() { routeMap.invalidateSize(); }, 100);
+        drawMapRoutes();
+    }
+
+    function getCurvedPoints(from, to, numPoints) {
+        var pts = [];
+        var dx = to[1] - from[1];
+        // Handle antimeridian crossing
+        if (Math.abs(dx) > 180) {
+            dx = dx > 0 ? dx - 360 : dx + 360;
+        }
+        var dy = to[0] - from[0];
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var curvature = Math.min(dist * 0.2, 15);
+        for (var i = 0; i <= numPoints; i++) {
+            var t = i / numPoints;
+            var lat = from[0] + dy * t;
+            var lng = from[1] + dx * t;
+            // Arc offset (parabolic curve)
+            var offset = curvature * Math.sin(Math.PI * t);
+            // Perpendicular direction
+            var angle = Math.atan2(dy, dx);
+            lat += offset * Math.cos(angle + Math.PI / 2) * 0.5;
+            lng += offset * Math.sin(angle + Math.PI / 2) * 0.5;
+            pts.push([lat, lng]);
+        }
+        return pts;
+    }
+
+    function getRouteColor(dest) {
+        var coords = AIRPORT_COORDS[dest];
+        if (!coords) return '#ff4444';
+        var lat = coords[0], lng = coords[1];
+        // Canada (codes Y__)
+        if (dest.charAt(0) === 'Y') return '#3498db';           // Bleu - Canada
+        // Europe (longitude -10 a 40, lat > 35)
+        if (lng >= -15 && lng <= 45 && lat > 35) return '#9b59b6'; // Violet - Europe
+        // Asie / Moyen-Orient (longitude > 45)
+        if (lng > 45) return '#f39c12';                          // Orange - Asie
+        // USA (lat > 25, lng < -50)
+        if (lat > 25 && lng < -50) return '#3498db';             // Bleu - USA
+        // Caraibes / Amerique Centrale (lat 0-25)
+        if (lat >= 0 && lat <= 25) return '#2ecc71';             // Vert - Caraibes
+        // Amerique du Sud (lat < 0)
+        if (lat < 0) return '#e74c3c';                           // Rouge - Am. du Sud
+        // Afrique
+        if (lng >= -20 && lng <= 45 && lat <= 35) return '#f1c40f'; // Or - Afrique
+        return '#ff4444';
+    }
+
+    function drawMapRoutes() {
+        if (!mapRoutesLayer) return;
+        mapRoutesLayer.clearLayers();
+
+        var yulCoords = AIRPORT_COORDS['YUL'];
+        var bounds = [yulCoords];
+
+        // Count pairings per destination
+        var destCounts = {};
+        var destBlockAvg = {};
+        PAIRINGS_DATA.forEach(function(p) {
+            p.destinations.forEach(function(d) {
+                if (d === 'YYZ') return;
+                destCounts[d] = (destCounts[d] || 0) + 1;
+                if (!destBlockAvg[d]) destBlockAvg[d] = [];
+                destBlockAvg[d].push(p.blockMinutes);
+            });
+        });
+
+        // YUL marker (base)
+        var yulIcon = L.divIcon({
+            className: '',
+            html: '<div style="background:var(--ac-red);color:white;font-weight:bold;font-size:11px;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid white;">YUL Montreal</div>',
+            iconAnchor: [45, 15]
+        });
+        L.marker(yulCoords, { icon: yulIcon }).addTo(mapRoutesLayer);
+
+        // Draw routes
+        var dests = Object.keys(destCounts);
+        dests.forEach(function(dest) {
+            var destCoords = AIRPORT_COORDS[dest];
+            if (!destCoords) return;
+            bounds.push(destCoords);
+
+            var count = destCounts[dest];
+            var avgBlock = destBlockAvg[dest].reduce(function(a, b) { return a + b; }, 0) / destBlockAvg[dest].length;
+            var avgHrs = Math.floor(avgBlock / 60);
+            var avgMin = Math.round(avgBlock % 60);
+            var color = getRouteColor(dest);
+            var cityName = CITY_NAMES[dest] || dest;
+
+            // Curved route line
+            var curvePoints = getCurvedPoints(yulCoords, destCoords, 50);
+            var polyline = L.polyline(curvePoints, {
+                color: color,
+                weight: Math.min(1.5 + count * 0.15, 4),
+                opacity: 0.7,
+                dashArray: null
+            }).addTo(mapRoutesLayer);
+
+            // Destination marker
+            var size = Math.min(8 + count * 0.5, 18);
+            var marker = L.circleMarker(destCoords, {
+                radius: size,
+                fillColor: color,
+                color: 'white',
+                weight: 1.5,
+                fillOpacity: 0.9
+            }).addTo(mapRoutesLayer);
+
+            // Label (non-interactive so clicks pass through to marker)
+            var label = L.divIcon({
+                className: '',
+                html: '<div style="color:white;font-size:10px;font-weight:bold;text-shadow:0 1px 3px rgba(0,0,0,0.8);white-space:nowrap;pointer-events:none;">' + dest + '</div>',
+                iconAnchor: [-size - 2, 5]
+            });
+            L.marker(destCoords, { icon: label, interactive: false }).addTo(mapRoutesLayer);
+
+            // Popup
+            var popupHtml = '<div class="map-popup-title">' + cityName + '</div>' +
+                '<div class="map-popup-code">' + dest + '</div>' +
+                '<div class="map-popup-stat">' + count + ' pairing' + (count > 1 ? 's' : '') + '</div>' +
+                '<div class="map-popup-stat">Block moyen: ' + avgHrs + 'h' + (avgMin < 10 ? '0' : '') + avgMin + '</div>';
+            marker.bindPopup(popupHtml);
+            polyline.bindPopup(popupHtml);
+        });
+
+        // Legend
+        var existingLegend = document.querySelector('.map-legend');
+        if (existingLegend) existingLegend.remove();
+        var legendDiv = document.createElement('div');
+        legendDiv.className = 'map-legend';
+        legendDiv.innerHTML = '<div class="map-legend-title">' + PAIRINGS_METADATA.month + ' — ' + dests.length + ' destinations</div>' +
+            '<div class="map-legend-item"><div class="map-legend-dot" style="background:#3498db"></div> Canada / USA</div>' +
+            '<div class="map-legend-item"><div class="map-legend-dot" style="background:#9b59b6"></div> Europe</div>' +
+            '<div class="map-legend-item"><div class="map-legend-dot" style="background:#f39c12"></div> Asie</div>' +
+            '<div class="map-legend-item"><div class="map-legend-dot" style="background:#2ecc71"></div> Caraibes / Am. Centrale</div>' +
+            '<div class="map-legend-item"><div class="map-legend-dot" style="background:#f1c40f"></div> Afrique</div>' +
+            '<div class="map-legend-item"><div class="map-legend-dot" style="background:#e74c3c"></div> Amerique du Sud</div>';
+        document.getElementById('mapContainer').appendChild(legendDiv);
+
+        // Fit bounds
+        if (bounds.length > 1) {
+            routeMap.fitBounds(bounds, { padding: [30, 30] });
+        }
+    }
 
     init();
     loadMonthsManifest();
