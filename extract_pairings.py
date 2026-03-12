@@ -464,15 +464,49 @@ if __name__ == '__main__':
         'pdfFile': os.path.basename(pdf_path),
     }
 
-    # Write as JavaScript module
+    # Write as JavaScript module (active month)
     os.makedirs(data_dir, exist_ok=True)
     output_path = os.path.join(data_dir, 'pairings.js')
 
-    output = f"const PAIRINGS_METADATA = {json.dumps(metadata, indent=2)};\n\n"
-    output += f"const PAIRINGS_DATA = {json.dumps(pairings, indent=2)};\n"
+    output = f"var PAIRINGS_METADATA = {json.dumps(metadata, indent=2)};\n\n"
+    output += f"var PAIRINGS_DATA = {json.dumps(pairings, indent=2)};\n"
 
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(output)
+
+    # Save per-month JSON file
+    month_slug = f"{metadata['monthCode']}"  # e.g. "2026-04"
+    json_path = os.path.join(data_dir, f"{month_slug}.json")
+    json_data = {
+        'metadata': metadata,
+        'pairings': pairings
+    }
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(json_data, f, ensure_ascii=False)
+    print(f"Fichier JSON mois: {json_path}")
+
+    # Update months manifest
+    manifest_path = os.path.join(data_dir, 'months.json')
+    manifest = []
+    if os.path.exists(manifest_path):
+        try:
+            with open(manifest_path, 'r', encoding='utf-8') as f:
+                manifest = json.load(f)
+        except Exception:
+            manifest = []
+
+    # Update or add this month
+    existing = [m for m in manifest if m['monthCode'] != metadata['monthCode']]
+    existing.append({
+        'monthCode': metadata['monthCode'],
+        'label': metadata['month'],
+        'file': f"{month_slug}.json",
+        'totalPairings': len(pairings)
+    })
+    existing.sort(key=lambda m: m['monthCode'])
+    with open(manifest_path, 'w', encoding='utf-8') as f:
+        json.dump(existing, f, indent=2, ensure_ascii=False)
+    print(f"Manifeste mis a jour: {manifest_path}")
 
     print(f"\nFichier genere: {output_path}")
     print(f"Destinations: {sorted(list(all_destinations))}")

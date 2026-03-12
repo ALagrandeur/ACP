@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC Crew Pairings - Mars 2026</title>
+    <title>AC Crew Pairings</title>
     <style>
         :root {
             --ac-red: #D72B1F;
@@ -77,6 +77,11 @@
             color: var(--ac-red);
         }
 
+        .month-selector {
+            position: relative;
+            display: inline-block;
+        }
+
         .month-badge {
             background: var(--ac-red);
             color: white;
@@ -84,6 +89,287 @@
             border-radius: 20px;
             font-weight: 600;
             font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .month-badge:hover {
+            background: #e03030;
+        }
+
+        .month-badge .arrow {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+
+        .month-badge.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .month-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            min-width: 200px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .month-dropdown.show {
+            display: block;
+        }
+
+        .month-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--ac-text);
+            transition: background 0.15s;
+        }
+
+        .month-option:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .month-option.active {
+            background: rgba(215, 43, 31, 0.15);
+            color: var(--ac-accent);
+            font-weight: 600;
+        }
+
+        .month-option .month-count {
+            font-size: 11px;
+            color: var(--ac-muted);
+            background: rgba(255,255,255,0.06);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .month-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .month-loading-content {
+            background: var(--ac-card);
+            padding: 24px 40px;
+            border-radius: var(--radius);
+            border: 1px solid var(--ac-border);
+            font-size: 16px;
+            color: var(--ac-text);
+        }
+
+        /* COMPARE TAB */
+        .compare-selectors {
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .compare-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .compare-select-group label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--ac-muted);
+            font-weight: 700;
+        }
+
+        .compare-select {
+            background: var(--ac-card);
+            color: var(--ac-text);
+            border: 1px solid var(--ac-border);
+            padding: 10px 16px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            min-width: 200px;
+            cursor: pointer;
+        }
+
+        .compare-arrow {
+            font-size: 24px;
+            color: var(--ac-muted);
+            padding-bottom: 8px;
+        }
+
+        .btn-compare {
+            background: var(--ac-red);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-compare:hover {
+            background: #e03030;
+        }
+
+        .compare-section {
+            margin-bottom: 28px;
+        }
+
+        .compare-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .compare-section-title .count-badge {
+            background: var(--ac-red);
+            color: white;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .compare-section-title .count-badge.removed {
+            background: #e74c3c;
+        }
+
+        .compare-dest-card {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .compare-dest-header {
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .compare-dest-header:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .compare-dest-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .compare-dest-name .city-name {
+            font-weight: 400;
+            color: var(--ac-muted);
+            font-size: 13px;
+            margin-left: 8px;
+        }
+
+        .compare-dest-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--ac-muted);
+        }
+
+        .compare-dest-stats .stat-value {
+            color: var(--ac-text);
+            font-weight: 600;
+        }
+
+        .compare-pairings-list {
+            border-top: 1px solid var(--ac-border);
+            padding: 0;
+        }
+
+        .compare-pairing-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            cursor: pointer;
+            transition: background 0.15s;
+            flex-wrap: wrap;
+        }
+
+        .compare-pairing-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .compare-pairing-row:last-child {
+            border-bottom: none;
+        }
+
+        .compare-pairing-id {
+            color: var(--ac-accent);
+            font-weight: 700;
+            min-width: 60px;
+        }
+
+        .compare-pairing-badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .compare-empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--ac-muted);
+            font-size: 14px;
+        }
+
+        .compare-dest-card .compare-pairings-list {
+            display: none;
+        }
+
+        .compare-dest-card.expanded .compare-pairings-list {
+            display: block;
+        }
+
+        .compare-dest-header::after {
+            content: '\25B6';
+            color: var(--ac-muted);
+            font-size: 10px;
+            transition: transform 0.2s;
+            margin-left: 8px;
+        }
+
+        .compare-dest-card.expanded .compare-dest-header::after {
+            transform: rotate(90deg);
         }
 
         .header-right {
@@ -1658,7 +1944,13 @@
                 <div class="logo-icon">AC</div>
                 <div class="logo-text">Crew <span>Pairings</span></div>
             </div>
-            <div class="month-badge" id="monthBadge">Mars 2026</div>
+            <div class="month-selector" id="monthSelector">
+                <button class="month-badge" id="monthBadge" onclick="toggleMonthDropdown()">
+                    <span id="monthLabel">Mars 2026</span>
+                    <span class="arrow">&#9660;</span>
+                </button>
+                <div class="month-dropdown" id="monthDropdown"></div>
+            </div>
             <button class="sidebar-toggle" onclick="toggleSidebar()">Filtres</button>
         </div>
         <div class="header-right">
@@ -1683,6 +1975,7 @@
         <button class="tab-btn active" onclick="switchTab('pairings')">Pairings</button>
         <button class="tab-btn" onclick="switchTab('bid')">Bid Sheet <span class="tab-badge" id="bidCount" style="display:none">0</span></button>
         <button class="tab-btn" onclick="switchTab('strategy')">Strategie Bid</button>
+        <button class="tab-btn" onclick="switchTab('compare')">Comparaison</button>
     </div>
 
     <!-- TAB: PAIRINGS -->
@@ -2016,6 +2309,29 @@
         </div>
     </div>
 
+    <!-- TAB: COMPARAISON -->
+    <div class="tab-content" id="tabCompare">
+        <div style="max-width:1200px;margin:0 auto;padding:20px;">
+            <h2 style="color:white;margin-bottom:4px;">Comparaison des Destinations</h2>
+            <p style="color:var(--ac-muted);font-size:13px;margin-bottom:20px;">Identifie les nouvelles destinations entre deux mois de pairings</p>
+
+            <div class="compare-selectors">
+                <div class="compare-select-group">
+                    <label>Mois de reference (ancien)</label>
+                    <select id="compareMonthRef" class="compare-select"></select>
+                </div>
+                <div class="compare-arrow">&#8594;</div>
+                <div class="compare-select-group">
+                    <label>Mois a comparer (nouveau)</label>
+                    <select id="compareMonthNew" class="compare-select"></select>
+                </div>
+                <button class="btn-compare" onclick="runComparison()">Comparer</button>
+            </div>
+
+            <div id="compareResults"></div>
+        </div>
+    </div>
+
     <div class="copy-toast" id="copyToast">Bid Sheet copie dans le presse-papier!</div>
 
     <script src="data/pairings.js"></script>
@@ -2086,10 +2402,144 @@
         page: 1
     };
 
+    // ============ MONTH SELECTOR ============
+    let availableMonths = [];
+    let currentMonthCode = null;
+
+    async function loadMonthsManifest() {
+        try {
+            const resp = await fetch('data/months.json');
+            if (resp.ok) {
+                availableMonths = await resp.json();
+            }
+        } catch (e) {
+            // Fallback: at least show the currently loaded month
+            availableMonths = [];
+        }
+        // Always ensure the current month is in the list
+        currentMonthCode = PAIRINGS_METADATA.monthCode;
+        if (!availableMonths.some(m => m.monthCode === currentMonthCode)) {
+            availableMonths.push({
+                monthCode: currentMonthCode,
+                label: PAIRINGS_METADATA.month,
+                file: currentMonthCode + '.json',
+                totalPairings: PAIRINGS_DATA.length
+            });
+            availableMonths.sort((a, b) => a.monthCode.localeCompare(b.monthCode));
+        }
+        buildMonthDropdown();
+    }
+
+    function buildMonthDropdown() {
+        const dropdown = document.getElementById('monthDropdown');
+        if (!availableMonths.length) {
+            dropdown.innerHTML = '<div class="month-option" style="color:var(--ac-muted)">Aucun mois disponible</div>';
+            return;
+        }
+        dropdown.innerHTML = availableMonths.map(m => {
+            const isActive = m.monthCode === currentMonthCode;
+            return `<div class="month-option ${isActive ? 'active' : ''}" onclick="switchMonth('${m.monthCode}', '${m.file}')">
+                <span>${m.label}</span>
+                <span class="month-count">${m.totalPairings} pairings</span>
+            </div>`;
+        }).join('');
+    }
+
+    function toggleMonthDropdown() {
+        const dropdown = document.getElementById('monthDropdown');
+        const badge = document.getElementById('monthBadge');
+        const isOpen = dropdown.classList.contains('show');
+        dropdown.classList.toggle('show');
+        badge.classList.toggle('open');
+        if (!isOpen) {
+            // Close on click outside
+            setTimeout(() => {
+                document.addEventListener('click', closeMonthDropdown, { once: true });
+            }, 0);
+        }
+    }
+
+    function closeMonthDropdown(e) {
+        const selector = document.getElementById('monthSelector');
+        if (!selector.contains(e.target)) {
+            document.getElementById('monthDropdown').classList.remove('show');
+            document.getElementById('monthBadge').classList.remove('open');
+        } else {
+            // Re-attach if click was inside
+            setTimeout(() => {
+                document.addEventListener('click', closeMonthDropdown, { once: true });
+            }, 0);
+        }
+    }
+
+    async function switchMonth(monthCode, file) {
+        if (monthCode === currentMonthCode) {
+            document.getElementById('monthDropdown').classList.remove('show');
+            document.getElementById('monthBadge').classList.remove('open');
+            return;
+        }
+
+        // Show loading overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'month-loading';
+        overlay.innerHTML = '<div class="month-loading-content">Chargement des pairings...</div>';
+        document.body.appendChild(overlay);
+
+        try {
+            const resp = await fetch('data/' + file);
+            if (!resp.ok) throw new Error('Fichier non trouve');
+            const data = await resp.json();
+
+            // Update global data
+            PAIRINGS_METADATA = data.metadata;
+            PAIRINGS_DATA = data.pairings;
+            currentMonthCode = monthCode;
+
+            // Reset state and re-init
+            resetState();
+            init();
+            buildMonthDropdown();
+
+            // Reset compare tab selectors
+            document.getElementById('compareMonthRef').innerHTML = '';
+            document.getElementById('compareMonthNew').innerHTML = '';
+            document.getElementById('compareResults').innerHTML = '';
+
+            document.getElementById('monthDropdown').classList.remove('show');
+            document.getElementById('monthBadge').classList.remove('open');
+        } catch (e) {
+            alert('Erreur lors du chargement: ' + e.message);
+        } finally {
+            overlay.remove();
+        }
+    }
+
+    function resetState() {
+        state.search = '';
+        state.selectedDests = new Set();
+        state.selectedDays = new Set();
+        state.selectedDates = new Set();
+        state.blockMin = 0;
+        state.blockMax = 40;
+        state.tafbMin = 0;
+        state.tafbMax = 120;
+        state.allowMin = 0;
+        state.allowMax = 800;
+        state.selectedEquip = new Set();
+        state.selectedLangs = new Set();
+        state.selectedCrew = new Set();
+        state.sortBy = 'id';
+        state.sortAsc = true;
+        state.page = 1;
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
+    }
+
     // ============ INIT ============
     function init() {
         document.getElementById('totalCount').textContent = PAIRINGS_DATA.length;
-        document.getElementById('monthBadge').textContent = PAIRINGS_METADATA.month;
+        document.getElementById('monthLabel').textContent = PAIRINGS_METADATA.month;
+        document.title = 'AC Crew Pairings - ' + PAIRINGS_METADATA.month;
 
         buildDestFilters();
         buildDaysFilter();
@@ -2505,7 +2955,7 @@
 
         // Operating dates
         const datesHtml = p.operatingDates.map(d =>
-            `<span class="date-chip">${d} mars</span>`
+            `<span class="date-chip">${d} ${PAIRINGS_METADATA.month.split(' ')[0].toLowerCase()}</span>`
         ).join('');
 
         return `
@@ -2630,18 +3080,23 @@
             b.classList.toggle('active',
                 (i === 0 && tab === 'pairings') ||
                 (i === 1 && tab === 'bid') ||
-                (i === 2 && tab === 'strategy')
+                (i === 2 && tab === 'strategy') ||
+                (i === 3 && tab === 'compare')
             );
         });
         document.getElementById('tabPairings').classList.toggle('active', tab === 'pairings');
         document.getElementById('tabBid').classList.toggle('active', tab === 'bid');
         document.getElementById('tabStrategy').classList.toggle('active', tab === 'strategy');
+        document.getElementById('tabCompare').classList.toggle('active', tab === 'compare');
         if (tab === 'bid') {
             buildBidDaysOff();
             updateBidConfig();
         }
         if (tab === 'strategy') {
             buildStrategyTab();
+        }
+        if (tab === 'compare') {
+            buildCompareTab();
         }
     }
 
@@ -3497,7 +3952,7 @@
                 <div class="value">$${Math.round(avgAllow)}</div>
             </div>
             <div class="strat-card">
-                <div class="label">Perdiem Reel Mars</div>
+                <div class="label">Perdiem Reel ${PAIRINGS_METADATA.month.split(' ')[0]}</div>
                 <div class="value gold">$${Math.round(actualMonthly)}</div>
             </div>
             <div class="strat-card">
@@ -3645,7 +4100,7 @@
             <div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:13px;">
                 <strong style="color:var(--ac-gold);">Perdiem mensuel estime (~${realisticPairingsPerMonth} pairings/mois, moy. ~$${Math.round(weightedAvgPerDiem)}/pairing):</strong>
                 <strong style="color:var(--ac-green);font-size:16px;">~$${totalExpected}</strong>
-                <span style="color:var(--ac-muted);"> vs $${actualMonthly} recu en mars (coverage awards seulement)</span>
+                <span style="color:var(--ac-muted);"> vs $${actualMonthly} recu precedemment (coverage awards seulement)</span>
             </div>
 
             <div style="margin-top:16px;padding:16px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;">
@@ -3656,7 +4111,7 @@
                 </p>
                 <ul style="font-size:12px;color:var(--ac-muted);margin:0 0 0 16px;line-height:2.2;">
                     <li><strong style="color:var(--ac-text);">Limiter les Prefer Off a 3-5 jours maximum.</strong> Chaque jour exclu reduit le pool de pairings. En Denial Mode, PBS supprime vos Prefer Off un par un (du dernier au premier) puis recommence tout le processus.</li>
-                    <li><strong style="color:var(--ac-text);">Eviter les Avoid Pairings agressifs.</strong> <code>Avoid Pairings If Pairing Length = 1 days</code> a ete refuse (Not honored) en mars. Chaque Avoid retire des pairings du pool. Si trop sont retires, PBS ne peut pas construire un bloc legal (71-80h) et passe en Denial Mode.</li>
+                    <li><strong style="color:var(--ac-text);">Eviter les Avoid Pairings agressifs.</strong> <code>Avoid Pairings If Pairing Length = 1 days</code> a ete refuse (Not honored) precedemment. Chaque Avoid retire des pairings du pool. Si trop sont retires, PBS ne peut pas construire un bloc legal (71-80h) et passe en Denial Mode.</li>
                     <li><strong style="color:var(--ac-text);">Ordonner les Prefer Off du moins au plus important.</strong> En Denial Mode, PBS supprime le <em>dernier</em> Prefer Off en premier. Placez vos jours les plus importants en premier dans la liste.</li>
                     <li><strong style="color:var(--ac-text);">Ne pas combiner trop de filtres restrictifs.</strong> Ex: eviter <code>Avoid If Legs > 2</code> + <code>Avoid If Length = 1</code> + <code>Prefer Off 10 jours</code> ensemble &mdash; ca elimine trop de pairings.</li>
                     <li><strong style="color:var(--ac-text);">Utiliser Set Condition Minimum Credit</strong> plutot que des Avoid pour controler la qualite. Ca ne retire pas de pairings du pool.</li>
@@ -3691,6 +4146,160 @@
                 if (match.match(/^[A-Z]{3}(,\s*[A-Z]{3})*$/)) return `<span class="dest">${match}</span>`;
                 return match;
             });
+    }
+
+    // ========== COMPARE TAB ==========
+    let compareDataCache = {};
+
+    function buildCompareTab() {
+        const selRef = document.getElementById('compareMonthRef');
+        const selNew = document.getElementById('compareMonthNew');
+
+        // Only rebuild selectors if empty
+        if (selRef.options.length === 0 || selNew.options.length === 0) {
+            selRef.innerHTML = '';
+            selNew.innerHTML = '';
+            availableMonths.forEach(m => {
+                selRef.add(new Option(m.label + ' (' + m.totalPairings + ')', m.monthCode));
+                selNew.add(new Option(m.label + ' (' + m.totalPairings + ')', m.monthCode));
+            });
+
+            // Pre-select: ref = first month, new = last month
+            if (availableMonths.length >= 2) {
+                selRef.value = availableMonths[availableMonths.length - 2].monthCode;
+                selNew.value = availableMonths[availableMonths.length - 1].monthCode;
+            }
+        }
+
+        // Auto-run if results area is empty
+        if (!document.getElementById('compareResults').innerHTML.trim()) {
+            runComparison();
+        }
+    }
+
+    async function fetchMonthData(monthCode) {
+        if (compareDataCache[monthCode]) return compareDataCache[monthCode];
+
+        const monthInfo = availableMonths.find(m => m.monthCode === monthCode);
+        if (!monthInfo) return null;
+
+        try {
+            const resp = await fetch('data/' + monthInfo.file);
+            if (!resp.ok) return null;
+            const data = await resp.json();
+            compareDataCache[monthCode] = data;
+            return data;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async function runComparison() {
+        const refCode = document.getElementById('compareMonthRef').value;
+        const newCode = document.getElementById('compareMonthNew').value;
+        const resultsDiv = document.getElementById('compareResults');
+
+        if (refCode === newCode) {
+            resultsDiv.innerHTML = '<div class="compare-empty">Selectionnez deux mois differents pour comparer.</div>';
+            return;
+        }
+
+        resultsDiv.innerHTML = '<div class="compare-empty">Chargement des donnees...</div>';
+
+        const [refData, newData] = await Promise.all([
+            fetchMonthData(refCode),
+            fetchMonthData(newCode)
+        ]);
+
+        if (!refData || !newData) {
+            resultsDiv.innerHTML = '<div class="compare-empty">Erreur: impossible de charger les donnees des mois.</div>';
+            return;
+        }
+
+        const refDests = new Set(refData.metadata.destinations);
+        const newDests = new Set(newData.metadata.destinations);
+
+        // New destinations (in new but not in ref)
+        const addedDests = [...newDests].filter(d => !refDests.has(d)).sort();
+        // Removed destinations (in ref but not in new)
+        const removedDests = [...refDests].filter(d => !newDests.has(d)).sort();
+
+        const refLabel = refData.metadata.month;
+        const newLabel = newData.metadata.month;
+
+        let html = '';
+
+        // === NEW DESTINATIONS ===
+        html += `<div class="compare-section">`;
+        html += `<div class="compare-section-title">Nouvelles destinations en ${newLabel} <span class="count-badge">${addedDests.length}</span></div>`;
+
+        if (addedDests.length === 0) {
+            html += `<div class="compare-empty">Aucune nouvelle destination — toutes les destinations de ${newLabel} existaient deja en ${refLabel}.</div>`;
+        } else {
+            addedDests.forEach(dest => {
+                const cityName = CITY_NAMES[dest] || '';
+                const pairings = newData.pairings.filter(p => p.destinations.includes(dest));
+
+                // Stats
+                const avgAllow = pairings.length ? Math.round(pairings.reduce((s, p) => s + p.allowance, 0) / pairings.length) : 0;
+                const avgDays = pairings.length ? (pairings.reduce((s, p) => s + p.numDays, 0) / pairings.length).toFixed(1) : 0;
+
+                html += `<div class="compare-dest-card">`;
+                html += `<div class="compare-dest-header" onclick="this.parentElement.classList.toggle('expanded')">`;
+                html += `<div class="compare-dest-name">${dest}<span class="city-name">${cityName}</span></div>`;
+                html += `<div class="compare-dest-stats">`;
+                html += `<span><span class="stat-value">${pairings.length}</span> pairings</span>`;
+                html += `<span>Moy. <span class="stat-value">${avgDays}j</span></span>`;
+                html += `<span>Perdiem moy. <span class="stat-value">$${avgAllow}</span></span>`;
+                html += `</div></div>`;
+
+                html += `<div class="compare-pairings-list">`;
+                pairings.forEach(p => {
+                    const blockStr = formatTimeStr(p.blockTotal);
+                    const tafbStr = formatTimeStr(p.tafb);
+                    html += `<div class="compare-pairing-row" onclick="goToPairing('${p.id}')">`;
+                    html += `<span class="compare-pairing-id">${p.id}</span>`;
+                    html += `<span class="compare-pairing-badge" style="background:rgba(52,152,219,0.15);color:#3498db;">${p.numDays}J</span>`;
+                    html += `<span class="compare-pairing-badge" style="background:rgba(142,68,173,0.15);color:#8e44ad;">${blockStr}</span>`;
+                    html += `<span style="color:var(--ac-muted);">TAFB ${tafbStr}</span>`;
+                    html += `<span class="compare-pairing-badge" style="background:${p.allowance > 0 ? 'rgba(46,204,113,0.15);color:#2ecc71' : 'rgba(255,255,255,0.06);color:var(--ac-muted)'};">$${p.allowance.toFixed(0)}</span>`;
+                    html += `<span style="color:var(--ac-muted);font-size:11px;">${p.equipment.join(', ')}</span>`;
+                    html += `<span style="color:var(--ac-muted);font-size:11px;">${p.dateStart} - ${p.dateEnd}</span>`;
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+            });
+        }
+        html += `</div>`;
+
+        // === REMOVED DESTINATIONS ===
+        if (removedDests.length > 0) {
+            html += `<div class="compare-section">`;
+            html += `<div class="compare-section-title">Destinations retirees en ${newLabel} <span class="count-badge removed">${removedDests.length}</span></div>`;
+            html += `<div style="display:flex;flex-wrap:wrap;gap:8px;">`;
+            removedDests.forEach(dest => {
+                const cityName = CITY_NAMES[dest] || '';
+                const refPairings = refData.pairings.filter(p => p.destinations.includes(dest));
+                html += `<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.2);padding:8px 14px;border-radius:8px;font-size:13px;">`;
+                html += `<strong style="color:#e74c3c;">${dest}</strong>`;
+                html += `<span style="color:var(--ac-muted);margin-left:6px;">${cityName}</span>`;
+                html += `<span style="color:var(--ac-muted);margin-left:8px;font-size:11px;">(${refPairings.length} pairings en ${refLabel})</span>`;
+                html += `</div>`;
+            });
+            html += `</div></div>`;
+        }
+
+        resultsDiv.innerHTML = html;
+    }
+
+    function goToPairing(pairingId) {
+        // Switch to pairings tab and search for this pairing
+        const searchInput = document.getElementById('searchInput');
+        searchInput.value = pairingId;
+        state.search = pairingId.toUpperCase();
+        state.page = 1;
+        switchTab('pairings');
+        applyFiltersAndRender();
     }
 
     // ========== SMART BID ALGORITHM ==========
@@ -4569,7 +5178,7 @@
         csv += 'Perdiem_mensuel_estime = Perdiem_moyen x (76h_cible / Block_moyen_heures)\n';
         csv += 'Probabilite basee sur: ratio senior historique + supply + duree + type destination\n';
         csv += `Anciennete: Rang ${userSeniority.rank}/${userSeniority.total} | Base: ${HISTORICAL_DATA.base}\n`;
-        csv += 'Donnees: Sep 2025; Oct 2025; Nov 2025; Mars 2026\n';
+        csv += `Donnees: Historique + ${PAIRINGS_METADATA.month}\n`;
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -4773,6 +5382,7 @@
     aggregatedHistory = computeAggregatedHistory();
 
     init();
+    loadMonthsManifest();
 
     // Render uploaded history on strategy tab init
     setTimeout(() => { renderUploadedHistory(); }, 100);
