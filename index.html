@@ -2559,6 +2559,11 @@
             document.getElementById('compareMonthNew').innerHTML = '';
             document.getElementById('compareResults').innerHTML = '';
 
+            // Update map if visible
+            if (routeMap && document.getElementById('tabMap').classList.contains('active')) {
+                drawMapRoutes();
+            }
+
             document.getElementById('monthDropdown').classList.remove('show');
             document.getElementById('monthBadge').classList.remove('open');
         } catch (e) {
