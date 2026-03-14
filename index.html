@@ -1293,6 +1293,9 @@
         .tag-secure { background: rgba(46,204,113,0.15); color: #2ecc71; }
         .tag-value { background: rgba(241,196,15,0.15); color: #f1c40f; }
         .tag-reach { background: rgba(231,76,60,0.15); color: #e74c3c; }
+        .tag-transition { background: rgba(155,89,182,0.15); color: #9b59b6; }
+        .tag-inherited { background: rgba(149,165,166,0.15); color: #95a5a6; font-size: 10px; }
+        .bid-line.inherited { opacity: 0.6; }
 
         .strat-export-btn {
             background: var(--ac-red);
@@ -2250,6 +2253,13 @@
                             <option value="4">4 blocs</option>
                             <option value="5">5 blocs</option>
                             <option value="6">6 blocs</option>
+                        </select>
+                    </div>
+                    <div class="config-group">
+                        <label>Transition entre blocs</label>
+                        <select id="cfgBlockTransition" onchange="userBlockTransition = this.value;">
+                            <option value="ESNBG" selected>ESNBG - Efface et recommence</option>
+                            <option value="CSSNBG">CSSNBG - Garde le standing</option>
                         </select>
                     </div>
                     <button class="config-btn-recalc" onclick="recalculateStrategy()">Recalculer</button>
@@ -3592,6 +3602,7 @@
     // --- User configurable state ---
     let userSeniority = { rank: 1502, total: 1673 };
     let userBlockCount = 2;
+    let userBlockTransition = 'ESNBG'; // 'ESNBG' or 'CSSNBG'
     let userBlockPriorities = [
         { p1: 'perdiem', p2: 'international' },
         { p1: 'canada', p2: 'daysoff' },
@@ -3690,9 +3701,9 @@
 
         grid.innerHTML = userBlockPriorities.map((bp, i) => {
             const isLast = (i === count - 1);
-            const blockName = i === 0 ? 'Bloc 1 - Bid de Block (principal)'
-                : `Bloc ${i + 1} - Bid de Block`;
-            const blockSub = i === 0 ? 'Priorite principale' : '';
+            const blockSubtitle = i === 0 ? 'Optimiste' : (isLast ? 'Filet de securite' : 'Realiste');
+            const blockName = `Bloc ${i + 1} - ${blockSubtitle}`;
+            const blockSub = i === 0 ? 'Priorite principale' : (isLast ? 'Inclut les lignes des blocs precedents' : '');
             return `
                 <div class="block-config-item">
                     <div class="block-label">${blockName}<small>${blockSub}</small></div>
@@ -4192,6 +4203,7 @@
                     <li><strong style="color:var(--ac-text);">Les destinations domestiques sont votre filet de securite.</strong> YHZ, YWG, YYZ, YVR ont un grand volume et moins de competition. Perdiem modeste mais assure (~$120-$200/pairing).</li>
                     <li><strong style="color:var(--ac-text);">Ajouter <code>Average Daily Credit > 005:00</code></strong> comme filtre de qualite &mdash; ca elimine les pairings a faible ratio credit/jour sans retirer du pool.</li>
                     <li><strong style="color:var(--ac-text);">Toujours terminer par <code>Award Pairings</code></strong> (generique sans filtre). C'est votre derniere ligne de defense avant que PBS passe au Denial Mode.</li>
+                    <li><strong style="color:var(--ac-text);">Utiliser <code>ESNBG</code> ou <code>CSSNBG</code> entre les blocs.</strong> <code>ESNBG</code> (End Standing Next Bid Group) efface tout et recommence au prochain bloc &mdash; ideal pour une strategie progressive (optimiste &rarr; realiste &rarr; filet). <code>CSSNBG</code> (Current Standing Start Next Bid Group) garde le standing actuel et continue.</li>
                 </ul>
             </div>
         `;
@@ -4203,7 +4215,7 @@
 
     function colorizeBidCmd(cmd) {
         return cmd
-            .replace(/(Award Pairings|Avoid Pairings|Prefer Off|Set Condition)/g, '<span class="kw">$1</span>')
+            .replace(/(Award Pairings|Avoid Pairings|Prefer Off|Set Condition|CSSNBG|ESNBG)/g, '<span class="kw">$1</span>')
             .replace(/(If Allowance Amount|If Pairing Length|If Pairing Check-In Time|If Pairing Check-Out Time|If Average Daily Credit|If Pairing Total Credit|If Any Layover In|If Any Duty Legs|If Departing On|If TAFB|And Of Duration)/g, '<span class="cond">$1</span>')
             .replace(/(\$\d+|\d+:\d+|> \d+|< \d+|= \d+|Between \d+|Minimum \d+)/g, '<span class="val">$1</span>')
             .replace(/\b([A-Z]{3}(?:,\s*[A-Z]{3})*)\b/g, (match) => {
@@ -4983,33 +4995,38 @@
     }
 
     // --- THE MAIN SMART ALGORITHM ---
-    function generateBlockBidLines(blockIndex, p1Id, p2Id) {
+    function generateBlockBidLines(blockIndex, p1Id, p2Id, inheritedLines) {
+        inheritedLines = inheritedLines || [];
         const juniorRatio = userSeniority.rank / userSeniority.total;
         const denialRate = aggregatedHistory ? aggregatedHistory.denialRate : 0.75;
 
-        // Step 1: Optimal line count
+        // Step 1: Optimal line count for NEW lines in this block
         const optimalCount = calculateOptimalLineCount(juniorRatio, denialRate);
 
         // Step 2: Generate all candidates
         const candidates = generateCandidateLines(p1Id, p2Id);
 
-        // Step 3: Determine risk profile based on block position
-        // First blocks = conservative (safe), last block = aggressive (optimistic)
+        // Step 3: Deduplicate - exclude candidates already in inherited lines
+        const inheritedCmds = new Set(inheritedLines.map(l => l.cmd));
+        const newCandidates = candidates.filter(c => !inheritedCmds.has(c.cmd));
+
+        // Step 4: Determine risk profile based on block position
+        // First block = aggressive (optimistic/selective), last block = conservative (safe/wide)
         let riskProfile;
         if (userBlockCount <= 1) {
             riskProfile = 'balanced';
-        } else if (blockIndex === userBlockCount - 1) {
-            riskProfile = 'aggressive';
         } else if (blockIndex === 0) {
+            riskProfile = 'aggressive';
+        } else if (blockIndex === userBlockCount - 1) {
             riskProfile = 'conservative';
         } else {
             riskProfile = 'balanced';
         }
 
-        // Step 4: Select optimal set with risk-adjusted scoring
-        const selected = selectOptimalLines(candidates, optimalCount, p1Id, p2Id, riskProfile);
+        // Step 5: Select optimal set from NEW candidates only
+        const selected = selectOptimalLines(newCandidates, optimalCount, p1Id, p2Id, riskProfile);
 
-        // Step 4: Build final lines
+        // Step 6: Build final lines = inherited + new
         const lines = [];
         let lineNum = 0;
 
@@ -5021,11 +5038,28 @@
             comment: 'Maximise les heures de vol',
         });
 
+        // Add inherited lines first (from previous blocks)
+        const inheritedAwardLines = inheritedLines.filter(l =>
+            l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings' &&
+            l.cmd !== 'CSSNBG' && l.cmd !== 'ESNBG'
+        );
+        inheritedAwardLines.forEach(il => {
+            lineNum++;
+            lines.push({
+                ...il,
+                num: lineNum,
+                inherited: true,
+                tag: 'inherited', tagLabel: `Bloc ${il.fromBlock || '?'}`,
+            });
+        });
+
+        // Add new lines from this block
+        const newLines = [];
         selected.forEach(s => {
             lineNum++;
             const isAspirational = s.matchCount < 80;
             const isSecure = s.matchCount > 300;
-            lines.push({
+            const line = {
                 num: lineNum, cmd: s.cmd,
                 matchCount: s.matchCount,
                 matchIds: s.matchIds,
@@ -5036,7 +5070,10 @@
                 tag: isAspirational ? 'reach' : (isSecure ? 'secure' : 'value'),
                 tagLabel: isAspirational ? 'Aspirationnel' : (isSecure ? 'Securitaire' : 'Optimal'),
                 comment: `${s.matchCount} pairings | Priorite: ${Math.round(s.priorityScore * 100)}% | Senior: ${Math.round(s.seniorComp * 100)}%`,
-            });
+                fromBlock: blockIndex + 1,
+            };
+            lines.push(line);
+            newLines.push(line);
         });
 
         lineNum++;
@@ -5047,7 +5084,22 @@
             comment: `Filet de securite - ${PAIRINGS_DATA.length} pairings`,
         });
 
-        return { lines, riskProfile };
+        // Add block transition command (not on last block)
+        if (blockIndex < userBlockCount - 1) {
+            lineNum++;
+            lines.push({
+                num: lineNum, cmd: userBlockTransition,
+                tag: 'transition', tagLabel: 'Transition',
+                comment: userBlockTransition === 'ESNBG'
+                    ? 'Efface et recommence au prochain bloc'
+                    : 'Garde le standing et passe au prochain bloc',
+            });
+        }
+
+        // Collect all award lines (inherited + new) for passing to next block
+        const allAwardLines = [...inheritedAwardLines.map(l => ({...l, fromBlock: l.fromBlock})), ...newLines];
+
+        return { lines, riskProfile, allAwardLines };
     }
 
     function renderProposedBid() {
@@ -5075,15 +5127,18 @@
         html += 'Ajoutez vos <code>Prefer Off</code> manuellement dans PBS (max 3-5 jours pour eviter le denial).';
         html += '</div>';
 
+        let accumulatedLines = []; // Lines accumulated across blocks for progressive inheritance
+
         for (let i = 0; i < userBlockCount; i++) {
             const bp = userBlockPriorities[i] || { p1: 'perdiem', p2: 'international' };
-            const blockName = i === 0 ? 'Bloc 1 - Bid de Block (principal)'
-                : `Bloc ${i + 1} - Bid de Block`;
+            const blockSubtitle = i === 0 ? 'Optimiste' : (i === userBlockCount - 1 ? 'Filet de securite' : 'Realiste');
+            const blockName = `Bloc ${i + 1} - ${blockSubtitle}`;
 
             const p1Label = PRIORITY_OPTIONS.find(o => o.id === bp.p1)?.label || bp.p1;
             const p2Label = PRIORITY_OPTIONS.find(o => o.id === bp.p2)?.label || bp.p2;
 
-            const blockResult = generateBlockBidLines(i, bp.p1, bp.p2);
+            const blockResult = generateBlockBidLines(i, bp.p1, bp.p2, accumulatedLines);
+            accumulatedLines = blockResult.allAwardLines; // Pass to next block
             const lines = blockResult.lines;
             const blockRiskProfile = blockResult.riskProfile;
             const blockCmds = lines.map(l => l.cmd);
@@ -5096,12 +5151,12 @@
             // Risk level adjusted by block profile
             let riskLevel, riskLabel;
             if (blockRiskProfile === 'aggressive') {
-                // Last block: always medium or high risk
+                // First block (optimistic): medium or high risk
                 const feasibleRatio = awardLines.length > 0 ? awardLines.filter(l => l.canBuildBlock).length / awardLines.length : 1;
                 riskLevel = feasibleRatio > 0.7 ? 'medium' : 'high';
                 riskLabel = riskLevel === 'medium' ? 'Moyen' : 'Eleve';
             } else if (blockRiskProfile === 'conservative') {
-                // First block: always low
+                // Last block (safety net): always low
                 riskLevel = 'low';
                 riskLabel = 'Faible';
             } else {
@@ -5129,12 +5184,12 @@
                 }
                 // Match count badge
                 let matchHtml = '';
-                if (l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit') {
+                if (l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'CSSNBG' && l.cmd !== 'ESNBG') {
                     const mc = l.matchCount;
                     const cls = mc >= 200 ? 'good' : (mc >= 50 ? 'medium' : 'low');
                     matchHtml = `<span class="match-badge ${cls}">${mc} pairings</span>`;
                 }
-                html += `<div class="bid-line">
+                html += `<div class="bid-line${l.inherited ? ' inherited' : ''}">
                     <span class="bid-num">${l.num}.</span>
                     <span class="bid-cmd">${cmdHtml}</span>
                     ${tagHtml}${matchHtml}
@@ -5169,7 +5224,12 @@
             const profileLabel = blockRiskProfile === 'conservative' ? 'Conservateur' : (blockRiskProfile === 'aggressive' ? 'Optimiste' : 'Equilibre');
             html += `<div class="denial-risk-meter ${riskLevel}">`;
             html += `<strong>Risque Denial Mode: ${riskLabel}</strong>`;
-            html += ` | Strategie: ${profileLabel} | Moy. ${avgMatch} pairings/ligne | ${lines.length - 2} lignes optimisees`;
+            const inheritedCount = lines.filter(l => l.inherited).length;
+            const newCount = awardLines.length - inheritedCount;
+            const linesSummary = inheritedCount > 0
+                ? `${newCount} nouvelles + ${inheritedCount} heritees`
+                : `${newCount} lignes optimisees`;
+            html += ` | Strategie: ${profileLabel} | Moy. ${avgMatch} pairings/ligne | ${linesSummary}`;
             html += `</div>`;
 
             html += '</div></div></div>';
