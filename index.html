@@ -177,6 +177,92 @@
             border: 1px solid #d5d5dd;
             color: #1a1a1a;
         }
+        /* Override all hardcoded white text in light mode */
+        [data-theme="light"] .pairing-card *,
+        [data-theme="light"] .strategy-container *,
+        [data-theme="light"] .bid-sheet-area *,
+        [data-theme="light"] .sidebar *,
+        [data-theme="light"] .results-area * {
+            color: inherit;
+        }
+        [data-theme="light"] h2, [data-theme="light"] h3, [data-theme="light"] h4,
+        [data-theme="light"] strong {
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .bid-line-text .kw { color: #C41230 !important; }
+        [data-theme="light"] .bid-line-text .val { color: #b8860b !important; }
+        [data-theme="light"] .bid-line-text .cond { color: #2563eb !important; }
+        [data-theme="light"] .tag { color: white !important; }
+        [data-theme="light"] .bid-block-header { color: white !important; }
+        [data-theme="light"] .logo-icon { color: white !important; }
+        [data-theme="light"] .month-badge { color: white !important; }
+        [data-theme="light"] .sidebar-toggle { color: white !important; }
+        [data-theme="light"] .btn-primary { color: white !important; }
+        [data-theme="light"] .btn-add-bid.added { color: white !important; }
+        [data-theme="light"] .config-btn-recalc { color: white !important; }
+        [data-theme="light"] .strat-export-btn { color: white !important; }
+        [data-theme="light"] .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8fa 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        [data-theme="light"] .logo-text {
+            color: #1a1a1a !important;
+        }
+        [data-theme="light"] .logo-text span {
+            color: #1a1a1a !important;
+        }
+        [data-theme="light"] .stats,
+        [data-theme="light"] .stats span {
+            color: #4a4a5a !important;
+        }
+        [data-theme="light"] .stats strong {
+            color: #1a1a1a !important;
+        }
+        [data-theme="light"] .sort-btn {
+            background: #f0f0f4;
+            border-color: #d5d5dd;
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .sort-btn.active {
+            background: var(--ac-red);
+            color: white !important;
+        }
+        [data-theme="light"] .day-chip {
+            background: #f0f0f4;
+            border: 1px solid #d5d5dd;
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .day-chip.active,
+        [data-theme="light"] .day-chip:hover {
+            background: rgba(196,18,48,0.1);
+            border-color: var(--ac-red);
+            color: var(--ac-red);
+        }
+        /* Compare tab light fixes */
+        [data-theme="light"] .compare-dest-header:hover {
+            background: rgba(0,0,0,0.03);
+        }
+        [data-theme="light"] .compare-dest-stats {
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .compare-dest-expand {
+            color: #4a4a5a;
+        }
+        /* Map tab light fixes */
+        [data-theme="light"] #tabMap {
+            background: #f5f5f7;
+        }
+        [data-theme="light"] .leaflet-popup-content-wrapper {
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+        /* Global fix: override inline color:white on headings/text in light mode */
+        [data-theme="light"] #tabCompare h2,
+        [data-theme="light"] #tabCompare h3,
+        [data-theme="light"] #tabCompare .compare-section-title,
+        [data-theme="light"] #tabCompare .compare-dest-name {
+            color: #1a1a1a !important;
+        }
         [data-theme="light"] .btn {
             border-color: #d5d5dd;
             color: #4a4a5a;
@@ -414,7 +500,7 @@
         .compare-section-title {
             font-size: 16px;
             font-weight: 700;
-            color: white;
+            color: var(--ac-text);
             margin-bottom: 12px;
             display: flex;
             align-items: center;
@@ -458,7 +544,7 @@
         .compare-dest-name {
             font-size: 16px;
             font-weight: 700;
-            color: white;
+            color: var(--ac-text);
         }
 
         .compare-dest-name .city-name {
@@ -2274,7 +2360,7 @@
     <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--ac-darker);z-index:99999;display:flex;align-items:center;justify-content:center;">
         <div style="background:var(--ac-card);border-radius:16px;padding:40px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:360px;width:90%;">
             <div style="background:var(--ac-red);color:white;font-weight:bold;font-size:28px;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">AC</div>
-            <h2 style="color:white;margin:0 0 4px;">Crew Pairings</h2>
+            <h2 style="color:var(--ac-text);margin:0 0 4px;">Crew Pairings</h2>
             <p style="color:var(--ac-muted);font-size:13px;margin:0 0 24px;">Acces restreint</p>
             <input type="password" id="loginPassword" placeholder="Mot de passe" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid var(--ac-border);background:var(--ac-darker);color:white;font-size:15px;box-sizing:border-box;margin-bottom:12px;text-align:center;" onkeydown="if(event.key==='Enter')checkLogin()">
             <button onclick="checkLogin()" style="width:100%;padding:12px;border-radius:8px;border:none;background:var(--ac-red);color:white;font-size:15px;font-weight:bold;cursor:pointer;">Entrer</button>
@@ -2573,7 +2659,7 @@
     <!-- TAB: COMPARAISON -->
     <div class="tab-content" id="tabCompare">
         <div style="max-width:1200px;margin:0 auto;padding:20px;">
-            <h2 style="color:white;margin-bottom:4px;">Comparaison des Destinations</h2>
+            <h2 style="color:var(--ac-text);margin-bottom:4px;">Comparaison des Destinations</h2>
             <p style="color:var(--ac-muted);font-size:13px;margin-bottom:20px;">Identifie les nouvelles destinations entre deux mois de pairings</p>
 
             <div class="compare-selectors">
@@ -3936,13 +4022,14 @@
         if (!parsed) return `<div class="bid-editor-system"><div class="bid-editor-cmd">${text}</div></div>`;
 
         if (!parsed.editable) {
-            return `<div class="bid-editor-system"><div class="bid-editor-cmd">${text}</div></div>`;
+            return `<div class="bid-editor-system"><div class="bid-editor-cmd">Ligne ${index + 1}: ${text}</div></div>`;
         }
 
         let html = `<div class="bid-editor-line">`;
         const actionLabel = parsed.action === 'avoid' ? 'EVITER' : 'AWARD';
         const actionColor = parsed.action === 'avoid' ? 'var(--ac-red)' : 'var(--ac-green)';
-        html += `<div class="bid-editor-label"><span style="color:${actionColor}">${actionLabel}</span><button class="bid-editor-delete" onclick="editorDeleteLine(${index})" title="Supprimer">&#10005;</button></div>`;
+        html += `<div class="bid-editor-label"><span style="color:${actionColor}">Ligne ${index + 1} - ${actionLabel}</span><button class="bid-editor-delete" onclick="editorDeleteLine(${index})" title="Supprimer">&#10005;</button></div>`;
+        html += `<div class="bid-editor-cmd" id="bidEditorCmdPreview${index}">${text}</div>`;
 
         parsed.conditions.forEach((c, ci) => {
             switch(c.type) {
@@ -4225,7 +4312,7 @@
         const hasStrategy = proposedBidBlocks && proposedBidBlocks.length > 0;
 
         let html = `<div class="bid-empty" style="text-align:center;padding:40px 20px;">`;
-        html += `<h3 style="color:white;margin-bottom:8px;">Bid Sheet</h3>`;
+        html += `<h3 style="color:var(--ac-text);margin-bottom:8px;">Bid Sheet</h3>`;
         html += `<p style="color:var(--ac-muted);margin-bottom:24px;">Choisissez la source de vos lignes de bid</p>`;
 
         html += `<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;max-width:700px;margin:0 auto;">`;
@@ -4233,7 +4320,7 @@
         // Option 1: Manual selection from pairings tab
         html += `<div style="flex:1;min-width:280px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:12px;padding:24px;text-align:left;">`;
         html += `<div style="font-size:24px;margin-bottom:8px;">&#9992;</div>`;
-        html += `<h4 style="color:white;margin-bottom:6px;">Selection manuelle</h4>`;
+        html += `<h4 style="color:var(--ac-text);margin-bottom:6px;">Selection manuelle</h4>`;
         html += `<p style="font-size:12px;color:var(--ac-muted);margin-bottom:16px;">Importer les pairings selectionnes manuellement avec <strong style="color:var(--ac-green)">+ Bid</strong> dans l'onglet Pairings</p>`;
         if (manualCount > 0) {
             html += `<div style="font-size:13px;color:var(--ac-green);margin-bottom:12px;font-weight:600;">${manualCount} pairing(s) selectionne(s)</div>`;
@@ -4250,7 +4337,7 @@
         // Option 2: From strategy algorithm
         html += `<div style="flex:1;min-width:280px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:12px;padding:24px;text-align:left;">`;
         html += `<div style="font-size:24px;margin-bottom:8px;">&#129302;</div>`;
-        html += `<h4 style="color:white;margin-bottom:6px;">Algorithme automatique</h4>`;
+        html += `<h4 style="color:var(--ac-text);margin-bottom:6px;">Algorithme automatique</h4>`;
         html += `<p style="font-size:12px;color:var(--ac-muted);margin-bottom:16px;">Importer un bloc genere par l'algorithme dans l'onglet <strong style="color:var(--ac-red)">Strategie Bid</strong></p>`;
         if (hasStrategy) {
             proposedBidBlocks.forEach((block, i) => {
@@ -6346,9 +6433,11 @@
                 worldCopyJump: true,
                 maxBoundsViscosity: 0
             });
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 18
-            }).addTo(routeMap);
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const tileUrl = isLight
+                ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+            L.tileLayer(tileUrl, { maxZoom: 18 }).addTo(routeMap);
             mapRoutesLayer = L.layerGroup().addTo(routeMap);
         }
         setTimeout(function() { routeMap.invalidateSize(); }, 100);
@@ -6464,7 +6553,7 @@
             // Label (non-interactive so clicks pass through to marker)
             var label = L.divIcon({
                 className: '',
-                html: '<div style="color:white;font-size:10px;font-weight:bold;text-shadow:0 1px 3px rgba(0,0,0,0.8);white-space:nowrap;pointer-events:none;">' + dest + '</div>',
+                html: '<div style="color:' + (document.documentElement.getAttribute('data-theme') === 'light' ? '#1a1a1a' : 'white') + ';font-size:10px;font-weight:bold;text-shadow:0 1px 3px ' + (document.documentElement.getAttribute('data-theme') === 'light' ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)') + ';white-space:nowrap;pointer-events:none;">' + dest + '</div>',
                 iconAnchor: [-size - 2, 5]
             });
             L.marker(destCoords, { icon: label, interactive: false }).addTo(mapRoutesLayer);
