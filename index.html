@@ -3982,7 +3982,7 @@
         recalculateMatchIds();
         renderBidSheet();
         if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
-            showMatchingPairings();
+            showMatchingPairings('no-scroll');
         }
     }
 
@@ -3992,7 +3992,7 @@
         recalculateMatchIds();
         renderBidSheet();
         if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
-            showMatchingPairings();
+            showMatchingPairings('no-scroll');
         }
     }
 
@@ -4169,7 +4169,7 @@
         const cmdEl = document.getElementById('bidEditorCmd' + lineIndex);
         if (cmdEl) cmdEl.textContent = newText;
         if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
-            showMatchingPairings();
+            showMatchingPairings('no-scroll');
         }
     }
 
@@ -4191,7 +4191,7 @@
         const cmdEl = document.getElementById('bidEditorCmd' + lineIndex);
         if (cmdEl) cmdEl.textContent = newText;
         if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
-            showMatchingPairings();
+            showMatchingPairings('no-scroll');
         }
     }
 
@@ -4210,7 +4210,7 @@
         recalculateMatchIds();
         renderBidSheet();
         if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
-            showMatchingPairings();
+            showMatchingPairings('no-scroll');
         }
     }
 
@@ -4398,7 +4398,9 @@
         }
 
         panel.style.display = 'block';
-        panel.scrollIntoView({ behavior: 'smooth' });
+        if (!arguments[0] || arguments[0] !== 'no-scroll') {
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
     }
 
     function copyBidSheet() {
