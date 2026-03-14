@@ -3185,6 +3185,7 @@
     // ============ BID SHEET ============
     let bidList = []; // selected pairing IDs for reference
     let bidDaysOff = []; // ordered array of day numbers user wants off
+    let importedBidBlock = null; // { name, lines, matchIds } from strategy tab
 
     function addToBid(pairingId) {
         if (bidList.some(b => b.id === pairingId)) return;
@@ -3436,9 +3437,53 @@
         return lines;
     }
 
+    function transferBlockToBidSheet(blockIndex) {
+        if (!proposedBidBlocks[blockIndex]) return;
+        importedBidBlock = proposedBidBlocks[blockIndex];
+        switchTab('bid');
+        renderBidSheet();
+        // Auto-show matching pairings
+        showMatchingPairings();
+    }
+
+    function clearImportedBid() {
+        importedBidBlock = null;
+        renderBidSheet();
+        document.getElementById('matchingPairingsPanel').style.display = 'none';
+    }
+
     function renderBidSheet() {
         const area = document.getElementById('bidSheetArea');
         const info = document.getElementById('bidBlockInfo');
+
+        // If we have imported lines from strategy tab, render those instead
+        if (importedBidBlock) {
+            const block = importedBidBlock;
+            const matchCount = block.matchIds ? block.matchIds.size : 0;
+            info.textContent = `${block.lines.length} ligne(s) importees | ~${matchCount} pairings correspondent`;
+
+            let html = `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(215,43,31,0.1);border:1px solid rgba(215,43,31,0.3);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">`;
+            html += `<span style="font-size:13px;color:var(--ac-red);font-weight:600;">Importe de: ${block.name}</span>`;
+            html += `<button onclick="clearImportedBid()" style="padding:6px 12px;background:var(--ac-dark);border:1px solid var(--ac-border);color:var(--ac-muted);border-radius:6px;cursor:pointer;font-size:12px;">Retour aux preferences</button>`;
+            html += `</div>`;
+
+            html += `<div class="bid-sheet-block">`;
+            html += `<div class="bid-block-header">Start Pairings</div>`;
+            block.lines.forEach((line, idx) => {
+                const highlighted = highlightSyntax(line);
+                html += `<div class="bid-line-item"><span class="bid-line-num">${idx + 1}.</span><span class="bid-line-text">${highlighted}</span></div>`;
+            });
+            html += `</div>`;
+
+            html += `<div class="bid-sheet-block">`;
+            html += `<div class="bid-block-header" style="opacity:0.5">Start Reserve Bid</div>`;
+            html += `<div class="bid-embedded">Start Reserve</div>`;
+            html += `</div>`;
+
+            area.innerHTML = html;
+            return;
+        }
+
         const lines = generateBidLines();
 
         if (lines.length === 0 && bidDaysOff.length === 0) {
@@ -3545,7 +3590,10 @@
     }
 
     function showMatchingPairings() {
-        const matching = getMatchingPairings();
+        // If imported from strategy, use matchIds directly
+        const matching = importedBidBlock && importedBidBlock.matchIds
+            ? PAIRINGS_DATA.filter(p => importedBidBlock.matchIds.has(p.id))
+            : getMatchingPairings();
         const panel = document.getElementById('matchingPairingsPanel');
         const grid = document.getElementById('matchingPairingsGrid');
         const title = document.getElementById('matchingTitle');
@@ -5060,6 +5108,17 @@
             comment: 'Maximise les heures de vol',
         });
 
+        // Add no-turn avoid line if checkbox is checked
+        const noTurn = document.getElementById('bidNoTurn')?.checked;
+        if (noTurn) {
+            lineNum++;
+            lines.push({
+                num: lineNum, cmd: 'Avoid Pairings If Pairing Length = 1 days',
+                tag: 'condition', tagLabel: 'Condition',
+                comment: 'Pas de turn (aller-retour meme jour)',
+            });
+        }
+
         // Add inherited lines first (from previous blocks)
         const inheritedAwardLines = inheritedLines.filter(l =>
             l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings' &&
@@ -5164,7 +5223,10 @@
             const lines = blockResult.lines;
             const blockRiskProfile = blockResult.riskProfile;
             const blockCmds = lines.map(l => l.cmd);
-            proposedBidBlocks.push({ name: blockName, lines: blockCmds });
+            // Collect all matchIds for this block
+            const blockAllMatchIds = new Set();
+            lines.forEach(l => { if (l.matchIds) l.matchIds.forEach(id => blockAllMatchIds.add(id)); });
+            proposedBidBlocks.push({ name: blockName, lines: blockCmds, matchIds: blockAllMatchIds });
 
             // Calculate block-level stats
             const awardLines = lines.filter(l => l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings');
@@ -5253,6 +5315,8 @@
                 : `${newCount} lignes optimisees`;
             html += ` | Strategie: ${profileLabel} | Moy. ${avgMatch} pairings/ligne | ${linesSummary}`;
             html += `</div>`;
+
+            html += `<button onclick="transferBlockToBidSheet(${i})" style="margin-top:8px;padding:8px 16px;background:rgba(215,43,31,0.1);border:1px solid var(--ac-red);color:var(--ac-red);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Voir les pairings dans Bid Sheet</button>`;
 
             html += '</div></div></div>';
         }
