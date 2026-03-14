@@ -90,26 +90,15 @@
         [data-theme="light"] .bid-line-text .kw { color: #C41230; }
         [data-theme="light"] .bid-line-text .val { color: #b8860b; }
         [data-theme="light"] .bid-line-text .cond { color: #2563eb; }
-        [data-theme="light"] .bid-editor-line {
-            background: #f8f8fc;
-            border: 1px solid #e0e0e6;
+        [data-theme="light"] .bid-popover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
-        [data-theme="light"] .bid-editor-line:hover {
-            border-color: rgba(196,18,48,0.4);
-        }
-        [data-theme="light"] .bid-editor-control input[type="number"],
-        [data-theme="light"] .bid-editor-control input[type="text"],
-        [data-theme="light"] .bid-editor-control select {
-            background: #ffffff;
-            border: 1px solid #d5d5dd;
-            color: #1a1a1a;
-        }
-        [data-theme="light"] .bid-editor-chip {
+        [data-theme="light"] .bid-popover-chip {
             background: #f0f0f4;
             border: 1px solid #d5d5dd;
             color: #4a4a5a;
         }
-        [data-theme="light"] .bid-editor-chip.active {
+        [data-theme="light"] .bid-popover-chip.active {
             background: rgba(196,18,48,0.1);
             border-color: var(--ac-red);
             color: var(--ac-red);
@@ -2110,73 +2099,42 @@
         }
 
         /* Bid Editor Sidebar */
-        .bid-editor-line {
-            background: var(--ac-darker);
-            border: 1px solid var(--ac-border);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
-            position: relative;
+        .bid-token {
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.15s;
+            display: inline;
         }
-        .bid-editor-line:hover {
-            border-color: rgba(215,43,31,0.4);
+        .bid-token:hover {
+            background: rgba(215,43,31,0.15);
         }
-        .bid-editor-label {
-            font-size: 11px;
-            color: var(--ac-muted);
-            text-transform: uppercase;
+        .bid-token-action {
             font-weight: 700;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-        .bid-editor-cmd {
-            font-size: 11px;
-            color: var(--ac-text);
-            font-family: 'Consolas', monospace;
-            margin-bottom: 8px;
-            word-break: break-all;
-            opacity: 0.7;
-        }
-        .bid-editor-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .bid-editor-control input[type="range"] {
-            flex: 1;
-            accent-color: var(--ac-red);
-        }
-        .bid-editor-control input[type="number"],
-        .bid-editor-control input[type="text"] {
-            background: var(--ac-card);
-            border: 1px solid var(--ac-border);
-            color: var(--ac-text);
-            border-radius: 6px;
-            padding: 5px 8px;
-            font-size: 13px;
-            width: 80px;
-        }
-        .bid-editor-control select {
-            background: var(--ac-card);
-            border: 1px solid var(--ac-border);
-            color: var(--ac-text);
-            border-radius: 6px;
-            padding: 5px 8px;
-            font-size: 12px;
-            flex: 1;
-        }
-        .bid-editor-delete {
+        .bid-token-action.award { color: var(--ac-green); }
+        .bid-token-action.avoid { color: var(--ac-red); }
+        .bid-token-kw { color: var(--ac-blue); }
+        .bid-token-op { color: var(--ac-blue); font-weight: 600; }
+        .bid-token-val { color: var(--ac-gold); font-weight: 600; }
+        .bid-token-dest { color: var(--ac-accent); font-weight: 600; }
+        .bid-token-static { color: var(--ac-muted); cursor: default; }
+        .bid-token-static:hover { background: none; }
+        .bid-line-delete {
             background: none;
             border: none;
             color: var(--ac-muted);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             padding: 2px 6px;
             border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.15s;
+            margin-left: auto;
+            flex-shrink: 0;
         }
-        .bid-editor-delete:hover {
+        .bid-line-item:hover .bid-line-delete { opacity: 1; }
+        .bid-line-delete:hover {
             color: var(--ac-red);
             background: rgba(215,43,31,0.15);
         }
@@ -2195,44 +2153,75 @@
         .bid-editor-add:hover {
             background: rgba(215,43,31,0.15);
         }
-        .bid-editor-chips {
+        .bid-popover {
+            position: fixed;
+            z-index: 1000;
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            min-width: 140px;
+            max-width: 380px;
+        }
+        .bid-popover-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--ac-muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .bid-popover-option {
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--ac-text);
+            font-weight: 500;
+        }
+        .bid-popover-option:hover {
+            background: rgba(215,43,31,0.1);
+        }
+        .bid-popover-option.active {
+            background: rgba(215,43,31,0.15);
+            color: var(--ac-red);
+            font-weight: 700;
+        }
+        .bid-popover-chips {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 4px;
+            gap: 5px;
         }
-        .bid-editor-chip {
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 4px;
+        .bid-popover-chip {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
             cursor: pointer;
             border: 1px solid var(--ac-border);
-            background: var(--ac-card);
+            background: var(--ac-darker);
             color: var(--ac-muted);
+            font-weight: 500;
         }
-        .bid-editor-chip.active {
+        .bid-popover-chip.active {
             background: rgba(215,43,31,0.2);
             border-color: var(--ac-red);
             color: var(--ac-red);
         }
-        .bid-editor-val {
-            font-size: 13px;
+        .bid-popover-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bid-popover-slider input[type="range"] {
+            flex: 1;
+            accent-color: var(--ac-red);
+        }
+        .bid-popover-slider .pop-val {
+            font-size: 14px;
             font-weight: 700;
             color: var(--ac-gold);
-            min-width: 50px;
+            min-width: 55px;
             text-align: right;
-        }
-        .bid-editor-system {
-            background: var(--ac-darker);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 8px 10px;
-            margin-bottom: 8px;
-            opacity: 0.5;
-        }
-        .bid-editor-system .bid-editor-cmd {
-            margin-bottom: 0;
-            font-size: 10px;
         }
 
         /* Add to bid button on pairing cards */
@@ -2358,15 +2347,38 @@
 
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--ac-darker);z-index:99999;display:flex;align-items:center;justify-content:center;">
-        <div style="background:var(--ac-card);border-radius:16px;padding:40px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:360px;width:90%;">
+        <div style="background:var(--ac-card);border-radius:16px;padding:40px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:360px;width:90%;position:relative;">
+            <button id="loginThemeBtn" onclick="toggleThemeLogin()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ac-muted);padding:4px 8px;border-radius:6px;" title="Changer le theme">&#9788;</button>
             <div style="background:var(--ac-red);color:white;font-weight:bold;font-size:28px;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">AC</div>
             <h2 style="color:var(--ac-text);margin:0 0 4px;">Crew Pairings</h2>
             <p style="color:var(--ac-muted);font-size:13px;margin:0 0 24px;">Acces restreint</p>
-            <input type="password" id="loginPassword" placeholder="Mot de passe" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid var(--ac-border);background:var(--ac-darker);color:white;font-size:15px;box-sizing:border-box;margin-bottom:12px;text-align:center;" onkeydown="if(event.key==='Enter')checkLogin()">
+            <input type="password" id="loginPassword" placeholder="Mot de passe" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid var(--ac-border);background:var(--ac-darker);color:var(--ac-text);font-size:15px;box-sizing:border-box;margin-bottom:12px;text-align:center;" onkeydown="if(event.key==='Enter')checkLogin()">
             <button onclick="checkLogin()" style="width:100%;padding:12px;border-radius:8px;border:none;background:var(--ac-red);color:white;font-size:15px;font-weight:bold;cursor:pointer;">Entrer</button>
             <p id="loginError" style="color:var(--ac-red);font-size:13px;margin:12px 0 0;display:none;">Mot de passe incorrect</p>
         </div>
     </div>
+    <script>
+    function toggleThemeLogin() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const newTheme = current === 'light' ? 'dark' : 'light';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('ac_theme', newTheme);
+        const loginBtn = document.getElementById('loginThemeBtn');
+        if (loginBtn) loginBtn.innerHTML = newTheme === 'light' ? '&#9790;' : '&#9788;';
+        const mainBtn = document.getElementById('themeToggleBtn');
+        if (mainBtn) mainBtn.innerHTML = newTheme === 'light' ? '&#9790;' : '&#9788;';
+    }
+    // Apply saved theme immediately on login screen
+    (function() {
+        const saved = localStorage.getItem('ac_theme');
+        if (saved === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            const btn = document.getElementById('loginThemeBtn');
+            if (btn) btn.innerHTML = '&#9790;';
+        }
+    })();
+    </script>
     <script>
     function checkLogin() {
         var pw = document.getElementById('loginPassword').value;
@@ -4017,201 +4029,345 @@
         { label: 'Eviter allowance < montant', cmd: 'Avoid Pairings If Allowance Amount > $100' },
     ];
 
-    function renderEditorControl(index, text) {
-        const parsed = parseBidLine(text);
-        if (!parsed) return `<div class="bid-editor-system"><div class="bid-editor-cmd">${text}</div></div>`;
+    // ============ INLINE POPOVER EDITOR ============
+    let activePopover = null;
 
-        if (!parsed.editable) {
-            return `<div class="bid-editor-system"><div class="bid-editor-cmd">Ligne ${index + 1}: ${text}</div></div>`;
+    function renderClickableLine(index, text) {
+        const parsed = parseBidLine(text);
+        if (!parsed || !parsed.editable) {
+            return `<span style="color:var(--ac-muted)">${text}</span>`;
         }
 
-        let html = `<div class="bid-editor-line">`;
-        const actionLabel = parsed.action === 'avoid' ? 'EVITER' : 'AWARD';
-        const actionColor = parsed.action === 'avoid' ? 'var(--ac-red)' : 'var(--ac-green)';
-        html += `<div class="bid-editor-label"><span style="color:${actionColor}">Ligne ${index + 1} - ${actionLabel}</span><button class="bid-editor-delete" onclick="editorDeleteLine(${index})" title="Supprimer">&#10005;</button></div>`;
-        html += `<div class="bid-editor-cmd" id="bidEditorCmdPreview${index}">${text}</div>`;
+        let html = '';
+        // Action token (Award/Avoid)
+        const actionClass = parsed.action === 'avoid' ? 'avoid' : 'award';
+        const actionLabel = parsed.action === 'avoid' ? 'Avoid Pairings' : 'Award Pairings';
+        html += `<span class="bid-token bid-token-action ${actionClass}" onclick="event.stopPropagation(); openLinePopover(${index},'action',-1,this)">${actionLabel}</span>`;
+        html += `<span class="bid-token-static"> If </span>`;
 
         parsed.conditions.forEach((c, ci) => {
+            if (ci > 0) html += `<span class="bid-token-static"> If </span>`;
+
             switch(c.type) {
                 case 'allowance':
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">Allocation&gt;</span>
-                        <input type="range" min="0" max="1000" step="25" value="${c.value}"
-                            oninput="this.nextElementSibling.textContent='$'+this.value; editorModifyCondition(${index},${ci},'value',parseInt(this.value))">
-                        <span class="bid-editor-val">$${c.value}</span>
-                    </div>`;
+                    html += `<span class="bid-token-static">Allowance Amount </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">${c.op || '>'}</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> $${c.value}</span>`;
                     break;
                 case 'tafb':
-                    const tafbTotal = c.hours * 60 + c.minutes;
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">TAFB&gt;</span>
-                        <input type="range" min="0" max="120" step="5" value="${tafbTotal}"
-                            oninput="let h=Math.floor(this.value/60),m=this.value%60; this.nextElementSibling.textContent=h+':'+(m<10?'0':'')+m+'h'; editorModifyTime(${index},${ci},parseInt(this.value))">
-                        <span class="bid-editor-val">${c.hours}:${String(c.minutes).padStart(2,'0')}h</span>
-                    </div>`;
+                    html += `<span class="bid-token-static">TAFB </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">${c.op || '>'}</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}</span>`;
                     break;
                 case 'length_eq':
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">Duree =</span>
-                        <input type="range" min="1" max="7" step="1" value="${c.value}"
-                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'value',parseInt(this.value))">
-                        <span class="bid-editor-val">${c.value}J</span>
-                    </div>`;
+                    html += `<span class="bid-token-static">Pairing Length </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">=</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${c.value} days</span>`;
                     break;
                 case 'length_gt':
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">Duree&gt;</span>
-                        <input type="range" min="1" max="7" step="1" value="${c.value}"
-                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'value',parseInt(this.value))">
-                        <span class="bid-editor-val">${c.value}J</span>
-                    </div>`;
+                    html += `<span class="bid-token-static">Pairing Length </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">></span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${c.value} days</span>`;
                     break;
                 case 'length_btw':
-                    html += `<div class="bid-editor-control" style="flex-wrap:wrap;">
-                        <span style="font-size:11px;color:var(--ac-muted);width:100%">Duree entre</span>
-                        <input type="range" min="1" max="7" step="1" value="${c.min}" style="flex:1"
-                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'min',parseInt(this.value))">
-                        <span class="bid-editor-val" style="min-width:30px">${c.min}J</span>
-                        <span style="color:var(--ac-muted);font-size:11px">et</span>
-                        <input type="range" min="1" max="7" step="1" value="${c.max}" style="flex:1"
-                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'max',parseInt(this.value))">
-                        <span class="bid-editor-val" style="min-width:30px">${c.max}J</span>
-                    </div>`;
+                    html += `<span class="bid-token-static">Pairing Length </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">Between</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${c.min} days And ${c.max} days</span>`;
                     break;
                 case 'checkin':
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">Check-In&gt;</span>
-                        <select onchange="let p=this.value.split(':'); editorModifyCondition(${index},${ci},'hours',parseInt(p[0])); editorModifyCondition(${index},${ci},'minutes',parseInt(p[1]))">
-                            ${[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].map(h => [0,30].map(m => {
-                                const val = `${h}:${String(m).padStart(2,'0')}`;
-                                const sel = (h===c.hours && m===c.minutes) ? 'selected' : '';
-                                return `<option value="${val}" ${sel}>${val}</option>`;
-                            }).join('')).join('')}
-                        </select>
-                    </div>`;
+                    html += `<span class="bid-token-static">Pairing Check-In Time </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">${c.op || '>'}</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}</span>`;
                     break;
                 case 'checkout':
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">Check-Out&lt;</span>
-                        <select onchange="let p=this.value.split(':'); editorModifyCondition(${index},${ci},'hours',parseInt(p[0])); editorModifyCondition(${index},${ci},'minutes',parseInt(p[1]))">
-                            ${[14,15,16,17,18,19,20,21,22,23].map(h => [0,30].map(m => {
-                                const val = `${h}:${String(m).padStart(2,'0')}`;
-                                const sel = (h===c.hours && m===c.minutes) ? 'selected' : '';
-                                return `<option value="${val}" ${sel}>${val}</option>`;
-                            }).join('')).join('')}
-                        </select>
-                    </div>`;
+                    html += `<span class="bid-token-static">Pairing Check-Out Time </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">${c.op || '<'}</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}</span>`;
                     break;
                 case 'avg_credit':
-                case 'total_credit': {
-                    const label = c.type === 'avg_credit' ? 'Credit moy/jour' : 'Credit total';
-                    const totalMin = c.hours * 60 + c.minutes;
-                    const maxMin = c.type === 'avg_credit' ? 720 : 1800;
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">${label}&gt;</span>
-                        <input type="range" min="0" max="${maxMin}" step="15" value="${totalMin}"
-                            oninput="let h=Math.floor(this.value/60),m=this.value%60; this.nextElementSibling.textContent=h+':'+(m<10?'0':'')+m; editorModifyTime(${index},${ci},parseInt(this.value))">
-                        <span class="bid-editor-val">${c.hours}:${String(c.minutes).padStart(2,'0')}</span>
-                    </div>`;
+                    html += `<span class="bid-token-static">Average Daily Credit </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">${c.op || '>'}</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${String(c.hours).padStart(3,'0')}:${String(c.minutes).padStart(2,'0')}</span>`;
                     break;
-                }
-                case 'layover': {
-                    const allDests = PAIRINGS_METADATA ? PAIRINGS_METADATA.destinations.filter(d => d !== 'YUL') : [];
-                    html += `<div style="margin-top:4px">
-                        <span style="font-size:11px;color:var(--ac-muted)">Layover:</span>
-                        <div class="bid-editor-chips">
-                            ${allDests.slice(0,30).map(d => {
-                                const isActive = c.destinations.includes(d);
-                                return `<span class="bid-editor-chip ${isActive ? 'active' : ''}" onclick="editorToggleDest(${index},${ci},'${d}')">${d}</span>`;
-                            }).join('')}
-                        </div>
-                    </div>`;
+                case 'total_credit':
+                    html += `<span class="bid-token-static">Pairing Total Credit </span>`;
+                    html += `<span class="bid-token bid-token-op" onclick="event.stopPropagation(); openLinePopover(${index},'op',${ci},this)">${c.op || '>'}</span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)"> ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}</span>`;
                     break;
-                }
+                case 'layover':
+                    html += `<span class="bid-token-static">Any Layover In </span>`;
+                    html += `<span class="bid-token bid-token-dest" onclick="event.stopPropagation(); openLinePopover(${index},'dest',${ci},this)">${c.destinations.join(', ')}</span>`;
+                    break;
                 case 'pairing_number':
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">Pairing#</span>
-                        <input type="text" value="${c.value}" style="flex:1"
-                            onchange="editorModifyCondition(${index},${ci},'value',this.value)">
-                    </div>`;
+                    html += `<span class="bid-token-static">Pairing Number = </span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'value',${ci},this)">${c.value}</span>`;
                     break;
                 case 'departing_on':
-                    html += `<div class="bid-editor-control">
-                        <span style="font-size:11px;color:var(--ac-muted)">Depart:</span>
-                        <select onchange="editorModifyCondition(${index},${ci},'day',this.value)">
-                            ${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d =>
-                                `<option ${d===c.day?'selected':''}>${d}</option>`
-                            ).join('')}
-                        </select>
-                    </div>`;
+                    html += `<span class="bid-token-static">Departing On </span>`;
+                    html += `<span class="bid-token bid-token-val" onclick="event.stopPropagation(); openLinePopover(${index},'day',${ci},this)">${c.day}</span>`;
                     break;
             }
         });
-
-        html += `</div>`;
         return html;
     }
 
-    function editorModifyCondition(lineIndex, condIndex, prop, value) {
+    function closeLinePopover() {
+        if (activePopover) {
+            activePopover.remove();
+            activePopover = null;
+        }
+        document.removeEventListener('click', closeLinePopover);
+    }
+
+    function applyLineEdit(lineIndex) {
         if (!importedBidBlock) return;
-        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || importedBidBlock.lines[lineIndex].cmd || '';
-        const parsed = parseBidLine(text);
-        if (!parsed || !parsed.editable) return;
-        parsed.conditions[condIndex][prop] = value;
-        const newText = rebuildBidLine(parsed);
-        importedBidBlock.lines[lineIndex] = newText;
         recalculateMatchIds();
-        // Update info and matching panel without full re-render (to keep slider focus)
         const info = document.getElementById('bidBlockInfo');
         const matchCount = importedBidBlock.matchIds ? importedBidBlock.matchIds.size : 0;
         info.textContent = `${importedBidBlock.lines.length} ligne(s) | ~${matchCount} pairings correspondent`;
-        // Update main area cmd display
-        const cmdEl = document.getElementById('bidEditorCmd' + lineIndex);
-        if (cmdEl) cmdEl.textContent = newText;
+        // Re-render just the line tokens
+        const lineEl = document.getElementById('bidLineTokens' + lineIndex);
+        if (lineEl) {
+            const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || importedBidBlock.lines[lineIndex].cmd || '';
+            lineEl.innerHTML = renderClickableLine(lineIndex, text);
+        }
         if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
             showMatchingPairings('no-scroll');
         }
     }
 
-    function editorModifyTime(lineIndex, condIndex, totalMinutes) {
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        if (!importedBidBlock) return;
+    function openLinePopover(lineIndex, editType, condIndex, anchorEl) {
+        closeLinePopover();
         const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || importedBidBlock.lines[lineIndex].cmd || '';
         const parsed = parseBidLine(text);
         if (!parsed || !parsed.editable) return;
-        parsed.conditions[condIndex].hours = hours;
-        parsed.conditions[condIndex].minutes = minutes;
-        const newText = rebuildBidLine(parsed);
-        importedBidBlock.lines[lineIndex] = newText;
-        recalculateMatchIds();
-        const info = document.getElementById('bidBlockInfo');
-        const matchCount = importedBidBlock.matchIds ? importedBidBlock.matchIds.size : 0;
-        info.textContent = `${importedBidBlock.lines.length} ligne(s) | ~${matchCount} pairings correspondent`;
-        const cmdEl = document.getElementById('bidEditorCmd' + lineIndex);
-        if (cmdEl) cmdEl.textContent = newText;
-        if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
-            showMatchingPairings('no-scroll');
+
+        const pop = document.createElement('div');
+        pop.className = 'bid-popover';
+        let html = '';
+
+        if (editType === 'action') {
+            html += `<div class="bid-popover-title">Type d'action</div>`;
+            ['award', 'avoid'].forEach(a => {
+                const label = a === 'award' ? 'Award Pairings' : 'Avoid Pairings';
+                const cls = parsed.action === a ? 'active' : '';
+                html += `<div class="bid-popover-option ${cls}" onclick="event.stopPropagation(); popoverSetAction(${lineIndex},'${a}')">${label}</div>`;
+            });
+        } else if (editType === 'op') {
+            const c = parsed.conditions[condIndex];
+            html += `<div class="bid-popover-title">Operateur</div>`;
+            let ops = ['>', '<', '=', '>=', '<='];
+            if (['length_eq','length_gt','length_btw'].includes(c.type)) {
+                ops = ['=', '>', 'Between'];
+            }
+            const currentOp = c.type === 'length_eq' ? '=' : c.type === 'length_gt' ? '>' : c.type === 'length_btw' ? 'Between' : (c.op || '>');
+            ops.forEach(op => {
+                const cls = currentOp === op ? 'active' : '';
+                html += `<div class="bid-popover-option ${cls}" onclick="event.stopPropagation(); popoverSetOp(${lineIndex},${condIndex},'${op}')">${op}</div>`;
+            });
+        } else if (editType === 'value') {
+            const c = parsed.conditions[condIndex];
+            html += `<div class="bid-popover-title">Valeur</div>`;
+            switch(c.type) {
+                case 'allowance':
+                    html += `<div class="bid-popover-slider">
+                        <input type="range" min="0" max="1000" step="25" value="${c.value}"
+                            oninput="document.getElementById('popVal').textContent='$'+this.value; popoverSetValue(${lineIndex},${condIndex},'value',parseInt(this.value))">
+                        <span class="pop-val" id="popVal">$${c.value}</span>
+                    </div>`;
+                    break;
+                case 'tafb':
+                case 'avg_credit':
+                case 'total_credit': {
+                    const totalMin = c.hours * 60 + c.minutes;
+                    const maxMin = c.type === 'avg_credit' ? 720 : c.type === 'total_credit' ? 1800 : 7200;
+                    const step = c.type === 'tafb' ? 5 : 15;
+                    html += `<div class="bid-popover-slider">
+                        <input type="range" min="0" max="${maxMin}" step="${step}" value="${totalMin}"
+                            oninput="let h=Math.floor(this.value/60),m=this.value%60; document.getElementById('popVal').textContent=h+':'+(m<10?'0':'')+m; popoverSetTime(${lineIndex},${condIndex},parseInt(this.value))">
+                        <span class="pop-val" id="popVal">${c.hours}:${String(c.minutes).padStart(2,'0')}</span>
+                    </div>`;
+                    break;
+                }
+                case 'length_eq':
+                case 'length_gt':
+                    html += `<div class="bid-popover-slider">
+                        <input type="range" min="1" max="7" step="1" value="${c.value}"
+                            oninput="document.getElementById('popVal').textContent=this.value+' jours'; popoverSetValue(${lineIndex},${condIndex},'value',parseInt(this.value))">
+                        <span class="pop-val" id="popVal">${c.value} jours</span>
+                    </div>`;
+                    break;
+                case 'length_btw':
+                    html += `<div style="margin-bottom:8px"><span style="font-size:11px;color:var(--ac-muted)">Min</span>
+                    <div class="bid-popover-slider">
+                        <input type="range" min="1" max="7" step="1" value="${c.min}"
+                            oninput="document.getElementById('popValMin').textContent=this.value+'J'; popoverSetValue(${lineIndex},${condIndex},'min',parseInt(this.value))">
+                        <span class="pop-val" id="popValMin">${c.min}J</span>
+                    </div></div>`;
+                    html += `<div><span style="font-size:11px;color:var(--ac-muted)">Max</span>
+                    <div class="bid-popover-slider">
+                        <input type="range" min="1" max="7" step="1" value="${c.max}"
+                            oninput="document.getElementById('popValMax').textContent=this.value+'J'; popoverSetValue(${lineIndex},${condIndex},'max',parseInt(this.value))">
+                        <span class="pop-val" id="popValMax">${c.max}J</span>
+                    </div></div>`;
+                    break;
+                case 'checkin':
+                case 'checkout': {
+                    const hours = c.type === 'checkin' ? [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18] : [14,15,16,17,18,19,20,21,22,23];
+                    html += `<div class="bid-popover-chips">`;
+                    hours.forEach(h => {
+                        [0,30].forEach(m => {
+                            const val = `${h}:${String(m).padStart(2,'0')}`;
+                            const isActive = (h === c.hours && m === c.minutes);
+                            html += `<span class="bid-popover-chip ${isActive ? 'active' : ''}" onclick="event.stopPropagation(); popoverSetTimeFromChip(${lineIndex},${condIndex},${h},${m})">${val}</span>`;
+                        });
+                    });
+                    html += `</div>`;
+                    break;
+                }
+                case 'pairing_number':
+                    html += `<input type="text" value="${c.value}" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--ac-border);background:var(--ac-darker);color:var(--ac-text);font-size:14px;font-family:Consolas,monospace;"
+                        onchange="popoverSetValue(${lineIndex},${condIndex},'value',this.value)" onclick="event.stopPropagation()">`;
+                    break;
+            }
+        } else if (editType === 'dest') {
+            const c = parsed.conditions[condIndex];
+            const allDests = PAIRINGS_METADATA ? PAIRINGS_METADATA.destinations.filter(d => d !== 'YUL') : [];
+            html += `<div class="bid-popover-title">Destinations layover</div>`;
+            html += `<div class="bid-popover-chips">`;
+            allDests.forEach(d => {
+                const isActive = c.destinations.includes(d);
+                html += `<span class="bid-popover-chip ${isActive ? 'active' : ''}" onclick="event.stopPropagation(); popoverToggleDest(${lineIndex},${condIndex},'${d}',this)">${d}</span>`;
+            });
+            html += `</div>`;
+        } else if (editType === 'day') {
+            const c = parsed.conditions[condIndex];
+            html += `<div class="bid-popover-title">Jour de depart</div>`;
+            ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(d => {
+                const cls = c.day === d ? 'active' : '';
+                html += `<div class="bid-popover-option ${cls}" onclick="event.stopPropagation(); popoverSetDay(${lineIndex},${condIndex},'${d}')">${d}</div>`;
+            });
         }
+
+        pop.innerHTML = html;
+        document.body.appendChild(pop);
+        activePopover = pop;
+
+        // Position under anchor
+        const rect = anchorEl.getBoundingClientRect();
+        let top = rect.bottom + 6;
+        let left = rect.left;
+        // Keep within viewport
+        const popRect = pop.getBoundingClientRect();
+        if (left + popRect.width > window.innerWidth - 10) left = window.innerWidth - popRect.width - 10;
+        if (left < 10) left = 10;
+        if (top + popRect.height > window.innerHeight - 10) top = rect.top - popRect.height - 6;
+        pop.style.top = top + 'px';
+        pop.style.left = left + 'px';
+
+        setTimeout(() => { document.addEventListener('click', closeLinePopover); }, 10);
+    }
+
+    // Popover action handlers
+    function popoverSetAction(lineIndex, action) {
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
+        const parsed = parseBidLine(text);
+        if (!parsed) return;
+        parsed.action = action;
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        closeLinePopover();
+        applyLineEdit(lineIndex);
+    }
+
+    function popoverSetOp(lineIndex, condIndex, op) {
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
+        const parsed = parseBidLine(text);
+        if (!parsed) return;
+        const c = parsed.conditions[condIndex];
+        // Handle type changes for length operators
+        if (['length_eq','length_gt','length_btw'].includes(c.type)) {
+            if (op === '=') { c.type = 'length_eq'; c.value = c.value || c.min || 3; delete c.min; delete c.max; }
+            else if (op === '>') { c.type = 'length_gt'; c.value = c.value || c.min || 2; delete c.min; delete c.max; }
+            else if (op === 'Between') { c.type = 'length_btw'; c.min = c.value || c.min || 2; c.max = c.max || 5; delete c.value; }
+        } else {
+            c.op = op;
+        }
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        closeLinePopover();
+        applyLineEdit(lineIndex);
+    }
+
+    function popoverSetValue(lineIndex, condIndex, prop, value) {
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
+        const parsed = parseBidLine(text);
+        if (!parsed) return;
+        parsed.conditions[condIndex][prop] = value;
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        applyLineEdit(lineIndex);
+    }
+
+    function popoverSetTime(lineIndex, condIndex, totalMinutes) {
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
+        const parsed = parseBidLine(text);
+        if (!parsed) return;
+        parsed.conditions[condIndex].hours = Math.floor(totalMinutes / 60);
+        parsed.conditions[condIndex].minutes = totalMinutes % 60;
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        applyLineEdit(lineIndex);
+    }
+
+    function popoverSetTimeFromChip(lineIndex, condIndex, h, m) {
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
+        const parsed = parseBidLine(text);
+        if (!parsed) return;
+        parsed.conditions[condIndex].hours = h;
+        parsed.conditions[condIndex].minutes = m;
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        closeLinePopover();
+        applyLineEdit(lineIndex);
+    }
+
+    function popoverToggleDest(lineIndex, condIndex, dest, chipEl) {
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
+        const parsed = parseBidLine(text);
+        if (!parsed) return;
+        const c = parsed.conditions[condIndex];
+        const idx = c.destinations.indexOf(dest);
+        if (idx >= 0) { if (c.destinations.length <= 1) return; c.destinations.splice(idx, 1); chipEl.classList.remove('active'); }
+        else { c.destinations.push(dest); chipEl.classList.add('active'); }
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        applyLineEdit(lineIndex);
+    }
+
+    function popoverSetDay(lineIndex, condIndex, day) {
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
+        const parsed = parseBidLine(text);
+        if (!parsed) return;
+        parsed.conditions[condIndex].day = day;
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        closeLinePopover();
+        applyLineEdit(lineIndex);
+    }
+
+    function editorModifyCondition(lineIndex, condIndex, prop, value) {
+        popoverSetValue(lineIndex, condIndex, prop, value);
+    }
+
+    function editorModifyTime(lineIndex, condIndex, totalMinutes) {
+        popoverSetTime(lineIndex, condIndex, totalMinutes);
     }
 
     function editorToggleDest(lineIndex, condIndex, dest) {
         if (!importedBidBlock) return;
-        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || importedBidBlock.lines[lineIndex].cmd || '';
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || '';
         const parsed = parseBidLine(text);
         if (!parsed || !parsed.editable) return;
         const c = parsed.conditions[condIndex];
         const idx = c.destinations.indexOf(dest);
-        if (idx >= 0) { c.destinations.splice(idx, 1); }
-        else { c.destinations.push(dest); }
-        if (c.destinations.length === 0) return; // don't allow empty
-        const newText = rebuildBidLine(parsed);
-        importedBidBlock.lines[lineIndex] = newText;
-        recalculateMatchIds();
-        renderBidSheet();
-        if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
-            showMatchingPairings('no-scroll');
-        }
+        if (idx >= 0) { c.destinations.splice(idx, 1); } else { c.destinations.push(dest); }
+        if (c.destinations.length === 0) return;
+        importedBidBlock.lines[lineIndex] = rebuildBidLine(parsed);
+        applyLineEdit(lineIndex);
     }
 
     let showAddLineMenu = false;
@@ -4220,33 +4376,8 @@
         renderBidSheet();
     }
 
-    function renderBidEditor() {
-        if (!importedBidBlock) return '';
-        let html = '';
-        html += `<div style="font-size:11px;text-transform:uppercase;color:var(--ac-muted);font-weight:700;margin-bottom:10px;">Editeur de lignes PBS</div>`;
-
-        importedBidBlock.lines.forEach((line, i) => {
-            const text = typeof line === 'string' ? line : line.text || line.cmd || '';
-            html += renderEditorControl(i, text);
-        });
-
-        // Add line button
-        html += `<button class="bid-editor-add" onclick="toggleAddLineMenu()">+ Ajouter une ligne</button>`;
-
-        if (showAddLineMenu) {
-            html += `<div style="margin-top:8px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:8px;padding:8px;">`;
-            BID_LINE_TEMPLATES.forEach(t => {
-                html += `<div style="padding:6px 8px;font-size:12px;color:var(--ac-text);cursor:pointer;border-radius:4px;"
-                    onmouseover="this.style.background='rgba(215,43,31,0.1)'" onmouseout="this.style.background='none'"
-                    onclick="showAddLineMenu=false; editorAddLine('${t.cmd.replace(/'/g, "\\'")}')">${t.label}</div>`;
-            });
-            html += `</div>`;
-        }
-
-        return html;
-    }
-
     function renderBidSheet() {
+        closeLinePopover();
         const area = document.getElementById('bidSheetArea');
         const info = document.getElementById('bidBlockInfo');
 
@@ -4257,16 +4388,7 @@
             const sourceLabel = block.source === 'manual' ? 'Selection manuelle' : 'Strategie Bid';
             info.textContent = `${block.lines.length} ligne(s) | ~${matchCount} pairings correspondent`;
 
-            // Layout: sidebar editor + main bid sheet
-            let html = `<div style="display:flex;gap:16px;align-items:flex-start;">`;
-
-            // LEFT: Editor sidebar
-            html += `<aside class="sidebar" style="position:static;max-height:calc(100vh - 200px);min-width:280px;max-width:320px;flex-shrink:0;">`;
-            html += renderBidEditor();
-            html += `</aside>`;
-
-            // RIGHT: Bid sheet display
-            html += `<div style="flex:1;min-width:0;">`;
+            let html = '';
 
             html += `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(215,43,31,0.1);border:1px solid rgba(215,43,31,0.3);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">`;
             html += `<span style="font-size:13px;color:var(--ac-red);font-weight:600;">&#128203; ${sourceLabel}: ${block.name}</span>`;
@@ -4277,14 +4399,29 @@
             html += `<div class="bid-block-header">Start Pairings</div>`;
             block.lines.forEach((line, idx) => {
                 const lineText = typeof line === 'string' ? line : line.text || line.cmd || '';
-                const highlighted = highlightSyntax(lineText);
-                const commentHtml = (typeof line === 'object' && line.comment) ? `<span class="bid-line-info">${line.comment}</span>` : '';
-                html += `<div class="bid-line-item"><span class="bid-line-num">${idx + 1}.</span><span class="bid-line-text" id="bidEditorCmd${idx}">${highlighted}</span>${commentHtml}</div>`;
+                const clickableTokens = renderClickableLine(idx, lineText);
+                html += `<div class="bid-line-item">`;
+                html += `<span class="bid-line-num">${idx + 1}.</span>`;
+                html += `<span class="bid-line-text" id="bidLineTokens${idx}">${clickableTokens}</span>`;
+                html += `<button class="bid-line-delete" onclick="editorDeleteLine(${idx})" title="Supprimer">&#10005;</button>`;
+                html += `</div>`;
             });
             html += `<div class="bid-embedded">${block.lines.length + 1}. Award Pairings</div>`;
             html += `</div>`;
 
-            html += `<div class="bid-sheet-block">`;
+            // Add line button
+            html += `<button class="bid-editor-add" onclick="toggleAddLineMenu()">+ Ajouter une ligne</button>`;
+            if (showAddLineMenu) {
+                html += `<div style="margin-top:8px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:8px;padding:8px;">`;
+                BID_LINE_TEMPLATES.forEach(t => {
+                    html += `<div style="padding:6px 8px;font-size:12px;color:var(--ac-text);cursor:pointer;border-radius:4px;"
+                        onmouseover="this.style.background='rgba(215,43,31,0.1)'" onmouseout="this.style.background='none'"
+                        onclick="showAddLineMenu=false; editorAddLine('${t.cmd.replace(/'/g, "\\'")}')">${t.label}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `<div class="bid-sheet-block" style="margin-top:12px;">`;
             html += `<div class="bid-block-header" style="opacity:0.5">Start Reserve Bid</div>`;
             html += `<div class="bid-embedded">Start Reserve</div>`;
             html += `</div>`;
@@ -4299,8 +4436,6 @@
                 });
                 html += `</div></div>`;
             }
-
-            html += `</div></div>`; // close right + flex layout
 
             area.innerHTML = html;
             return;
@@ -4398,9 +4533,6 @@
         }
 
         panel.style.display = 'block';
-        if (!arguments[0] || arguments[0] !== 'no-scroll') {
-            panel.scrollIntoView({ behavior: 'smooth' });
-        }
     }
 
     function copyBidSheet() {
@@ -6592,6 +6724,7 @@
     initTheme();
     init();
     loadMonthsManifest();
+    setTimeout(() => { window.scrollTo(0, 0); }, 200);
 
     // Render uploaded history on strategy tab init
     setTimeout(() => { renderUploadedHistory(); }, 100);
