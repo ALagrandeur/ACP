@@ -2184,6 +2184,14 @@
                 </div>
 
                 <div class="filter-section">
+                    <div class="filter-title">Pas de turn (aller-retour meme jour)</div>
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                        <input type="checkbox" id="bidNoTurn" onchange="updateBidConfig()" style="width:18px;height:18px;accent-color:var(--ac-red);">
+                        <span style="font-size:13px;color:var(--ac-muted);">Eviter les pairings de 1 jour</span>
+                    </label>
+                </div>
+
+                <div class="filter-section">
                     <div class="filter-title">Eviter check-in avant</div>
                     <select class="filter-select" id="bidNoEarlyCheckin" onchange="updateBidConfig()">
                         <option value="" selected>Pas de restriction</option>
@@ -3258,6 +3266,7 @@
         // Reset selects to defaults
         document.getElementById('bidMaxLegs').value = '4';
         document.getElementById('bidNoEarlyCheckin').value = '';
+        document.getElementById('bidNoTurn').checked = false;
 
         // Hide matching pairings panel
         document.getElementById('matchingPairingsPanel').style.display = 'none';
@@ -3332,6 +3341,7 @@
         const maxLegs = parseInt(document.getElementById('bidMaxLegs').value);
         const tafbMin = parseInt(document.getElementById('bidTafbMin').value);
         const noEarly = document.getElementById('bidNoEarlyCheckin').value;
+        const noTurn = document.getElementById('bidNoTurn').checked;
 
         // --- 1. PREFER OFF (days off in priority order) ---
         if (bidDaysOff.length > 0) {
@@ -3344,6 +3354,14 @@
         }
 
         // --- 2. AVOID lines (filter out unwanted pairings) ---
+        if (noTurn) {
+            lines.push({
+                text: `Avoid Pairings If Pairing Length = 1 days`,
+                type: 'negative',
+                explain: `Pas de turn (aller-retour meme jour)`
+            });
+        }
+
         if (noEarly) {
             lines.push({
                 text: `Avoid Pairings If Pairing Check-In Time Between 00:01 And ${noEarly}`,
@@ -3497,8 +3515,10 @@
         const maxLegs = parseInt(document.getElementById('bidMaxLegs').value);
         const tafbMin = parseInt(document.getElementById('bidTafbMin').value);
         const noEarly = document.getElementById('bidNoEarlyCheckin').value;
+        const noTurn = document.getElementById('bidNoTurn').checked;
 
         return PAIRINGS_DATA.filter(p => {
+            if (noTurn && p.numDays === 1) return false;
             if (perDiem > 0 && p.allowance < perDiem) return false;
             if (p.numDays < daysMin || p.numDays > daysMax) return false;
             if (tafbMin > 0 && (p.tafbMinutes / 60) < tafbMin) return false;
@@ -4470,7 +4490,9 @@
 
     // --- Evaluate a candidate bid line against actual pairing pool ---
     function evaluateCandidate(cmd, filterFn) {
-        const matching = PAIRINGS_DATA.filter(filterFn);
+        const noTurn = document.getElementById('bidNoTurn')?.checked;
+        const pool = noTurn ? PAIRINGS_DATA.filter(p => p.numDays > 1) : PAIRINGS_DATA;
+        const matching = pool.filter(filterFn);
         const totalCredit = matching.reduce((sum, p) => sum + p.blockMinutes, 0);
         return {
             cmd,
