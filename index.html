@@ -20,6 +20,179 @@
             --radius: 10px;
         }
 
+        /* Theme clair inspire d'Air Canada */
+        [data-theme="light"] {
+            --ac-red: #C41230;
+            --ac-dark: #f5f5f7;
+            --ac-darker: #ffffff;
+            --ac-card: #ffffff;
+            --ac-border: #e0e0e0;
+            --ac-text: #1a1a1a;
+            --ac-muted: #6b6b78;
+            --ac-accent: #C41230;
+            --ac-green: #1e8a4a;
+            --ac-blue: #2563eb;
+            --ac-gold: #b8860b;
+        }
+        [data-theme="light"] body {
+            background: #f5f5f7;
+        }
+        [data-theme="light"] .top-bar {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8fa 100%);
+            border-bottom: 3px solid var(--ac-red);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        [data-theme="light"] .top-bar .logo {
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .tab-btn {
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .tab-btn.active {
+            color: var(--ac-red);
+            border-bottom-color: var(--ac-red);
+        }
+        [data-theme="light"] .pairing-card {
+            background: #ffffff;
+            border: 1px solid #e8e8ec;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        [data-theme="light"] .pairing-card:hover {
+            border-color: var(--ac-red);
+            box-shadow: 0 3px 12px rgba(196,18,48,0.1);
+        }
+        [data-theme="light"] .sidebar {
+            background: #ffffff;
+            border-right: 1px solid #e8e8ec;
+        }
+        [data-theme="light"] .filter-section {
+            border-bottom-color: #eeeeee;
+        }
+        [data-theme="light"] .search-input {
+            background: #ffffff;
+            border: 1px solid #d5d5dd;
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .search-input:focus {
+            border-color: var(--ac-red);
+            box-shadow: 0 0 0 3px rgba(196,18,48,0.1);
+        }
+        [data-theme="light"] .bid-sheet-block {
+            background: #ffffff;
+            border: 1px solid #e8e8ec;
+        }
+        [data-theme="light"] .bid-line-item {
+            border-bottom-color: #f0f0f4;
+        }
+        [data-theme="light"] .bid-line-item:hover {
+            background: #f8f8fc;
+        }
+        [data-theme="light"] .bid-line-text .kw { color: #C41230; }
+        [data-theme="light"] .bid-line-text .val { color: #b8860b; }
+        [data-theme="light"] .bid-line-text .cond { color: #2563eb; }
+        [data-theme="light"] .bid-editor-line {
+            background: #f8f8fc;
+            border: 1px solid #e0e0e6;
+        }
+        [data-theme="light"] .bid-editor-line:hover {
+            border-color: rgba(196,18,48,0.4);
+        }
+        [data-theme="light"] .bid-editor-control input[type="number"],
+        [data-theme="light"] .bid-editor-control input[type="text"],
+        [data-theme="light"] .bid-editor-control select {
+            background: #ffffff;
+            border: 1px solid #d5d5dd;
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .bid-editor-chip {
+            background: #f0f0f4;
+            border: 1px solid #d5d5dd;
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .bid-editor-chip.active {
+            background: rgba(196,18,48,0.1);
+            border-color: var(--ac-red);
+            color: var(--ac-red);
+        }
+        [data-theme="light"] .strat-config,
+        [data-theme="light"] .strat-section {
+            background: #ffffff;
+            border: 1px solid #e8e8ec;
+        }
+        [data-theme="light"] .strat-section-title {
+            background: #f5f5f7;
+            border-bottom: 1px solid #e8e8ec;
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .strat-config input,
+        [data-theme="light"] .strat-config select {
+            background: #ffffff;
+            border: 1px solid #d5d5dd;
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .config-btn-recalc {
+            background: var(--ac-red);
+            color: white;
+        }
+        [data-theme="light"] .filter-select {
+            background: #ffffff;
+            border: 1px solid #d5d5dd;
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .dest-chip {
+            background: #f0f0f4;
+            border: 1px solid #d5d5dd;
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .dest-chip.active {
+            background: rgba(196,18,48,0.1);
+            border-color: var(--ac-red);
+            color: var(--ac-red);
+        }
+        [data-theme="light"] .tag {
+            opacity: 0.9;
+        }
+        [data-theme="light"] .month-dropdown {
+            background: #ffffff;
+            border: 1px solid #e8e8ec;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        [data-theme="light"] .month-option:hover {
+            background: #f5f5f7;
+        }
+        [data-theme="light"] .bid-block-header {
+            background: var(--ac-red);
+            color: white;
+        }
+        [data-theme="light"] .login-screen {
+            background: #f5f5f7;
+        }
+        [data-theme="light"] .login-box {
+            background: #ffffff;
+            border: 1px solid #e0e0e6;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        [data-theme="light"] .login-box input {
+            background: #f8f8fc;
+            border: 1px solid #d5d5dd;
+            color: #1a1a1a;
+        }
+        [data-theme="light"] .btn {
+            border-color: #d5d5dd;
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .btn:hover {
+            background: #f5f5f7;
+        }
+        [data-theme="light"] .theme-toggle {
+            background: #f0f0f4;
+            border: 1px solid #d5d5dd;
+            color: #4a4a5a;
+        }
+        [data-theme="light"] .theme-toggle:hover {
+            background: #e8e8ec;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -376,6 +549,24 @@
             display: flex;
             align-items: center;
             gap: 16px;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--ac-text);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.2);
         }
 
         .stats {
@@ -1832,6 +2023,132 @@
             margin-bottom: 4px;
         }
 
+        /* Bid Editor Sidebar */
+        .bid-editor-line {
+            background: var(--ac-darker);
+            border: 1px solid var(--ac-border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .bid-editor-line:hover {
+            border-color: rgba(215,43,31,0.4);
+        }
+        .bid-editor-label {
+            font-size: 11px;
+            color: var(--ac-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bid-editor-cmd {
+            font-size: 11px;
+            color: var(--ac-text);
+            font-family: 'Consolas', monospace;
+            margin-bottom: 8px;
+            word-break: break-all;
+            opacity: 0.7;
+        }
+        .bid-editor-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bid-editor-control input[type="range"] {
+            flex: 1;
+            accent-color: var(--ac-red);
+        }
+        .bid-editor-control input[type="number"],
+        .bid-editor-control input[type="text"] {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            color: var(--ac-text);
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 13px;
+            width: 80px;
+        }
+        .bid-editor-control select {
+            background: var(--ac-card);
+            border: 1px solid var(--ac-border);
+            color: var(--ac-text);
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 12px;
+            flex: 1;
+        }
+        .bid-editor-delete {
+            background: none;
+            border: none;
+            color: var(--ac-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .bid-editor-delete:hover {
+            color: var(--ac-red);
+            background: rgba(215,43,31,0.15);
+        }
+        .bid-editor-add {
+            width: 100%;
+            padding: 10px;
+            background: rgba(215,43,31,0.08);
+            border: 1px dashed rgba(215,43,31,0.4);
+            color: var(--ac-red);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .bid-editor-add:hover {
+            background: rgba(215,43,31,0.15);
+        }
+        .bid-editor-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .bid-editor-chip {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid var(--ac-border);
+            background: var(--ac-card);
+            color: var(--ac-muted);
+        }
+        .bid-editor-chip.active {
+            background: rgba(215,43,31,0.2);
+            border-color: var(--ac-red);
+            color: var(--ac-red);
+        }
+        .bid-editor-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ac-gold);
+            min-width: 50px;
+            text-align: right;
+        }
+        .bid-editor-system {
+            background: var(--ac-darker);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+        .bid-editor-system .bid-editor-cmd {
+            margin-bottom: 0;
+            font-size: 10px;
+        }
+
         /* Add to bid button on pairing cards */
         .btn-add-bid {
             background: none;
@@ -2001,6 +2318,7 @@
                 <span><strong id="resultCount">0</strong> pairings</span>
                 <span><strong id="totalCount">0</strong> total</span>
             </div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" title="Changer le theme">&#9788;</button>
         </div>
     </header>
 
@@ -2501,6 +2819,25 @@
         const btn = document.getElementById('tabBtnPairings');
         if (btn && PAIRINGS_METADATA && PAIRINGS_METADATA.month) {
             btn.textContent = 'Pairings - ' + PAIRINGS_METADATA.month;
+        }
+    }
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const newTheme = current === 'light' ? 'dark' : 'light';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('ac_theme', newTheme);
+        const btn = document.getElementById('themeToggleBtn');
+        btn.innerHTML = newTheme === 'light' ? '&#9790;' : '&#9788;';
+    }
+
+    function initTheme() {
+        const saved = localStorage.getItem('ac_theme');
+        if (saved === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            const btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.innerHTML = '&#9790;';
         }
     }
 
@@ -3367,6 +3704,461 @@
         document.getElementById('matchingPairingsPanel').style.display = 'none';
     }
 
+    // ============ BID EDITOR ============
+
+    function parseBidLine(text) {
+        if (!text || typeof text !== 'string') return null;
+        const t = text.trim();
+
+        if (/^Set Condition/i.test(t)) return { action: 'set_condition', raw: t, editable: false };
+        if (/^CSSNBG|^ESNBG/i.test(t)) return { action: 'transition', raw: t, editable: false };
+
+        let action = 'award';
+        if (/^Avoid/i.test(t)) action = 'avoid';
+        if (/^Prefer Off/i.test(t)) return { action: 'prefer_off', raw: t, editable: false };
+
+        const conds = [];
+
+        // Allowance Amount
+        const allowM = t.match(/Allowance Amount\s*>\s*\$(\d+)/i);
+        if (allowM) conds.push({ type: 'allowance', op: '>', value: parseInt(allowM[1]) });
+
+        // TAFB
+        const tafbM = t.match(/TAFB\s*>\s*(\d+):(\d+)/i);
+        if (tafbM) conds.push({ type: 'tafb', op: '>', hours: parseInt(tafbM[1]), minutes: parseInt(tafbM[2]) });
+
+        // Pairing Length = N days
+        const lenEqM = t.match(/Pairing Length\s*=\s*(\d+)\s*days/i);
+        if (lenEqM) conds.push({ type: 'length_eq', value: parseInt(lenEqM[1]) });
+
+        // Pairing Length > N days
+        const lenGtM = t.match(/Pairing Length\s*>\s*(\d+)\s*days/i);
+        if (lenGtM && !lenEqM) conds.push({ type: 'length_gt', value: parseInt(lenGtM[1]) });
+
+        // Pairing Length Between N And M
+        const lenBtwM = t.match(/Pairing Length\s+Between\s+(\d+)\s*days?\s+And\s+(\d+)\s*days?/i);
+        if (lenBtwM) conds.push({ type: 'length_btw', min: parseInt(lenBtwM[1]), max: parseInt(lenBtwM[2]) });
+
+        // Check-In Time
+        const ciM = t.match(/Pairing Check-In Time\s*>\s*(\d+):(\d+)/i);
+        if (ciM) conds.push({ type: 'checkin', op: '>', hours: parseInt(ciM[1]), minutes: parseInt(ciM[2]) });
+
+        // Check-Out Time
+        const coM = t.match(/Pairing Check-Out Time\s*<\s*(\d+):(\d+)/i);
+        if (coM) conds.push({ type: 'checkout', op: '<', hours: parseInt(coM[1]), minutes: parseInt(coM[2]) });
+
+        // Average Daily Credit
+        const adcM = t.match(/Average Daily Credit\s*>\s*(\d+):(\d+)/i);
+        if (adcM) conds.push({ type: 'avg_credit', op: '>', hours: parseInt(adcM[1]), minutes: parseInt(adcM[2]) });
+
+        // Pairing Total Credit
+        const ptcM = t.match(/Pairing Total Credit\s*>\s*(\d+):(\d+)/i);
+        if (ptcM) conds.push({ type: 'total_credit', op: '>', hours: parseInt(ptcM[1]), minutes: parseInt(ptcM[2]) });
+
+        // Any Layover In
+        const layM = t.match(/Any Layover In\s+([A-Z, ]+)/i);
+        if (layM) {
+            const dests = layM[1].split(',').map(d => d.trim()).filter(d => d.length > 0);
+            conds.push({ type: 'layover', destinations: dests });
+        }
+
+        // Pairing Number
+        const pnM = t.match(/Pairing Number\s*=\s*(\S+)/i);
+        if (pnM) conds.push({ type: 'pairing_number', value: pnM[1] });
+
+        // Departing On
+        const depM = t.match(/Departing On\s+(\w+)/i);
+        if (depM) conds.push({ type: 'departing_on', day: depM[1] });
+
+        if (conds.length === 0) return { action: action, raw: t, editable: false };
+        return { action, conditions: conds, editable: true };
+    }
+
+    function rebuildBidLine(parsed) {
+        if (!parsed || !parsed.editable) return parsed.raw;
+        const prefix = parsed.action === 'avoid' ? 'Avoid Pairings' : 'Award Pairings';
+        const parts = [];
+        parsed.conditions.forEach(c => {
+            switch(c.type) {
+                case 'allowance': parts.push(`Allowance Amount > $${c.value}`); break;
+                case 'tafb': parts.push(`TAFB > ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}`); break;
+                case 'length_eq': parts.push(`Pairing Length = ${c.value} days`); break;
+                case 'length_gt': parts.push(`Pairing Length > ${c.value} days`); break;
+                case 'length_btw': parts.push(`Pairing Length Between ${c.min} days And ${c.max} days`); break;
+                case 'checkin': parts.push(`Pairing Check-In Time > ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}`); break;
+                case 'checkout': parts.push(`Pairing Check-Out Time < ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}`); break;
+                case 'avg_credit': parts.push(`Average Daily Credit > ${String(c.hours).padStart(3,'0')}:${String(c.minutes).padStart(2,'0')}`); break;
+                case 'total_credit': parts.push(`Pairing Total Credit > ${String(c.hours).padStart(2,'0')}:${String(c.minutes).padStart(2,'0')}`); break;
+                case 'layover': parts.push(`Any Layover In ${c.destinations.join(', ')}`); break;
+                case 'pairing_number': parts.push(`Pairing Number = ${c.value}`); break;
+                case 'departing_on': parts.push(`Departing On ${c.day}`); break;
+            }
+        });
+        return `${prefix} If ${parts.join(' If ')}`;
+    }
+
+    function buildFilterFromParsed(parsed) {
+        if (!parsed || !parsed.editable) return null;
+        return function(p) {
+            for (const c of parsed.conditions) {
+                switch(c.type) {
+                    case 'allowance': if (!(p.allowance > c.value)) return false; break;
+                    case 'tafb': if (!((p.tafbMinutes / 60) > (c.hours + c.minutes/60))) return false; break;
+                    case 'length_eq': if (p.numDays !== c.value) return false; break;
+                    case 'length_gt': if (!(p.numDays > c.value)) return false; break;
+                    case 'length_btw': if (p.numDays < c.min || p.numDays > c.max) return false; break;
+                    case 'checkin': {
+                        if (!p.legs || p.legs.length === 0) return false;
+                        const dt = String(p.legs[0].dep_time).padStart(4,'0');
+                        const limit = String(c.hours).padStart(2,'0') + String(c.minutes).padStart(2,'0');
+                        if (dt <= limit) return false;
+                        break;
+                    }
+                    case 'checkout': {
+                        if (!p.legs || p.legs.length === 0) return false;
+                        const last = p.legs[p.legs.length-1];
+                        const at = String(last.arr_time).padStart(4,'0');
+                        const limit = String(c.hours).padStart(2,'0') + String(c.minutes).padStart(2,'0');
+                        if (at >= limit) return false;
+                        break;
+                    }
+                    case 'avg_credit': {
+                        const days = Math.max(1, p.numDays);
+                        const avgMin = p.blockMinutes / days;
+                        if (!(avgMin > (c.hours*60 + c.minutes))) return false;
+                        break;
+                    }
+                    case 'total_credit': {
+                        if (!(p.blockMinutes > (c.hours*60 + c.minutes))) return false;
+                        break;
+                    }
+                    case 'layover': {
+                        const pDests = p.destinations || [];
+                        if (!c.destinations.some(d => pDests.includes(d))) return false;
+                        break;
+                    }
+                    case 'pairing_number': if (p.id !== c.value) return false; break;
+                    case 'departing_on': {
+                        const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                        if (!p.startDate) return true;
+                        const d = new Date(p.startDate);
+                        if (dayNames[d.getDay()] !== c.day) return false;
+                        break;
+                    }
+                }
+            }
+            return true;
+        };
+    }
+
+    function recalculateMatchIds() {
+        if (!importedBidBlock) return;
+        const noTurn = document.getElementById('bidNoTurn')?.checked;
+        let pool = noTurn ? PAIRINGS_DATA.filter(p => p.numDays > 1) : [...PAIRINGS_DATA];
+
+        // For each award line, get matching pairings; for avoid lines, exclude
+        const awardSets = [];
+        const avoidFilters = [];
+
+        importedBidBlock.lines.forEach(line => {
+            const text = typeof line === 'string' ? line : line.text || line.cmd || '';
+            const parsed = parseBidLine(text);
+            if (!parsed || !parsed.editable) return;
+            const filterFn = buildFilterFromParsed(parsed);
+            if (!filterFn) return;
+
+            if (parsed.action === 'avoid') {
+                avoidFilters.push(filterFn);
+            } else {
+                const ids = new Set();
+                pool.forEach(p => { if (filterFn(p)) ids.add(p.id); });
+                awardSets.push(ids);
+            }
+        });
+
+        // Union of all award matches
+        const allMatch = new Set();
+        awardSets.forEach(s => s.forEach(id => allMatch.add(id)));
+
+        // Remove avoided pairings
+        avoidFilters.forEach(fn => {
+            PAIRINGS_DATA.forEach(p => {
+                if (fn(p)) allMatch.delete(p.id);
+            });
+        });
+
+        importedBidBlock.matchIds = allMatch;
+    }
+
+    function editorUpdateLine(index, newText) {
+        if (!importedBidBlock) return;
+        importedBidBlock.lines[index] = newText;
+        recalculateMatchIds();
+        renderBidSheet();
+        if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
+            showMatchingPairings();
+        }
+    }
+
+    function editorDeleteLine(index) {
+        if (!importedBidBlock) return;
+        importedBidBlock.lines.splice(index, 1);
+        recalculateMatchIds();
+        renderBidSheet();
+        if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
+            showMatchingPairings();
+        }
+    }
+
+    function editorAddLine(cmdText) {
+        if (!importedBidBlock) return;
+        importedBidBlock.lines.push(cmdText);
+        recalculateMatchIds();
+        renderBidSheet();
+    }
+
+    const BID_LINE_TEMPLATES = [
+        { label: 'Allowance > montant', cmd: 'Award Pairings If Allowance Amount > $200' },
+        { label: 'TAFB > heures', cmd: 'Award Pairings If TAFB > 40:00' },
+        { label: 'Duree du pairing', cmd: 'Award Pairings If Pairing Length Between 2 days And 5 days' },
+        { label: 'Duree > N jours', cmd: 'Award Pairings If Pairing Length > 2 days' },
+        { label: 'Check-In apres heure', cmd: 'Award Pairings If Pairing Check-In Time > 12:00' },
+        { label: 'Check-Out avant heure', cmd: 'Award Pairings If Pairing Check-Out Time < 20:00' },
+        { label: 'Credit quotidien moyen', cmd: 'Award Pairings If Average Daily Credit > 005:00' },
+        { label: 'Credit total du pairing', cmd: 'Award Pairings If Pairing Total Credit > 15:00' },
+        { label: 'Layover destination', cmd: 'Award Pairings If Any Layover In NRT, GVA, TLS' },
+        { label: 'Eviter duree = N jours', cmd: 'Avoid Pairings If Pairing Length = 1 days' },
+        { label: 'Eviter allowance < montant', cmd: 'Avoid Pairings If Allowance Amount > $100' },
+    ];
+
+    function renderEditorControl(index, text) {
+        const parsed = parseBidLine(text);
+        if (!parsed) return `<div class="bid-editor-system"><div class="bid-editor-cmd">${text}</div></div>`;
+
+        if (!parsed.editable) {
+            return `<div class="bid-editor-system"><div class="bid-editor-cmd">${text}</div></div>`;
+        }
+
+        let html = `<div class="bid-editor-line">`;
+        const actionLabel = parsed.action === 'avoid' ? 'EVITER' : 'AWARD';
+        const actionColor = parsed.action === 'avoid' ? 'var(--ac-red)' : 'var(--ac-green)';
+        html += `<div class="bid-editor-label"><span style="color:${actionColor}">${actionLabel}</span><button class="bid-editor-delete" onclick="editorDeleteLine(${index})" title="Supprimer">&#10005;</button></div>`;
+
+        parsed.conditions.forEach((c, ci) => {
+            switch(c.type) {
+                case 'allowance':
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">Allocation&gt;</span>
+                        <input type="range" min="0" max="1000" step="25" value="${c.value}"
+                            oninput="this.nextElementSibling.textContent='$'+this.value; editorModifyCondition(${index},${ci},'value',parseInt(this.value))">
+                        <span class="bid-editor-val">$${c.value}</span>
+                    </div>`;
+                    break;
+                case 'tafb':
+                    const tafbTotal = c.hours * 60 + c.minutes;
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">TAFB&gt;</span>
+                        <input type="range" min="0" max="120" step="5" value="${tafbTotal}"
+                            oninput="let h=Math.floor(this.value/60),m=this.value%60; this.nextElementSibling.textContent=h+':'+(m<10?'0':'')+m+'h'; editorModifyTime(${index},${ci},parseInt(this.value))">
+                        <span class="bid-editor-val">${c.hours}:${String(c.minutes).padStart(2,'0')}h</span>
+                    </div>`;
+                    break;
+                case 'length_eq':
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">Duree =</span>
+                        <input type="range" min="1" max="7" step="1" value="${c.value}"
+                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'value',parseInt(this.value))">
+                        <span class="bid-editor-val">${c.value}J</span>
+                    </div>`;
+                    break;
+                case 'length_gt':
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">Duree&gt;</span>
+                        <input type="range" min="1" max="7" step="1" value="${c.value}"
+                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'value',parseInt(this.value))">
+                        <span class="bid-editor-val">${c.value}J</span>
+                    </div>`;
+                    break;
+                case 'length_btw':
+                    html += `<div class="bid-editor-control" style="flex-wrap:wrap;">
+                        <span style="font-size:11px;color:var(--ac-muted);width:100%">Duree entre</span>
+                        <input type="range" min="1" max="7" step="1" value="${c.min}" style="flex:1"
+                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'min',parseInt(this.value))">
+                        <span class="bid-editor-val" style="min-width:30px">${c.min}J</span>
+                        <span style="color:var(--ac-muted);font-size:11px">et</span>
+                        <input type="range" min="1" max="7" step="1" value="${c.max}" style="flex:1"
+                            oninput="this.nextElementSibling.textContent=this.value+'J'; editorModifyCondition(${index},${ci},'max',parseInt(this.value))">
+                        <span class="bid-editor-val" style="min-width:30px">${c.max}J</span>
+                    </div>`;
+                    break;
+                case 'checkin':
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">Check-In&gt;</span>
+                        <select onchange="let p=this.value.split(':'); editorModifyCondition(${index},${ci},'hours',parseInt(p[0])); editorModifyCondition(${index},${ci},'minutes',parseInt(p[1]))">
+                            ${[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].map(h => [0,30].map(m => {
+                                const val = `${h}:${String(m).padStart(2,'0')}`;
+                                const sel = (h===c.hours && m===c.minutes) ? 'selected' : '';
+                                return `<option value="${val}" ${sel}>${val}</option>`;
+                            }).join('')).join('')}
+                        </select>
+                    </div>`;
+                    break;
+                case 'checkout':
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">Check-Out&lt;</span>
+                        <select onchange="let p=this.value.split(':'); editorModifyCondition(${index},${ci},'hours',parseInt(p[0])); editorModifyCondition(${index},${ci},'minutes',parseInt(p[1]))">
+                            ${[14,15,16,17,18,19,20,21,22,23].map(h => [0,30].map(m => {
+                                const val = `${h}:${String(m).padStart(2,'0')}`;
+                                const sel = (h===c.hours && m===c.minutes) ? 'selected' : '';
+                                return `<option value="${val}" ${sel}>${val}</option>`;
+                            }).join('')).join('')}
+                        </select>
+                    </div>`;
+                    break;
+                case 'avg_credit':
+                case 'total_credit': {
+                    const label = c.type === 'avg_credit' ? 'Credit moy/jour' : 'Credit total';
+                    const totalMin = c.hours * 60 + c.minutes;
+                    const maxMin = c.type === 'avg_credit' ? 720 : 1800;
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">${label}&gt;</span>
+                        <input type="range" min="0" max="${maxMin}" step="15" value="${totalMin}"
+                            oninput="let h=Math.floor(this.value/60),m=this.value%60; this.nextElementSibling.textContent=h+':'+(m<10?'0':'')+m; editorModifyTime(${index},${ci},parseInt(this.value))">
+                        <span class="bid-editor-val">${c.hours}:${String(c.minutes).padStart(2,'0')}</span>
+                    </div>`;
+                    break;
+                }
+                case 'layover': {
+                    const allDests = PAIRINGS_METADATA ? PAIRINGS_METADATA.destinations.filter(d => d !== 'YUL') : [];
+                    html += `<div style="margin-top:4px">
+                        <span style="font-size:11px;color:var(--ac-muted)">Layover:</span>
+                        <div class="bid-editor-chips">
+                            ${allDests.slice(0,30).map(d => {
+                                const isActive = c.destinations.includes(d);
+                                return `<span class="bid-editor-chip ${isActive ? 'active' : ''}" onclick="editorToggleDest(${index},${ci},'${d}')">${d}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                    break;
+                }
+                case 'pairing_number':
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">Pairing#</span>
+                        <input type="text" value="${c.value}" style="flex:1"
+                            onchange="editorModifyCondition(${index},${ci},'value',this.value)">
+                    </div>`;
+                    break;
+                case 'departing_on':
+                    html += `<div class="bid-editor-control">
+                        <span style="font-size:11px;color:var(--ac-muted)">Depart:</span>
+                        <select onchange="editorModifyCondition(${index},${ci},'day',this.value)">
+                            ${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d =>
+                                `<option ${d===c.day?'selected':''}>${d}</option>`
+                            ).join('')}
+                        </select>
+                    </div>`;
+                    break;
+            }
+        });
+
+        html += `</div>`;
+        return html;
+    }
+
+    function editorModifyCondition(lineIndex, condIndex, prop, value) {
+        if (!importedBidBlock) return;
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || importedBidBlock.lines[lineIndex].cmd || '';
+        const parsed = parseBidLine(text);
+        if (!parsed || !parsed.editable) return;
+        parsed.conditions[condIndex][prop] = value;
+        const newText = rebuildBidLine(parsed);
+        importedBidBlock.lines[lineIndex] = newText;
+        recalculateMatchIds();
+        // Update info and matching panel without full re-render (to keep slider focus)
+        const info = document.getElementById('bidBlockInfo');
+        const matchCount = importedBidBlock.matchIds ? importedBidBlock.matchIds.size : 0;
+        info.textContent = `${importedBidBlock.lines.length} ligne(s) | ~${matchCount} pairings correspondent`;
+        // Update main area cmd display
+        const cmdEl = document.getElementById('bidEditorCmd' + lineIndex);
+        if (cmdEl) cmdEl.textContent = newText;
+        if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
+            showMatchingPairings();
+        }
+    }
+
+    function editorModifyTime(lineIndex, condIndex, totalMinutes) {
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        if (!importedBidBlock) return;
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || importedBidBlock.lines[lineIndex].cmd || '';
+        const parsed = parseBidLine(text);
+        if (!parsed || !parsed.editable) return;
+        parsed.conditions[condIndex].hours = hours;
+        parsed.conditions[condIndex].minutes = minutes;
+        const newText = rebuildBidLine(parsed);
+        importedBidBlock.lines[lineIndex] = newText;
+        recalculateMatchIds();
+        const info = document.getElementById('bidBlockInfo');
+        const matchCount = importedBidBlock.matchIds ? importedBidBlock.matchIds.size : 0;
+        info.textContent = `${importedBidBlock.lines.length} ligne(s) | ~${matchCount} pairings correspondent`;
+        const cmdEl = document.getElementById('bidEditorCmd' + lineIndex);
+        if (cmdEl) cmdEl.textContent = newText;
+        if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
+            showMatchingPairings();
+        }
+    }
+
+    function editorToggleDest(lineIndex, condIndex, dest) {
+        if (!importedBidBlock) return;
+        const text = typeof importedBidBlock.lines[lineIndex] === 'string' ? importedBidBlock.lines[lineIndex] : importedBidBlock.lines[lineIndex].text || importedBidBlock.lines[lineIndex].cmd || '';
+        const parsed = parseBidLine(text);
+        if (!parsed || !parsed.editable) return;
+        const c = parsed.conditions[condIndex];
+        const idx = c.destinations.indexOf(dest);
+        if (idx >= 0) { c.destinations.splice(idx, 1); }
+        else { c.destinations.push(dest); }
+        if (c.destinations.length === 0) return; // don't allow empty
+        const newText = rebuildBidLine(parsed);
+        importedBidBlock.lines[lineIndex] = newText;
+        recalculateMatchIds();
+        renderBidSheet();
+        if (document.getElementById('matchingPairingsPanel').style.display !== 'none') {
+            showMatchingPairings();
+        }
+    }
+
+    let showAddLineMenu = false;
+    function toggleAddLineMenu() {
+        showAddLineMenu = !showAddLineMenu;
+        renderBidSheet();
+    }
+
+    function renderBidEditor() {
+        if (!importedBidBlock) return '';
+        let html = '';
+        html += `<div style="font-size:11px;text-transform:uppercase;color:var(--ac-muted);font-weight:700;margin-bottom:10px;">Editeur de lignes PBS</div>`;
+
+        importedBidBlock.lines.forEach((line, i) => {
+            const text = typeof line === 'string' ? line : line.text || line.cmd || '';
+            html += renderEditorControl(i, text);
+        });
+
+        // Add line button
+        html += `<button class="bid-editor-add" onclick="toggleAddLineMenu()">+ Ajouter une ligne</button>`;
+
+        if (showAddLineMenu) {
+            html += `<div style="margin-top:8px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:8px;padding:8px;">`;
+            BID_LINE_TEMPLATES.forEach(t => {
+                html += `<div style="padding:6px 8px;font-size:12px;color:var(--ac-text);cursor:pointer;border-radius:4px;"
+                    onmouseover="this.style.background='rgba(215,43,31,0.1)'" onmouseout="this.style.background='none'"
+                    onclick="showAddLineMenu=false; editorAddLine('${t.cmd.replace(/'/g, "\\'")}')">${t.label}</div>`;
+            });
+            html += `</div>`;
+        }
+
+        return html;
+    }
+
     function renderBidSheet() {
         const area = document.getElementById('bidSheetArea');
         const info = document.getElementById('bidBlockInfo');
@@ -3378,7 +4170,18 @@
             const sourceLabel = block.source === 'manual' ? 'Selection manuelle' : 'Strategie Bid';
             info.textContent = `${block.lines.length} ligne(s) | ~${matchCount} pairings correspondent`;
 
-            let html = `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(215,43,31,0.1);border:1px solid rgba(215,43,31,0.3);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">`;
+            // Layout: sidebar editor + main bid sheet
+            let html = `<div style="display:flex;gap:16px;align-items:flex-start;">`;
+
+            // LEFT: Editor sidebar
+            html += `<aside class="sidebar" style="position:static;max-height:calc(100vh - 200px);min-width:280px;max-width:320px;flex-shrink:0;">`;
+            html += renderBidEditor();
+            html += `</aside>`;
+
+            // RIGHT: Bid sheet display
+            html += `<div style="flex:1;min-width:0;">`;
+
+            html += `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(215,43,31,0.1);border:1px solid rgba(215,43,31,0.3);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">`;
             html += `<span style="font-size:13px;color:var(--ac-red);font-weight:600;">&#128203; ${sourceLabel}: ${block.name}</span>`;
             html += `<button onclick="clearImportedBid()" style="padding:6px 12px;background:var(--ac-dark);border:1px solid var(--ac-border);color:var(--ac-muted);border-radius:6px;cursor:pointer;font-size:12px;">Changer la source</button>`;
             html += `</div>`;
@@ -3389,7 +4192,7 @@
                 const lineText = typeof line === 'string' ? line : line.text || line.cmd || '';
                 const highlighted = highlightSyntax(lineText);
                 const commentHtml = (typeof line === 'object' && line.comment) ? `<span class="bid-line-info">${line.comment}</span>` : '';
-                html += `<div class="bid-line-item"><span class="bid-line-num">${idx + 1}.</span><span class="bid-line-text">${highlighted}</span>${commentHtml}</div>`;
+                html += `<div class="bid-line-item"><span class="bid-line-num">${idx + 1}.</span><span class="bid-line-text" id="bidEditorCmd${idx}">${highlighted}</span>${commentHtml}</div>`;
             });
             html += `<div class="bid-embedded">${block.lines.length + 1}. Award Pairings</div>`;
             html += `</div>`;
@@ -3409,6 +4212,8 @@
                 });
                 html += `</div></div>`;
             }
+
+            html += `</div></div>`; // close right + flex layout
 
             area.innerHTML = html;
             return;
@@ -4005,6 +4810,7 @@
     }
 
     function renderStrategyTable() {
+        if (!document.getElementById('stratTableBody')) return;
         const sorted = [...stratData].sort((a, b) => {
             const va = a[stratSortCol], vb = b[stratSortCol];
             if (typeof va === 'string') return stratSortDir * va.localeCompare(vb);
@@ -4043,6 +4849,7 @@
     }
 
     function renderDetailTable() {
+        if (!document.getElementById('stratDetailBody')) return;
         const sorted = [...stratDetailData].sort((a, b) => {
             const va = a[stratDetailSortCol], vb = b[stratDetailSortCol];
             if (typeof va === 'string') return stratDetailSortDir * va.localeCompare(vb);
@@ -5691,6 +6498,7 @@
         }
     }
 
+    initTheme();
     init();
     loadMonthsManifest();
 
