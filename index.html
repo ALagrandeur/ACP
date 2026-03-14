@@ -3087,6 +3087,13 @@
         applyFiltersAndRender();
     }
 
+    function clearBidList() {
+        bidList = [];
+        updateBidBadge();
+        applyFiltersAndRender();
+        renderBidSheet();
+    }
+
     function updateBidBadge() {
         const badge = document.getElementById('bidCount');
         badge.textContent = bidList.length;
@@ -3425,7 +3432,10 @@
         html += `<p style="font-size:12px;color:var(--ac-muted);margin-bottom:16px;">Importer les pairings selectionnes manuellement avec <strong style="color:var(--ac-green)">+ Bid</strong> dans l'onglet Pairings</p>`;
         if (manualCount > 0) {
             html += `<div style="font-size:13px;color:var(--ac-green);margin-bottom:12px;font-weight:600;">${manualCount} pairing(s) selectionne(s)</div>`;
-            html += `<button onclick="importManualSelection()" class="btn btn-primary" style="width:100%;">Importer la selection</button>`;
+            html += `<div style="display:flex;gap:8px;">`;
+            html += `<button onclick="importManualSelection()" class="btn btn-primary" style="flex:1;">Importer la selection</button>`;
+            html += `<button onclick="clearBidList()" class="btn" style="flex:1;border-color:var(--ac-border);color:var(--ac-muted);">Effacer les bid</button>`;
+            html += `</div>`;
         } else {
             html += `<div style="font-size:12px;color:var(--ac-muted);margin-bottom:12px;font-style:italic;">Aucun pairing selectionne</div>`;
             html += `<button onclick="switchTab('pairings')" class="btn" style="width:100%;border-color:var(--ac-border);">Aller aux Pairings</button>`;
