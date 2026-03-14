@@ -2015,9 +2015,9 @@
 
     <!-- TABS -->
     <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('pairings')">Pairings</button>
-        <button class="tab-btn" onclick="switchTab('bid')">Bid Sheet <span class="tab-badge" id="bidCount" style="display:none">0</span></button>
+        <button class="tab-btn active" onclick="switchTab('pairings')" id="tabBtnPairings">Pairings du mois courant</button>
         <button class="tab-btn" onclick="switchTab('strategy')">Strategie Bid</button>
+        <button class="tab-btn" onclick="switchTab('bid')">Bid Sheet <span class="tab-badge" id="bidCount" style="display:none">0</span></button>
         <button class="tab-btn" onclick="switchTab('compare')">Comparaison</button>
         <button class="tab-btn" onclick="switchTab('map')">Carte</button>
     </div>
@@ -2132,92 +2132,13 @@
 
     <!-- TAB: BID SHEET -->
     <div class="tab-content" id="tabBid">
-        <div style="display:flex;flex:1;overflow:hidden;">
-            <!-- BID CONFIG SIDEBAR -->
-            <aside class="sidebar" id="bidSidebar" style="position:static;max-height:calc(100vh - 180px);">
-                <div class="filter-section">
-                    <div class="filter-title">Jours de conge (cliquer en ordre de priorite)</div>
-                    <div class="day-chips" id="bidDaysOff" style="gap:3px"></div>
-                    <button class="btn-reset" onclick="clearDaysOff()" style="margin-top:6px;padding:6px;font-size:11px">Effacer les conges</button>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-title">Per Diem minimum ($)</div>
-                    <div class="range-slider-container">
-                        <label>Allocation min: <span id="bidPerDiemVal">$0</span></label>
-                        <input type="range" id="bidPerDiem" min="0" max="600" value="0" step="10" oninput="updateBidConfig()">
-                    </div>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-title">Duree du pairing (jours)</div>
-                    <div style="display:flex;gap:8px;">
-                        <div style="flex:1">
-                            <label style="font-size:11px;color:var(--ac-muted)">Min: <span id="bidDaysMinVal">1</span>J</label>
-                            <input type="range" id="bidDaysMin" min="1" max="7" value="1" step="1" oninput="updateBidConfig()">
-                        </div>
-                        <div style="flex:1">
-                            <label style="font-size:11px;color:var(--ac-muted)">Max: <span id="bidDaysMaxVal">7</span>J</label>
-                            <input type="range" id="bidDaysMax" min="1" max="7" value="7" step="1" oninput="updateBidConfig()">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-title">Max vols (legs) par duty</div>
-                    <select class="filter-select" id="bidMaxLegs" onchange="updateBidConfig()">
-                        <option value="0">Pas de limite</option>
-                        <option value="1">1 leg max</option>
-                        <option value="2">2 legs max</option>
-                        <option value="3">3 legs max</option>
-                        <option value="4" selected>4 legs max</option>
-                        <option value="5">5 legs max</option>
-                    </select>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-title">TAFB minimum (heures)</div>
-                    <div class="range-slider-container">
-                        <label>Min: <span id="bidTafbMinVal">0h</span></label>
-                        <input type="range" id="bidTafbMin" min="0" max="80" value="0" step="1" oninput="updateBidConfig()">
-                    </div>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-title">Pas de turn (aller-retour meme jour)</div>
-                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                        <input type="checkbox" id="bidNoTurn" checked onchange="updateBidConfig()" style="width:18px;height:18px;accent-color:var(--ac-red);">
-                        <span style="font-size:13px;color:var(--ac-muted);">Eviter les pairings de 1 jour</span>
-                    </label>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-title">Eviter check-in avant</div>
-                    <select class="filter-select" id="bidNoEarlyCheckin" onchange="updateBidConfig()">
-                        <option value="" selected>Pas de restriction</option>
-                        <option value="04:30">04h30</option>
-                        <option value="05:00">05h00</option>
-                        <option value="05:30">05h30</option>
-                        <option value="06:00">06h00</option>
-                        <option value="07:00">07h00</option>
-                    </select>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-title">Suggestions auto</div>
-                    <button class="btn-reset" onclick="autoSuggestFromSelection()" style="background:rgba(215,43,31,0.1);border-color:var(--ac-red);color:var(--ac-red);padding:10px;">
-                        Generer depuis pairings selectionnes
-                    </button>
-                    <p style="font-size:11px;color:var(--ac-muted);margin-top:6px">Analyse les pairings marques <strong style="color:var(--ac-green)">+ Bid</strong> et optimise les criteres.</p>
-                </div>
-            </aside>
-
-            <!-- BID SHEET OUTPUT -->
+        <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+            <!-- BID SHEET MAIN AREA -->
             <main class="results-area" style="flex:1">
                 <div class="bid-toolbar">
                     <button class="btn btn-primary" onclick="copyBidSheet()">Copier le Bid Sheet</button>
                     <button class="btn" onclick="showMatchingPairings()" id="btnShowMatch">Voir les pairings disponibles</button>
-                    <button class="btn" onclick="clearAllBidConfig()" style="color:var(--ac-muted)">Effacer tout</button>
+                    <button class="btn" onclick="clearImportedBid()" style="color:var(--ac-muted)">Effacer tout</button>
                     <span style="flex:1"></span>
                     <span style="color:var(--ac-muted);font-size:12px" id="bidBlockInfo"></span>
                 </div>
@@ -2271,6 +2192,12 @@
                         </select>
                     </div>
                     <button class="config-btn-recalc" onclick="recalculateStrategy()">Recalculer</button>
+                    <div class="config-group" style="display:flex;align-items:center;">
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                            <input type="checkbox" id="bidNoTurn" checked onchange="recalculateStrategy()" style="width:18px;height:18px;accent-color:var(--ac-red);">
+                            <span style="font-size:13px;color:var(--ac-muted);">Pas de turn (eviter pairings de 1 jour)</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="block-config-container" id="blockConfigContainer">
                     <h4>Priorites par bloc</h4>
@@ -2322,49 +2249,6 @@
                 </div>
             </div>
 
-            <!-- 6. Tableaux de vols (BAS) -->
-            <div class="strat-section">
-                <div class="strat-section-title">Analyse par Destination - Score Optimise</div>
-                <div class="strat-section-body">
-                    <table class="strat-table" id="stratTable">
-                        <thead>
-                            <tr>
-                                <th onclick="sortStratTable('dest')">Destination</th>
-                                <th onclick="sortStratTable('count')">Nb Pairings</th>
-                                <th onclick="sortStratTable('avgDays')">Duree Moy.</th>
-                                <th onclick="sortStratTable('avgAllow')">Perdiem Moy.</th>
-                                <th onclick="sortStratTable('maxAllow')">Perdiem Max</th>
-                                <th onclick="sortStratTable('monthlyAllow')">Perdiem/Mois Est.</th>
-                                <th onclick="sortStratTable('seniorRatio')">Competition</th>
-                                <th onclick="sortStratTable('prob')">Probabilite</th>
-                                <th onclick="sortStratTable('score')">Score Optimise</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stratTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="strat-section">
-                <div class="strat-section-title">Detail des Pairings - Tries par Score</div>
-                <div class="strat-section-body">
-                    <table class="strat-table" id="stratDetailTable">
-                        <thead>
-                            <tr>
-                                <th onclick="sortStratDetail('id')">Pairing ID</th>
-                                <th onclick="sortStratDetail('dest')">Destination</th>
-                                <th onclick="sortStratDetail('days')">Jours</th>
-                                <th onclick="sortStratDetail('block')">Block Time</th>
-                                <th onclick="sortStratDetail('allow')">Perdiem ($)</th>
-                                <th onclick="sortStratDetail('perDay')">$/Jour</th>
-                                <th onclick="sortStratDetail('prob')">Probabilite</th>
-                                <th onclick="sortStratDetail('score')">Score</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stratDetailBody"></tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -2613,10 +2497,18 @@
     }
 
     // ============ INIT ============
+    function updatePairingsTabLabel() {
+        const btn = document.getElementById('tabBtnPairings');
+        if (btn && PAIRINGS_METADATA && PAIRINGS_METADATA.month) {
+            btn.textContent = 'Pairings - ' + PAIRINGS_METADATA.month;
+        }
+    }
+
     function init() {
         document.getElementById('totalCount').textContent = PAIRINGS_DATA.length;
         document.getElementById('monthLabel').textContent = PAIRINGS_METADATA.month;
         document.title = 'AC Crew Pairings - ' + PAIRINGS_METADATA.month;
+        updatePairingsTabLabel();
 
         buildDestFilters();
         buildDaysFilter();
@@ -3156,8 +3048,8 @@
         document.querySelectorAll('.tab-btn').forEach((b, i) => {
             b.classList.toggle('active',
                 (i === 0 && tab === 'pairings') ||
-                (i === 1 && tab === 'bid') ||
-                (i === 2 && tab === 'strategy') ||
+                (i === 1 && tab === 'strategy') ||
+                (i === 2 && tab === 'bid') ||
                 (i === 3 && tab === 'compare') ||
                 (i === 4 && tab === 'map')
             );
@@ -3168,8 +3060,7 @@
         document.getElementById('tabCompare').classList.toggle('active', tab === 'compare');
         document.getElementById('tabMap').classList.toggle('active', tab === 'map');
         if (tab === 'bid') {
-            buildBidDaysOff();
-            updateBidConfig();
+            renderBidSheet();
         }
         if (tab === 'strategy') {
             buildStrategyTab();
@@ -3314,12 +3205,6 @@
     }
 
     function updateBidConfig() {
-        // Update labels
-        document.getElementById('bidPerDiemVal').textContent = '$' + document.getElementById('bidPerDiem').value;
-        document.getElementById('bidDaysMinVal').textContent = document.getElementById('bidDaysMin').value;
-        document.getElementById('bidDaysMaxVal').textContent = document.getElementById('bidDaysMax').value;
-        document.getElementById('bidTafbMinVal').textContent = document.getElementById('bidTafbMin').value + 'h';
-
         renderBidSheet();
     }
 
@@ -3439,10 +3324,33 @@
 
     function transferBlockToBidSheet(blockIndex) {
         if (!proposedBidBlocks[blockIndex]) return;
-        importedBidBlock = proposedBidBlocks[blockIndex];
+        const block = proposedBidBlocks[blockIndex];
+        importedBidBlock = { ...block, source: 'strategy' };
         switchTab('bid');
         renderBidSheet();
-        // Auto-show matching pairings
+        showMatchingPairings();
+    }
+
+    function importManualSelection() {
+        if (bidList.length === 0) return;
+        // Build bid lines from manually selected pairings
+        const pairings = bidList.map(b => b.pairingData);
+        const lines = [];
+        const matchIds = new Set(pairings.map(p => p.id));
+
+        // Add Award Pairings If Pairing Number = for each selected pairing
+        pairings.forEach(p => {
+            lines.push(`Award Pairings If Pairing Number = ${p.id}`);
+        });
+
+        importedBidBlock = {
+            name: `${pairings.length} pairing(s) selectionne(s)`,
+            lines: lines,
+            matchIds: matchIds,
+            source: 'manual',
+            pairings: pairings
+        };
+        renderBidSheet();
         showMatchingPairings();
     }
 
@@ -3456,23 +3364,27 @@
         const area = document.getElementById('bidSheetArea');
         const info = document.getElementById('bidBlockInfo');
 
-        // If we have imported lines from strategy tab, render those instead
+        // If we have imported lines (from strategy or manual selection), render those
         if (importedBidBlock) {
             const block = importedBidBlock;
             const matchCount = block.matchIds ? block.matchIds.size : 0;
-            info.textContent = `${block.lines.length} ligne(s) importees | ~${matchCount} pairings correspondent`;
+            const sourceLabel = block.source === 'manual' ? 'Selection manuelle' : 'Strategie Bid';
+            info.textContent = `${block.lines.length} ligne(s) | ~${matchCount} pairings correspondent`;
 
             let html = `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(215,43,31,0.1);border:1px solid rgba(215,43,31,0.3);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">`;
-            html += `<span style="font-size:13px;color:var(--ac-red);font-weight:600;">Importe de: ${block.name}</span>`;
-            html += `<button onclick="clearImportedBid()" style="padding:6px 12px;background:var(--ac-dark);border:1px solid var(--ac-border);color:var(--ac-muted);border-radius:6px;cursor:pointer;font-size:12px;">Retour aux preferences</button>`;
+            html += `<span style="font-size:13px;color:var(--ac-red);font-weight:600;">&#128203; ${sourceLabel}: ${block.name}</span>`;
+            html += `<button onclick="clearImportedBid()" style="padding:6px 12px;background:var(--ac-dark);border:1px solid var(--ac-border);color:var(--ac-muted);border-radius:6px;cursor:pointer;font-size:12px;">Changer la source</button>`;
             html += `</div>`;
 
             html += `<div class="bid-sheet-block">`;
             html += `<div class="bid-block-header">Start Pairings</div>`;
             block.lines.forEach((line, idx) => {
-                const highlighted = highlightSyntax(line);
-                html += `<div class="bid-line-item"><span class="bid-line-num">${idx + 1}.</span><span class="bid-line-text">${highlighted}</span></div>`;
+                const lineText = typeof line === 'string' ? line : line.text || line.cmd || '';
+                const highlighted = highlightSyntax(lineText);
+                const commentHtml = (typeof line === 'object' && line.comment) ? `<span class="bid-line-info">${line.comment}</span>` : '';
+                html += `<div class="bid-line-item"><span class="bid-line-num">${idx + 1}.</span><span class="bid-line-text">${highlighted}</span>${commentHtml}</div>`;
             });
+            html += `<div class="bid-embedded">${block.lines.length + 1}. Award Pairings</div>`;
             html += `</div>`;
 
             html += `<div class="bid-sheet-block">`;
@@ -3480,65 +3392,63 @@
             html += `<div class="bid-embedded">Start Reserve</div>`;
             html += `</div>`;
 
+            // Show reference pairings for manual import
+            if (block.source === 'manual' && block.pairings && block.pairings.length > 0) {
+                html += `<div style="padding:12px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:var(--radius);margin-top:8px">`;
+                html += `<div style="font-size:11px;text-transform:uppercase;color:var(--ac-muted);font-weight:700;margin-bottom:8px">Pairings de reference (${block.pairings.length} selectionnes)</div>`;
+                html += `<div style="display:flex;flex-wrap:wrap;gap:6px">`;
+                block.pairings.forEach(p => {
+                    html += `<span style="background:var(--ac-dark);border-radius:4px;padding:4px 8px;font-size:12px;font-family:Consolas,monospace"><span style="color:var(--ac-red);font-weight:700">${p.id}</span> <span style="color:var(--ac-muted)">${p.destinations.join(',')} ${p.numDays}J $${p.allowance.toFixed(0)}</span></span>`;
+                });
+                html += `</div></div>`;
+            }
+
             area.innerHTML = html;
             return;
         }
 
-        const lines = generateBidLines();
+        // No import - show import selection screen
+        info.textContent = '';
+        const manualCount = bidList.length;
+        const hasStrategy = proposedBidBlocks && proposedBidBlocks.length > 0;
 
-        if (lines.length === 0 && bidDaysOff.length === 0) {
-            area.innerHTML = `
-                <div class="bid-empty">
-                    <h3>Configurez vos preferences</h3>
-                    <p>Utilisez le panneau de gauche pour definir vos criteres.</p>
-                    <p style="margin-top:8px">1. Selectionnez vos <strong>jours de conge</strong> dans le calendrier</p>
-                    <p>2. Ajustez le <strong>per diem minimum</strong>, la <strong>duree</strong>, etc.</p>
-                    <p>3. Ou cliquez <strong style="color:var(--ac-red)">Generer depuis pairings selectionnes</strong></p>
-                </div>`;
-            info.textContent = '';
-            return;
+        let html = `<div class="bid-empty" style="text-align:center;padding:40px 20px;">`;
+        html += `<h3 style="color:white;margin-bottom:8px;">Bid Sheet</h3>`;
+        html += `<p style="color:var(--ac-muted);margin-bottom:24px;">Choisissez la source de vos lignes de bid</p>`;
+
+        html += `<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;max-width:700px;margin:0 auto;">`;
+
+        // Option 1: Manual selection from pairings tab
+        html += `<div style="flex:1;min-width:280px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:12px;padding:24px;text-align:left;">`;
+        html += `<div style="font-size:24px;margin-bottom:8px;">&#9992;</div>`;
+        html += `<h4 style="color:white;margin-bottom:6px;">Selection manuelle</h4>`;
+        html += `<p style="font-size:12px;color:var(--ac-muted);margin-bottom:16px;">Importer les pairings selectionnes manuellement avec <strong style="color:var(--ac-green)">+ Bid</strong> dans l'onglet Pairings</p>`;
+        if (manualCount > 0) {
+            html += `<div style="font-size:13px;color:var(--ac-green);margin-bottom:12px;font-weight:600;">${manualCount} pairing(s) selectionne(s)</div>`;
+            html += `<button onclick="importManualSelection()" class="btn btn-primary" style="width:100%;">Importer la selection</button>`;
+        } else {
+            html += `<div style="font-size:12px;color:var(--ac-muted);margin-bottom:12px;font-style:italic;">Aucun pairing selectionne</div>`;
+            html += `<button onclick="switchTab('pairings')" class="btn" style="width:100%;border-color:var(--ac-border);">Aller aux Pairings</button>`;
         }
-
-        // Count matching pairings with current criteria
-        const matchCount = countMatchingPairings();
-        info.textContent = `${lines.length} ligne(s) de bid | ~${matchCount} pairings correspondent a vos criteres`;
-
-        let html = `<div class="bid-sheet-block">`;
-        html += `<div class="bid-block-header">Start Pairings</div>`;
-
-        let lineNum = 1;
-        lines.forEach((line) => {
-            const highlighted = highlightSyntax(line.text);
-            const typeIcon = line.type === 'negative' ? '&#9940;' : '&#9989;';
-
-            html += `
-            <div class="bid-line-item">
-                <span class="bid-line-num">${lineNum}.</span>
-                <span class="bid-line-text">${highlighted}</span>
-                <span class="bid-line-info">${line.explain}</span>
-            </div>`;
-            lineNum++;
-        });
-
-        html += `<div class="bid-embedded">${lineNum}. Award Pairings</div>`;
         html += `</div>`;
 
-        html += `<div class="bid-sheet-block">`;
-        html += `<div class="bid-block-header" style="opacity:0.5">Start Reserve Bid</div>`;
-        html += `<div class="bid-embedded">Start Reserve</div>`;
-        html += `</div>`;
-
-        // Info block about selected pairings
-        if (bidList.length > 0) {
-            html += `<div style="padding:12px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:var(--radius);margin-top:8px">`;
-            html += `<div style="font-size:11px;text-transform:uppercase;color:var(--ac-muted);font-weight:700;margin-bottom:8px">Pairings de reference (${bidList.length} selectionnes)</div>`;
-            html += `<div style="display:flex;flex-wrap:wrap;gap:6px">`;
-            bidList.forEach(b => {
-                const p = b.pairingData;
-                html += `<span style="background:var(--ac-dark);border-radius:4px;padding:4px 8px;font-size:12px;font-family:Consolas,monospace"><span style="color:var(--ac-red);font-weight:700">${p.id}</span> <span style="color:var(--ac-muted)">${p.destinations.join(',')} ${p.numDays}J $${p.allowance.toFixed(0)}</span></span>`;
+        // Option 2: From strategy algorithm
+        html += `<div style="flex:1;min-width:280px;background:var(--ac-card);border:1px solid var(--ac-border);border-radius:12px;padding:24px;text-align:left;">`;
+        html += `<div style="font-size:24px;margin-bottom:8px;">&#129302;</div>`;
+        html += `<h4 style="color:white;margin-bottom:6px;">Algorithme automatique</h4>`;
+        html += `<p style="font-size:12px;color:var(--ac-muted);margin-bottom:16px;">Importer un bloc genere par l'algorithme dans l'onglet <strong style="color:var(--ac-red)">Strategie Bid</strong></p>`;
+        if (hasStrategy) {
+            proposedBidBlocks.forEach((block, i) => {
+                const blockLabel = i === 0 ? 'Optimiste' : (i === proposedBidBlocks.length - 1 ? 'Filet de securite' : 'Realiste');
+                html += `<button onclick="transferBlockToBidSheet(${i})" class="btn" style="width:100%;margin-bottom:6px;border-color:var(--ac-red);color:var(--ac-red);">Bloc ${i+1} - ${blockLabel}</button>`;
             });
-            html += `</div></div>`;
+        } else {
+            html += `<div style="font-size:12px;color:var(--ac-muted);margin-bottom:12px;font-style:italic;">Aucune strategie generee</div>`;
+            html += `<button onclick="switchTab('strategy')" class="btn" style="width:100%;border-color:var(--ac-border);">Aller a Strategie Bid</button>`;
         }
+        html += `</div>`;
+
+        html += `</div></div>`;
 
         area.innerHTML = html;
     }
@@ -3554,35 +3464,11 @@
     }
 
     function getMatchingPairings() {
-        const perDiem = parseInt(document.getElementById('bidPerDiem').value);
-        const daysMin = parseInt(document.getElementById('bidDaysMin').value);
-        const daysMax = parseInt(document.getElementById('bidDaysMax').value);
-        const maxLegs = parseInt(document.getElementById('bidMaxLegs').value);
-        const tafbMin = parseInt(document.getElementById('bidTafbMin').value);
-        const noEarly = document.getElementById('bidNoEarlyCheckin').value;
-        const noTurn = document.getElementById('bidNoTurn').checked;
-
-        return PAIRINGS_DATA.filter(p => {
-            if (noTurn && p.numDays === 1) return false;
-            if (perDiem > 0 && p.allowance < perDiem) return false;
-            if (p.numDays < daysMin || p.numDays > daysMax) return false;
-            if (tafbMin > 0 && (p.tafbMinutes / 60) < tafbMin) return false;
-            // Duty legs check
-            if (maxLegs > 0) {
-                const nonDhLegs = p.legs.filter(l => !l.deadhead).length;
-                const dutyPeriods = Math.max(1, p.numDays);
-                const avgLegs = nonDhLegs / dutyPeriods;
-                if (avgLegs > maxLegs) return false;
-            }
-            // Check-in time check
-            if (noEarly && p.legs.length > 0) {
-                const firstLeg = p.legs[0];
-                const depTime = String(firstLeg.dep_time).padStart(4, '0');
-                const limitTime = noEarly.replace(':', '');
-                if (depTime < limitTime) return false;
-            }
-            return true;
-        });
+        // Use matchIds from imported block if available
+        if (importedBidBlock && importedBidBlock.matchIds) {
+            return PAIRINGS_DATA.filter(p => importedBidBlock.matchIds.has(p.id));
+        }
+        return [];
     }
 
     function countMatchingPairings() {
@@ -3590,10 +3476,7 @@
     }
 
     function showMatchingPairings() {
-        // If imported from strategy, use matchIds directly
-        const matching = importedBidBlock && importedBidBlock.matchIds
-            ? PAIRINGS_DATA.filter(p => importedBidBlock.matchIds.has(p.id))
-            : getMatchingPairings();
+        const matching = getMatchingPairings();
         const panel = document.getElementById('matchingPairingsPanel');
         const grid = document.getElementById('matchingPairingsGrid');
         const title = document.getElementById('matchingTitle');
@@ -3617,12 +3500,14 @@
     }
 
     function copyBidSheet() {
-        const lines = generateBidLines();
+        if (!importedBidBlock) return;
+        const lines = importedBidBlock.lines;
         if (lines.length === 0) return;
 
         let text = 'Start Pairings\n';
         lines.forEach((line, idx) => {
-            text += `  ${idx + 1}. ${line.text}\n`;
+            const lineText = typeof line === 'string' ? line : line.text || line.cmd || '';
+            text += `  ${idx + 1}. ${lineText}\n`;
         });
         text += `  ${lines.length + 1}. Award Pairings\n`;
         text += 'Start Reserve Bid\n';
