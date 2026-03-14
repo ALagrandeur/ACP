@@ -2266,8 +2266,8 @@
                     <div class="config-group">
                         <label>Transition entre blocs</label>
                         <select id="cfgBlockTransition" onchange="userBlockTransition = this.value;">
-                            <option value="ESNBG" selected>ESNBG - Efface et recommence</option>
-                            <option value="CSSNBG">CSSNBG - Garde le standing</option>
+                            <option value="CSSNBG" selected>CSSNBG - Garde le standing</option>
+                            <option value="ESNBG">ESNBG - Efface et recommence</option>
                         </select>
                     </div>
                     <button class="config-btn-recalc" onclick="recalculateStrategy()">Recalculer</button>
@@ -3622,7 +3622,7 @@
     // --- User configurable state ---
     let userSeniority = { rank: 1502, total: 1673 };
     let userBlockCount = 2;
-    let userBlockTransition = 'ESNBG'; // 'ESNBG' or 'CSSNBG'
+    let userBlockTransition = 'CSSNBG'; // 'CSSNBG' or 'ESNBG'
     let userBlockPriorities = [
         { p1: 'perdiem', p2: 'international' },
         { p1: 'canada', p2: 'daysoff' },
