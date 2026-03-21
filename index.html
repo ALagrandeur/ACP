@@ -1562,6 +1562,7 @@
         .tag-transition { background: rgba(155,89,182,0.15); color: #9b59b6; }
         .tag-forget { background: rgba(230,126,34,0.15); color: #e67e22; font-weight: 700; }
         .tag-reserve { background: rgba(155,89,182,0.15); color: #9b59b6; font-weight: 600; }
+        .tag-safety { background: rgba(241,196,15,0.15); color: #f1c40f; font-weight: 600; }
         .tag-preferoff { background: rgba(52,152,219,0.15); color: #3498db; }
         .tag-inherited { background: rgba(149,165,166,0.15); color: #95a5a6; font-size: 10px; }
         .bid-line.inherited { opacity: 0.6; }
@@ -1859,7 +1860,50 @@
             margin-left: 8px;
             font-weight: 600;
             white-space: nowrap;
+            cursor: pointer;
+            transition: transform 0.1s;
         }
+        .match-badge:hover { transform: scale(1.1); }
+
+        /* Pairing preview popup */
+        .pairing-preview-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .pairing-preview-modal {
+            background: var(--ac-card); border: 1px solid var(--ac-border);
+            border-radius: 12px; width: 90%; max-width: 700px; max-height: 80vh;
+            display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .pairing-preview-header {
+            padding: 16px 20px; border-bottom: 1px solid var(--ac-border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .pairing-preview-header h3 { margin: 0; font-size: 15px; color: var(--ac-text); }
+        .pairing-preview-header .close-btn {
+            background: none; border: 1px solid var(--ac-border); border-radius: 6px;
+            color: var(--ac-muted); cursor: pointer; padding: 4px 12px; font-size: 12px;
+        }
+        .pairing-preview-body {
+            overflow-y: auto; padding: 12px 16px; flex: 1;
+        }
+        .pairing-preview-item {
+            display: grid; grid-template-columns: 90px 1fr 70px 70px 60px;
+            align-items: center; gap: 8px; padding: 8px 10px;
+            border-bottom: 1px solid var(--ac-border); font-size: 12px;
+        }
+        .pairing-preview-item:hover { background: rgba(215,43,31,0.05); }
+        .pairing-preview-item .pp-id { font-family: Consolas, monospace; font-weight: 700; color: var(--ac-red); }
+        .pairing-preview-item .pp-dest { color: var(--ac-text); font-weight: 600; }
+        .pairing-preview-item .pp-stat { color: var(--ac-muted); text-align: right; }
+        .pairing-preview-sort { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+        .pairing-preview-sort button {
+            padding: 4px 10px; font-size: 11px; border-radius: 4px;
+            border: 1px solid var(--ac-border); background: var(--ac-dark);
+            color: var(--ac-muted); cursor: pointer;
+        }
+        .pairing-preview-sort button.active { border-color: var(--ac-red); color: var(--ac-red); }
         .match-badge.good { background: rgba(46,204,113,0.15); color: #2ecc71; }
         .match-badge.medium { background: rgba(241,196,15,0.15); color: #f1c40f; }
         .match-badge.low { background: rgba(231,76,60,0.15); color: #e74c3c; }
@@ -3582,6 +3626,124 @@
         document.getElementById('bidDaysOff').innerHTML = '';
         buildBidDaysOff();
         updateBidConfig();
+    }
+
+    // === PAIRING PREVIEW POPUP (from strategy bid lines) ===
+    let previewSortKey = 'allowance';
+    let previewSortDir = -1;
+
+    function openPairingPreview(blockIdx, lineIdx) {
+        const block = proposedBidBlocks[blockIdx];
+        if (!block || !block.linesData) return;
+        const line = block.linesData[lineIdx];
+        if (!line || !line.matchIds) return;
+
+        const matchingPairings = PAIRINGS_DATA.filter(p => line.matchIds.has(p.id));
+        if (matchingPairings.length === 0) return;
+
+        previewSortKey = 'allowance';
+        previewSortDir = -1;
+        renderPairingPreview(matchingPairings, line.cmd, line.num);
+    }
+
+    function renderPairingPreview(pairings, cmdText, lineNum) {
+        // Sort pairings
+        const sorted = [...pairings].sort((a, b) => {
+            let va, vb;
+            switch (previewSortKey) {
+                case 'allowance': va = a.allowance; vb = b.allowance; break;
+                case 'tafb': va = a.tafbMinutes; vb = b.tafbMinutes; break;
+                case 'credit': va = a.blockMinutes; vb = b.blockMinutes; break;
+                case 'days': va = a.numDays; vb = b.numDays; break;
+                case 'checkin': va = a.legs && a.legs[0] ? parseInt(a.legs[0].depTime) : 0; vb = b.legs && b.legs[0] ? parseInt(b.legs[0].depTime) : 0; break;
+                default: va = a.allowance; vb = b.allowance;
+            }
+            return previewSortDir * (va - vb);
+        });
+
+        // Build overlay
+        let html = `<div class="pairing-preview-overlay" onclick="if(event.target===this)closePairingPreview()">`;
+        html += `<div class="pairing-preview-modal">`;
+
+        // Header
+        html += `<div class="pairing-preview-header">`;
+        html += `<h3>Ligne ${lineNum} — ${pairings.length} pairings</h3>`;
+        html += `<button class="close-btn" onclick="closePairingPreview()">Fermer</button>`;
+        html += `</div>`;
+
+        // Command text
+        html += `<div style="padding:8px 20px;background:rgba(215,43,31,0.05);border-bottom:1px solid var(--ac-border);font-size:12px;font-family:Consolas,monospace;color:var(--ac-muted);">${cmdText}</div>`;
+
+        // Sort buttons
+        html += `<div style="padding:10px 16px 0;">`;
+        html += `<div class="pairing-preview-sort">`;
+        html += `<span style="font-size:11px;color:var(--ac-muted);align-self:center;">Trier:</span>`;
+        const sortOpts = [
+            { key: 'allowance', label: 'Per diem $' },
+            { key: 'tafb', label: 'TAFB' },
+            { key: 'credit', label: 'Credit' },
+            { key: 'days', label: 'Jours' },
+            { key: 'checkin', label: 'Check-in' },
+        ];
+        sortOpts.forEach(s => {
+            const active = previewSortKey === s.key ? ' active' : '';
+            const arrow = previewSortKey === s.key ? (previewSortDir > 0 ? ' ↑' : ' ↓') : '';
+            html += `<button class="${active}" onclick="togglePreviewSort('${s.key}', ${pairings.length}, '${cmdText.replace(/'/g, "\\'")}', ${lineNum})">${s.label}${arrow}</button>`;
+        });
+        html += `</div></div>`;
+
+        // Column headers
+        html += `<div style="padding:0 16px;">`;
+        html += `<div class="pairing-preview-item" style="border-bottom:2px solid var(--ac-border);font-weight:700;color:var(--ac-muted);font-size:11px;text-transform:uppercase;">`;
+        html += `<span>Pairing</span><span>Destinations</span><span class="pp-stat">Per diem</span><span class="pp-stat">TAFB</span><span class="pp-stat">Jours</span>`;
+        html += `</div></div>`;
+
+        // Pairing list
+        html += `<div class="pairing-preview-body">`;
+        sorted.forEach(p => {
+            const dests = p.destinations ? p.destinations.join(', ') : '-';
+            const tafbH = Math.floor(p.tafbMinutes / 60);
+            const tafbM = Math.round(p.tafbMinutes % 60);
+            const checkin = p.legs && p.legs[0] ? p.legs[0].depTime : '';
+            html += `<div class="pairing-preview-item">`;
+            html += `<span class="pp-id">${p.id}</span>`;
+            html += `<span class="pp-dest">${dests}</span>`;
+            html += `<span class="pp-stat">$${p.allowance.toFixed(0)}</span>`;
+            html += `<span class="pp-stat">${tafbH}h${String(tafbM).padStart(2,'0')}</span>`;
+            html += `<span class="pp-stat">${p.numDays}J</span>`;
+            html += `</div>`;
+        });
+        html += `</div>`;
+
+        html += `</div></div>`;
+
+        // Remove existing overlay if any
+        closePairingPreview();
+        const overlay = document.createElement('div');
+        overlay.id = 'pairingPreviewOverlay';
+        overlay.innerHTML = html;
+        document.body.appendChild(overlay);
+    }
+
+    function togglePreviewSort(key, count, cmdText, lineNum) {
+        if (previewSortKey === key) {
+            previewSortDir *= -1;
+        } else {
+            previewSortKey = key;
+            previewSortDir = -1;
+        }
+        // Re-find matching pairings from the block data
+        const block = proposedBidBlocks[0];
+        if (!block || !block.linesData) return;
+        const line = block.linesData.find(l => l.num === lineNum);
+        if (!line || !line.matchIds) return;
+        const matchingPairings = PAIRINGS_DATA.filter(p => line.matchIds.has(p.id));
+        renderPairingPreview(matchingPairings, cmdText, lineNum);
+    }
+
+    function closePairingPreview() {
+        const existing = document.getElementById('pairingPreviewOverlay');
+        if (existing) existing.remove();
     }
 
     function clearDaysOff() {
@@ -5843,6 +6005,34 @@
             cands.push({ cmd: `Award Pairings If Any Layover In ${dest} If Pairing Check-In Time > 12:00`, filter: p => getPairingMainDest(p) === dest && getCheckInHour(p) >= 12, cat: 'dest_single_ci' });
         });
 
+        // ============================================
+        // 7b. DOMESTIC/WEST DESTINATIONS (proven reachable for junior crew)
+        // Based on April results: YVR, LAX, SFO, YYC, GUA produced awards at Bid 21
+        // ============================================
+        const domesticWest = ['LAX', 'SFO', 'YVR', 'YYC', 'GUA', 'YLW', 'YQR'];
+        const availableDomestic = domesticWest.filter(d => PAIRINGS_DATA.some(p => p.destinations && p.destinations.includes(d)));
+        if (availableDomestic.length > 0) {
+            // Full domestic group
+            const domStr = availableDomestic.join(', ');
+            cands.push({ cmd: `Award Pairings If Any Layover In ${domStr}`, filter: p => availableDomestic.some(d => p.destinations && p.destinations.includes(d)), cat: 'dest_domestic' });
+            // Domestic + check-in combos
+            [14, 12].forEach(h => {
+                const hStr = `${String(h).padStart(2, '0')}:00`;
+                cands.push({ cmd: `Award Pairings If Any Layover In ${domStr} If Pairing Check-In Time > ${hStr}`, filter: p => availableDomestic.some(d => p.destinations && p.destinations.includes(d)) && getCheckInHour(p) >= h, cat: 'dest_domestic_ci' });
+            });
+            // Domestic + TAFB
+            const hh = formatTafbHHMM(Math.round(tafbP60));
+            cands.push({ cmd: `Award Pairings If Any Layover In ${domStr} If TAFB > ${hh}`, filter: p => availableDomestic.some(d => p.destinations && p.destinations.includes(d)) && p.tafbMinutes > tafbP60, cat: 'dest_domestic_tafb' });
+            // Subgroups of domestic
+            [3, 4].forEach(n => {
+                const sub = availableDomestic.slice(0, Math.min(n, availableDomestic.length));
+                if (sub.length > 0) {
+                    const subStr = sub.join(', ');
+                    cands.push({ cmd: `Award Pairings If Any Layover In ${subStr}`, filter: p => sub.some(d => p.destinations && p.destinations.includes(d)), cat: 'dest_domestic_sub' });
+                }
+            });
+        }
+
         // Priority-specific destination groups
         [p1Id, p2Id].forEach((pid, idx) => {
             const dests = getDestFilterForPriority(pid);
@@ -6060,18 +6250,32 @@
 
             function computeHistoricalBoost(cmd) {
                 // Boost patterns that ACTUALLY produced awards in April
-                // CheckIn>14:00 + Length>2 was THE winning pattern (4/6 awards)
-                if (/Check-In Time > 14:00/.test(cmd)) return 0.20;
-                if (/Check-In Time > 12:00/.test(cmd) && /Length > [23]/.test(cmd)) return 0.15;
-                // Domestic/western destinations worked (YVR, LAX, SFO)
-                if (destMatch = cmd.match(/Layover In ([A-Z, ]+)/)) {
-                    const dests = destMatch[1].split(',').map(d => d.trim());
-                    const goodDests = ['YVR', 'YYC', 'LAX', 'SFO', 'YLW', 'YQR'];
-                    if (dests.some(d => goodDests.includes(d))) return 0.10;
+                // CheckIn>14:00 + Length>2 was THE winning pattern (4/6 coverage awards)
+                let boost = 0;
+                // STRONG boost: CheckIn>14:00 combos — proven winner
+                if (/Check-In Time > 14:00/.test(cmd) && /Length > [23]/.test(cmd)) {
+                    boost += 0.35; // THE #1 winning pattern from April
+                } else if (/Check-In Time > 14:00/.test(cmd)) {
+                    boost += 0.25; // Still strong even alone
+                } else if (/Check-In Time > 12:00/.test(cmd) && /Length > [23]/.test(cmd)) {
+                    boost += 0.20; // Close variant, good fallback
                 }
-                // Total Credit and TAFB combos are neutral-good
-                if (/Total Credit/.test(cmd) || /TAFB/.test(cmd)) return 0.05;
-                return 0;
+                // Domestic/western destinations — produced 1 award in April (Bid 21)
+                const destMatch2 = cmd.match(/Layover In ([A-Z, ]+)/);
+                if (destMatch2) {
+                    const dests = destMatch2[1].split(',').map(d => d.trim());
+                    const domesticDests = ['YVR', 'YYC', 'LAX', 'SFO', 'YLW', 'YQR', 'GUA', 'YYZ', 'YOW'];
+                    const domesticCount = dests.filter(d => domesticDests.includes(d)).length;
+                    // Boost proportional to how many are domestic/reachable
+                    if (domesticCount > 0 && domesticCount >= dests.length * 0.5) {
+                        boost += 0.20; // Majority domestic = strong boost
+                    } else if (domesticCount > 0) {
+                        boost += 0.10; // Some domestic mixed in
+                    }
+                }
+                // Total Credit and TAFB combos are neutral-good (provide schedule diversity)
+                if (/Total Credit/.test(cmd) || /TAFB/.test(cmd)) boost += 0.05;
+                return boost;
             }
 
             // Score candidates with AGGRESSIVE weights for reach phase + historical adjustments
@@ -6325,10 +6529,9 @@
         const aspirationalLines = selected.filter(s => s.phase === 'reach' || (!s.phase && s.matchCount < 300));
         const secureLines = selected.filter(s => s.phase === 'secure' || (!s.phase && s.matchCount >= 300));
 
-        // Add reach/aspirational lines first (these work WITH Prefer Off)
-        aspirationalLines.forEach(s => {
+        // Helper to create a line object from a selected candidate
+        function makeLineObj(s, tagType, tagLabelText) {
             lineNum++;
-            const isAspirational = s.matchCount < 80;
             const line = {
                 num: lineNum, cmd: s.cmd,
                 matchCount: s.matchCount,
@@ -6337,48 +6540,49 @@
                 canBuildBlock: s.canBuildBlock,
                 priorityPct: Math.round(s.priorityScore * 100),
                 seniorCompPct: Math.round(s.seniorComp * 100),
-                tag: isAspirational ? 'reach' : 'value',
-                tagLabel: isAspirational ? 'Aspirationnel' : 'Optimal',
+                tag: tagType, tagLabel: tagLabelText,
                 comment: `${s.matchCount} pairings | Priorite: ${Math.round(s.priorityScore * 100)}% | Senior: ${Math.round(s.seniorComp * 100)}%`,
                 fromBlock: blockIndex + 1,
             };
             lines.push(line);
             newLines.push(line);
-        });
+            return line;
+        }
 
-        // Insert Forget Line for lower-priority Prefer Off (releases dates for wider lines)
-        if (preferOffLineNums.length > 0 && secureLines.length > 0) {
-            // Forget the first (lower priority) Prefer Off line
+        if (hasPreferOff && preferOffLineNums.length > 0 && secureLines.length > 0) {
+            // === STRATEGY: Forget Line placement optimized from April results ===
+            // April lesson: 8 Prefer Off filtered 91-100% of pairings → Forget must come EARLY
+            // Structure: 2-3 reach → Forget secondaires → 2-3 reach → secure first half → Forget prioritaires → secure second half
+
+            // Phase 1: Add first 2-3 aspirational lines (work WITH all Prefer Off)
+            const earlyReachCount = Math.min(3, aspirationalLines.length);
+            aspirationalLines.slice(0, earlyReachCount).forEach(s => {
+                const isAspirational = s.matchCount < 80;
+                makeLineObj(s, isAspirational ? 'reach' : 'value', isAspirational ? 'Aspirationnel' : 'Optimal');
+            });
+
+            // Phase 2: EARLY Forget of secondary Prefer Off (releases dates for remaining reach+secure)
             lineNum++;
             lines.push({
                 num: lineNum, cmd: `Forget Line ${preferOffLineNums[0]}`,
                 tag: 'forget', tagLabel: 'Forget',
-                comment: `Oublie les conges secondaires - libere plus de pairings pour les lignes suivantes`,
+                comment: `Oublie les conges secondaires RAPIDEMENT - evite le blocage d'Avril (91% filtre)`,
             });
 
-            // If we have 2 Prefer Off groups, forget the high-priority one later
+            // Phase 3: Add remaining aspirational lines (now with fewer date constraints)
+            aspirationalLines.slice(earlyReachCount).forEach(s => {
+                const isAspirational = s.matchCount < 80;
+                makeLineObj(s, isAspirational ? 'reach' : 'value', isAspirational ? 'Aspirationnel' : 'Optimal');
+            });
+
             if (preferOffLineNums.length > 1 && secureLines.length > 2) {
-                // Add half the secure lines first
-                const halfSecure = Math.ceil(secureLines.length / 2);
-                secureLines.slice(0, halfSecure).forEach(s => {
-                    lineNum++;
-                    const line = {
-                        num: lineNum, cmd: s.cmd,
-                        matchCount: s.matchCount,
-                        matchIds: s.matchIds,
-                        creditMinutes: s.totalCreditMin,
-                        canBuildBlock: s.canBuildBlock,
-                        priorityPct: Math.round(s.priorityScore * 100),
-                        seniorCompPct: Math.round(s.seniorComp * 100),
-                        tag: 'secure', tagLabel: 'Securitaire',
-                        comment: `${s.matchCount} pairings | Priorite: ${Math.round(s.priorityScore * 100)}% | Senior: ${Math.round(s.seniorComp * 100)}%`,
-                        fromBlock: blockIndex + 1,
-                    };
-                    lines.push(line);
-                    newLines.push(line);
+                // Phase 4: First third of secure lines (still with high-priority Prefer Off)
+                const thirdSecure = Math.ceil(secureLines.length / 3);
+                secureLines.slice(0, thirdSecure).forEach(s => {
+                    makeLineObj(s, 'secure', 'Securitaire');
                 });
 
-                // Forget the second (high priority) Prefer Off line
+                // Phase 5: Forget high-priority Prefer Off (full freedom for remaining secure lines)
                 lineNum++;
                 lines.push({
                     num: lineNum, cmd: `Forget Line ${preferOffLineNums[1]}`,
@@ -6386,64 +6590,38 @@
                     comment: `Oublie les conges prioritaires - mode survie, maximise les chances d'award`,
                 });
 
-                // Add remaining secure lines
-                secureLines.slice(halfSecure).forEach(s => {
-                    lineNum++;
-                    const line = {
-                        num: lineNum, cmd: s.cmd,
-                        matchCount: s.matchCount,
-                        matchIds: s.matchIds,
-                        creditMinutes: s.totalCreditMin,
-                        canBuildBlock: s.canBuildBlock,
-                        priorityPct: Math.round(s.priorityScore * 100),
-                        seniorCompPct: Math.round(s.seniorComp * 100),
-                        tag: 'secure', tagLabel: 'Securitaire',
-                        comment: `${s.matchCount} pairings | Priorite: ${Math.round(s.priorityScore * 100)}% | Senior: ${Math.round(s.seniorComp * 100)}%`,
-                        fromBlock: blockIndex + 1,
-                    };
-                    lines.push(line);
-                    newLines.push(line);
+                // Phase 6: Remaining secure lines (no date constraints = maximum coverage)
+                secureLines.slice(thirdSecure).forEach(s => {
+                    makeLineObj(s, 'secure', 'Securitaire');
                 });
             } else {
                 // Single Prefer Off group: add all secure lines after the Forget
                 secureLines.forEach(s => {
-                    lineNum++;
-                    const line = {
-                        num: lineNum, cmd: s.cmd,
-                        matchCount: s.matchCount,
-                        matchIds: s.matchIds,
-                        creditMinutes: s.totalCreditMin,
-                        canBuildBlock: s.canBuildBlock,
-                        priorityPct: Math.round(s.priorityScore * 100),
-                        seniorCompPct: Math.round(s.seniorComp * 100),
-                        tag: 'secure', tagLabel: 'Securitaire',
-                        comment: `${s.matchCount} pairings | Priorite: ${Math.round(s.priorityScore * 100)}% | Senior: ${Math.round(s.seniorComp * 100)}%`,
-                        fromBlock: blockIndex + 1,
-                    };
-                    lines.push(line);
-                    newLines.push(line);
+                    makeLineObj(s, 'secure', 'Securitaire');
                 });
             }
         } else {
-            // No Prefer Off or no secure lines: add all secure lines normally
+            // No Prefer Off: add all lines normally
+            aspirationalLines.forEach(s => {
+                const isAspirational = s.matchCount < 80;
+                makeLineObj(s, isAspirational ? 'reach' : 'value', isAspirational ? 'Aspirationnel' : 'Optimal');
+            });
             secureLines.forEach(s => {
-                lineNum++;
-                const line = {
-                    num: lineNum, cmd: s.cmd,
-                    matchCount: s.matchCount,
-                    matchIds: s.matchIds,
-                    creditMinutes: s.totalCreditMin,
-                    canBuildBlock: s.canBuildBlock,
-                    priorityPct: Math.round(s.priorityScore * 100),
-                    seniorCompPct: Math.round(s.seniorComp * 100),
-                    tag: 'secure', tagLabel: 'Securitaire',
-                    comment: `${s.matchCount} pairings | Priorite: ${Math.round(s.priorityScore * 100)}% | Senior: ${Math.round(s.seniorComp * 100)}%`,
-                    fromBlock: blockIndex + 1,
-                };
-                lines.push(line);
-                newLines.push(line);
+                makeLineObj(s, 'secure', 'Securitaire');
             });
         }
+
+        // Add ultra-wide safety net before Award Reserve
+        // Lesson from April: even lines with 3800+ pairings gave 0 direct awards
+        // Need a final catch-all that accepts ANY multi-day pairing
+        lineNum++;
+        lines.push({
+            num: lineNum, cmd: 'Award Pairings If Pairing Length > 1 days',
+            matchCount: PAIRINGS_DATA.filter(p => p.numDays > 1).length,
+            canBuildBlock: true,
+            tag: 'safety', tagLabel: 'Filet max',
+            comment: `Accepte tout pairing multi-jour - derniere chance avant reserve`,
+        });
 
         // End with Award Reserve instead of Award Pairings
         // This tells PBS to assign reserve days if no pairings can be awarded
@@ -6534,10 +6712,11 @@
             // Collect all matchIds for this block
             const blockAllMatchIds = new Set();
             lines.forEach(l => { if (l.matchIds) l.matchIds.forEach(id => blockAllMatchIds.add(id)); });
-            proposedBidBlocks.push({ name: blockName, lines: blockCmds, matchIds: blockAllMatchIds });
+            const blockIdx = proposedBidBlocks.length;
+            proposedBidBlocks.push({ name: blockName, lines: blockCmds, matchIds: blockAllMatchIds, linesData: lines });
 
             // Calculate block-level stats
-            const awardLines = lines.filter(l => l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings' && l.cmd !== 'Award Reserve' && !l.cmd.startsWith('Forget Line') && !l.cmd.startsWith('Prefer Off'));
+            const awardLines = lines.filter(l => l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings' && l.cmd !== 'Award Reserve' && l.cmd !== 'Award Pairings If Pairing Length > 1 days' && !l.cmd.startsWith('Forget Line') && !l.cmd.startsWith('Prefer Off'));
             const avgMatch = awardLines.length > 0 ? Math.round(awardLines.reduce((s, l) => s + l.matchCount, 0) / awardLines.length) : 0;
             const allCanBuild = awardLines.every(l => l.canBuildBlock !== false);
             // Risk level adjusted by block profile
@@ -6574,12 +6753,13 @@
                 if (l.tag) {
                     tagHtml = `<span class="bid-tag tag-${l.tag}">${l.tagLabel}</span>`;
                 }
-                // Match count badge
+                // Match count badge (clickable to preview pairings)
                 let matchHtml = '';
                 if (l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'CSSNBG' && l.cmd !== 'ESNBG') {
                     const mc = l.matchCount;
                     const cls = mc >= 200 ? 'good' : (mc >= 50 ? 'medium' : 'low');
-                    matchHtml = `<span class="match-badge ${cls}">${mc} pairings</span>`;
+                    const lineIdx = lines.indexOf(l);
+                    matchHtml = `<span class="match-badge ${cls}" onclick="openPairingPreview(${blockIdx}, ${lineIdx})" title="Cliquer pour voir les pairings">${mc} pairings</span>`;
                 }
                 html += `<div class="bid-line${l.inherited ? ' inherited' : ''}">
                     <span class="bid-num">${l.num}.</span>
