@@ -1561,6 +1561,7 @@
         .tag-reach { background: rgba(231,76,60,0.15); color: #e74c3c; }
         .tag-transition { background: rgba(155,89,182,0.15); color: #9b59b6; }
         .tag-forget { background: rgba(230,126,34,0.15); color: #e67e22; font-weight: 700; }
+        .tag-reserve { background: rgba(155,89,182,0.15); color: #9b59b6; font-weight: 600; }
         .tag-preferoff { background: rgba(52,152,219,0.15); color: #3498db; }
         .tag-inherited { background: rgba(149,165,166,0.15); color: #95a5a6; font-size: 10px; }
         .bid-line.inherited { opacity: 0.6; }
@@ -2619,6 +2620,15 @@
                         <!-- Generated dynamically -->
                     </div>
                 </div>
+                <div class="block-config-container">
+                    <h4>Jours de conge (Prefer Off)</h4>
+                    <p style="font-size:12px;color:var(--ac-muted);margin-bottom:8px;">Cliquez sur les jours ou vous voulez etre en conge. L'ordre de clic = priorite (1er clic = plus important). Les Forget Lines seront generes automatiquement.</p>
+                    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+                        <button onclick="selectWeekends()" class="btn" style="font-size:12px;padding:6px 12px;border-color:var(--ac-red);color:var(--ac-red);">Weekends OFF</button>
+                        <button onclick="clearDaysOff(); recalculateStrategy();" class="btn" style="font-size:12px;padding:6px 12px;border-color:var(--ac-border);color:var(--ac-muted);">Effacer</button>
+                    </div>
+                    <div id="bidDaysOff" style="display:grid;grid-template-columns:repeat(7,30px);gap:4px;"></div>
+                </div>
                 <div class="upload-section">
                     <h4>Historique des resultats PBS</h4>
                     <div class="upload-row">
@@ -3497,6 +3507,7 @@
         }
         if (tab === 'strategy') {
             buildStrategyTab();
+            buildBidDaysOff();
         }
         if (tab === 'compare') {
             buildCompareTab();
@@ -3578,6 +3589,29 @@
         document.getElementById('bidDaysOff').innerHTML = '';
         buildBidDaysOff();
         updateBidConfig();
+    }
+
+    function selectWeekends() {
+        const mc = PAIRINGS_METADATA.monthCode.split('-');
+        const year = parseInt(mc[0]);
+        const month = parseInt(mc[1]);
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        // Clear existing selection
+        bidDaysOff = [];
+
+        // Add all Saturdays and Sundays (Saturday=6, Sunday=0)
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dow = new Date(year, month - 1, d).getDay();
+            if (dow === 0 || dow === 6) {
+                bidDaysOff.push(d);
+            }
+        }
+
+        // Rebuild calendar and recalculate
+        document.getElementById('bidDaysOff').innerHTML = '';
+        buildBidDaysOff();
+        recalculateStrategy();
     }
 
     function clearAllBidConfig() {
@@ -3809,6 +3843,7 @@
         if (/^Set Condition/i.test(t)) return { action: 'set_condition', raw: t, editable: false };
         if (/^CSSNBG|^ESNBG/i.test(t)) return { action: 'transition', raw: t, editable: false };
         if (/^Forget Line/i.test(t)) return { action: 'forget', raw: t, editable: false };
+        if (/^Award Reserve/i.test(t)) return { action: 'reserve', raw: t, editable: false };
 
         let action = 'award';
         if (/^Avoid/i.test(t)) action = 'avoid';
@@ -4405,7 +4440,7 @@
                 html += `<button class="bid-line-delete" onclick="editorDeleteLine(${idx})" title="Supprimer">&#10005;</button>`;
                 html += `</div>`;
             });
-            html += `<div class="bid-embedded">${block.lines.length + 1}. Award Pairings</div>`;
+            // Award Reserve is already in the block lines from the strategy algorithm
             html += `</div>`;
 
             // Add line button
@@ -4491,7 +4526,7 @@
 
     function highlightSyntax(text) {
         return text
-            .replace(/(Award Pairings|Avoid Pairings|Prefer Off|Forget Line)/g, '<span class="kw">$1</span>')
+            .replace(/(Award Pairings|Award Reserve|Avoid Pairings|Prefer Off|Forget Line)/g, '<span class="kw">$1</span>')
             .replace(/\b(If )/g, '<span class="cond">$1</span>')
             .replace(/(Pairing Check-In Time|Pairing Length|Duty Legs|Allowance Amount|TAFB|Departing On|Pairing Number|Pairing Credit)/g, '<span class="cond">$1</span>')
             .replace(/(Between|And|Not)\b/g, '<span class="cond">$1</span>')
@@ -5230,7 +5265,7 @@
     function colorizeBidCmd(cmd) {
         return cmd
             .replace(/(Forget Line \d+)/g, '<span class="kw">$1</span>')
-            .replace(/(Award Pairings|Avoid Pairings|Prefer Off|Set Condition|CSSNBG|ESNBG)/g, '<span class="kw">$1</span>')
+            .replace(/(Award Pairings|Award Reserve|Avoid Pairings|Prefer Off|Set Condition|CSSNBG|ESNBG)/g, '<span class="kw">$1</span>')
             .replace(/(If Allowance Amount|If Pairing Length|If Pairing Check-In Time|If Pairing Check-Out Time|If Average Daily Credit|If Pairing Total Credit|If Any Layover In|If Any Duty Legs|If Departing On|If TAFB|And Of Duration)/g, '<span class="cond">$1</span>')
             .replace(/(\$\d+|\d+:\d+|> \d+|< \d+|= \d+|Between \d+|Minimum \d+)/g, '<span class="val">$1</span>')
             .replace(/\b([A-Z]{3}(?:,\s*[A-Z]{3})*)\b/g, (match) => {
@@ -6410,12 +6445,14 @@
             });
         }
 
+        // End with Award Reserve instead of Award Pairings
+        // This tells PBS to assign reserve days if no pairings can be awarded
         lineNum++;
         lines.push({
-            num: lineNum, cmd: 'Award Pairings',
+            num: lineNum, cmd: 'Award Reserve',
             matchCount: PAIRINGS_DATA.length, canBuildBlock: true,
-            tag: '', tagLabel: '',
-            comment: `Filet de securite - ${PAIRINGS_DATA.length} pairings`,
+            tag: 'reserve', tagLabel: 'Reserve',
+            comment: `Demande le bloc de reserve plutot que des pairings imposes`,
         });
 
         // Add block transition command (not on last block)
@@ -6500,7 +6537,7 @@
             proposedBidBlocks.push({ name: blockName, lines: blockCmds, matchIds: blockAllMatchIds });
 
             // Calculate block-level stats
-            const awardLines = lines.filter(l => l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings' && !l.cmd.startsWith('Forget Line') && !l.cmd.startsWith('Prefer Off'));
+            const awardLines = lines.filter(l => l.matchCount !== undefined && l.cmd !== 'Set Condition Minimum Credit' && l.cmd !== 'Award Pairings' && l.cmd !== 'Award Reserve' && !l.cmd.startsWith('Forget Line') && !l.cmd.startsWith('Prefer Off'));
             const avgMatch = awardLines.length > 0 ? Math.round(awardLines.reduce((s, l) => s + l.matchCount, 0) / awardLines.length) : 0;
             const allCanBuild = awardLines.every(l => l.canBuildBlock !== false);
             // Risk level adjusted by block profile
